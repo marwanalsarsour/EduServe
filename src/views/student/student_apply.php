@@ -5,7 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تقديم طلب</title>
+<<<<<<< HEAD:src/views/student/apply.php
     <link rel="icon" type="image/png" href="/public/images/logo.png">
+=======
+    <link rel="icon" type="image/png" href="/images/logo.png">
+>>>>>>> de0294ff6a3300d692b89c2c37d2612c5ae2aa28:src/views/student/student_apply.php
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>

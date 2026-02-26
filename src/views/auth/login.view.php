@@ -29,24 +29,39 @@
             <div class="card-body p-3 p-md-4">
 
               <h3 class="text-center fw-bold mb-3">تسجيل الدخول</h3>
-              <!-- حدد ال action ضرووووري يحج اوك؟ -->
-              <form action="" id="loginForm">
-                <div class="mb-3">
-                  <input type="email" id="email" name="email" class="form-control" placeholder="ادخل بريدك الالكتروني"
-                    required>
-                </div>
-                <div class="mb-3">
-                  <div class="input-group">
-                    <input type="password" id="password" name="password" class="form-control"
-                      placeholder="ادخل كلمة المرور" required>
-                    <button class="btn btn-inline-light btn-outline-light" type="button" id="togglePassword">
-                      <i class="bi bi-eye-slash"></i>
-                    </button>
+
+              <?php if (isset($_GET['error'])): ?>
+                  <div class="alert alert-danger py-2 small text-center" role="alert">
+                      <?php 
+                          if ($_GET['error'] == 'wrong_credentials') echo "البريد أو كلمة المرور غير صحيحة";
+                          elseif ($_GET['error'] == 'empty_fields') echo "يرجى ملء جميع الحقول";
+                          else echo "حدث خطأ ما، حاول مجدداً";
+                      ?>
                   </div>
-                </div>
-                <button type="submit" id="loginBtn" class="btn btn-primary w-100">دخول</button>
-                <div id="loginMsg" class="alert d-none mt-3" role="alert"></div>
-              </form>
+              <?php endif; ?>
+    
+              <form action="/login_process" method ="POST" id="loginForm">
+    <div class="mb-3">
+        <input type="email" id="email" name="email" class="form-control" placeholder="ادخل بريدك الالكتروني" required>
+    </div>
+    <div class="mb-3">
+        <div class="input-group">
+            <input type="password" id="password" name="password" class="form-control" placeholder="ادخل كلمة المرور" required>
+            <button class="btn btn-inline-light btn-outline-light" type="button" id="togglePassword">
+                <i class="bi bi-eye-slash"></i>
+            </button>
+        </div>
+    </div>
+    
+    <button type="submit" id="loginBtn" class="btn btn-primary w-100 mb-2">دخول</button>
+    
+   <div class="text-center pt-3 border-top">
+        <span class="text-muted small">ليس لديك حساب؟</span>
+        <a href="/register" class="text-primary fw-bold text-decoration-none small ms-1">إنشاء حساب جديد</a>
+    </div>
+
+    <div id="loginMsg" class="alert d-none mt-3" role="alert"></div>
+</form>
             </div>
           </div>
         </div>

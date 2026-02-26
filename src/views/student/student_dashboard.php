@@ -1,3 +1,7 @@
+<?php 
+require_once VIEW_PATH . '/layout/header.php'; 
+?>
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -5,81 +9,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة التحكم</title>
+<<<<<<< HEAD:src/views/student/dashboard.php
     <link rel="icon" type="image/png" href="/public/images/logo.png">
+=======
+    <link rel="icon" type="image/png" href="/images/logo.png">
+>>>>>>> de0294ff6a3300d692b89c2c37d2612c5ae2aa28:src/views/student/student_dashboard.php
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 
 <body class="d-flex flex-column min-vh-100">
 
-  <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
-        <div class="container-fluid">
-            <div class="p-1 me-3 m-1 ms-4">
-                <img src="/assets/img/LogoNav.png" alt="LogoNav">
-            </div>
-            <span class="navbar-brand text-white mb-0 h1">EduServe</span>
-            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
-                aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar"
-                aria-labelledby="offcanvasNavbarLabel">
-                <div class="offcanvas-header">
-                    <h5 class="offcanvas-title" id="offcanvasNavbarLabel">EduServe</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                </div>
-                <div class="offcanvas-body bg-primary">
-                    <ul class="navbar-nav justify-content-end flex-grow-1 pe-3 fw-bold me-5 gap-3">
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="/View/Student/dashboard.html">لوحة التحكم</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page"
-                                href="/View/Student/opportunities.html">الفرص</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="/View/Student/my-application.html">طلباتي</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="/View/Student/attendance.html">الحضور</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link pe-3" aria-current="page" href="/View/Student/reports.html">التقارير</a>
-                        </li>
-                        <div class="dropdown">
-                            <a class="btn btn-outline-light dropdown-toggle" href="#" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-person-circle me-1"></i> <span id="studentName">الطالب</span>
-                            </a>
 
-                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
-                                <li>
-                                    <a class="dropdown-item" href="/student/profile.html">
-                                        <i class="bi bi-person me-2"></i> الملف الشخصي
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="/student/settings.html">
-                                        <i class="bi bi-gear me-2"></i> الإعدادات
-                                    </a>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li>
-                                    <a class="dropdown-item text-danger" href="/auth/login.html">
-                                        <i class="bi bi-box-arrow-right me-2"></i> تسجيل الخروج
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-
-
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
     <main class="flex-grow-1">
         <div class="container my-4">
 
