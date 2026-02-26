@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الفرص المتاحة</title>
-    <link rel="icon" type="image/png" href="../../assets/img/logo.png">
+    <link rel="icon" type="image/png" href="/public/images/logo.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
@@ -153,7 +153,7 @@
                             دعم الفعاليات المجتمعية والمساعدة في تنظيم الأنشطة الطلابية التطوعية.
                         </p>
 
-                        <a href="opportunity-details.html?id=102" class="btn btn-outline-success btn-sm mt-auto">
+                        <a  href="opportunity-details.html?id=102" class="btn btn-outline-success btn-sm mt-auto">
                             عرض التفاصيل
                         </a>
                     </div>
