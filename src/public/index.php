@@ -55,5 +55,9 @@ $router->add('GET','/student_opportunity-details', function(){
 $router->add('GET','/student_report-submit', function(){
     require_once VIEW_PATH . '/student/student_report-submit.php';
 });
-
+$router->add('POST', '/login_process', function() {
+    require_once APP_PATH . '/Controllers/AuthController.php';
+    $auth = new AuthController();
+    $auth->login();
+});
 $router->run();

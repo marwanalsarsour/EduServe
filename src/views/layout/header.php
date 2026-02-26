@@ -1,3 +1,15 @@
+<?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['is_logged_in']) || $_SESSION['is_logged_in'] !== true) {
+    
+    header('Location: /login');
+    exit();
+}
+?>
 <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
         <div class="container-fluid">
             <div class="p-1 me-3 m-1 ms-4">

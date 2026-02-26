@@ -1,3 +1,6 @@
+<?php 
+require_once VIEW_PATH . '/layout/header.php'; 
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -11,9 +14,7 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-<?php 
-require_once VIEW_PATH . '/layout/header.php'; 
-?>
+
 
     <div class="container my-4 flex-fill">
 
