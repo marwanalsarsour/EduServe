@@ -40,12 +40,10 @@ body {
 
 #email {
   direction: rtl;
-
   text-align: right;
 }
 
 #email:focus:not(:placeholder-shown) {
   direction: ltr;
-
   text-align: left;
 }
