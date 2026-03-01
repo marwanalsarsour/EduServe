@@ -10,7 +10,7 @@ class User {
 
 
     public function findByEmail($email) {
-        $query = "SELECT * FROM users WHERE email = :email LIMIT 1";
+        $query = "SELECT * FROM Users WHERE email = :email LIMIT 1";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':email', $email);
         $stmt->execute();
