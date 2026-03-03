@@ -13,7 +13,7 @@ if (!isset($_SESSION['is_logged_in']) || $_SESSION['is_logged_in'] !== true) {
 <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
         <div class="container-fluid">
             <div class="p-1 me-3 m-1 ms-4">
-                <img src="/images/LogoNav.png" alt="LogoNav">
+                <img src="/public/images/LogoNav.png" alt="LogoNav">
             </div>
             <span class="navbar-brand text-white mb-0 h1">EduServe</span>
             <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
