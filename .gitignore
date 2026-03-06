@@ -1,0 +1,6 @@
+.env
+
+src/public/uploads/reports/*
+src/public/uploads/cv/*
+
+!.gitkeep

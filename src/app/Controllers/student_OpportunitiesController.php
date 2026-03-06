@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../Core/Database.php';
 
-class OpportunitiesController {
+class student_OpportunitiesController {
     
     public function index() {
         $db = (new Database())->getConnection();

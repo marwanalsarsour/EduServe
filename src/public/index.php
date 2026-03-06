@@ -13,7 +13,6 @@ require_once APP_PATH . '/Core/Router.php';
 $router = new Router();
 
 
-
 $router->add('GET', '/', function() {
     require_once VIEW_PATH . '/auth/login.view.php';
 });
@@ -22,44 +21,51 @@ $router->add('GET', '/login', function() {
     require_once VIEW_PATH . '/auth/login.view.php';
 });
 
+$router->add('POST', '/login_process', function() {
+    require_once APP_PATH . '/Controllers/AuthController.php';
+    (new AuthController())->login();
+});
+
 
 $router->add('GET', '/student_dashboard', function() {
     require_once APP_PATH . '/Controllers/StudentDashboardController.php';
-    $controller = new StudentDashboardController();
-    $controller->index();
+    (new StudentDashboardController())->index();
 });
 
 
 $router->add('GET', '/student_attendance', function() {
-    require_once APP_PATH . '/Controllers/AttendanceController.php';
-    $controller = new AttendanceController();
-    $controller->index();
+    require_once APP_PATH . '/Controllers/student_AttendanceController.php';
+    (new student_AttendanceController())->index();
 });
 
 
 $router->add('GET', '/student_opportunities', function() {
-    require_once APP_PATH . '/Controllers/OpportunitiesController.php';
-    $controller = new OpportunitiesController();
-    $controller->index();
-});
-
-$router->add('GET', '/student_reports', function() {
-    require_once VIEW_PATH . '/student/student_reports.php';
-});
-
-
-$router->add('GET', '/student_apply', function() {
-    require_once VIEW_PATH . '/student/student_apply.php';
+    require_once APP_PATH . '/Controllers/student_OpportunitiesController.php';
+    (new student_OpportunitiesController())->index();
 });
 
 
 $router->add('GET','/student_my-application', function(){
-    require_once VIEW_PATH . '/student/student_my-application.php';
+    require_once APP_PATH . '/Controllers/student_MyApplicationsController.php';
+    (new student_MyApplicationsController())->index();
+});
+
+
+$router->add('GET', '/student_apply', function() {
+    require_once APP_PATH . '/Controllers/student_ApplyController.php';
+    (new student_ApplyController())->index();
 });
 
 
 $router->add('GET','/student_opportunity-details', function(){
-    require_once VIEW_PATH . '/student/student_opportunity-details.php';
+    require_once APP_PATH . '/Controllers/student_OpportunityDetailsController.php';
+    (new student_OpportunityDetailsController())->index();
+});
+
+
+$router->add('GET', '/student_reports', function() {
+    require_once APP_PATH . '/Controllers/student_ReportsController.php';
+    (new student_ReportsController())->index();
 });
 
 
@@ -68,18 +74,22 @@ $router->add('GET','/student_report-submit', function(){
 });
 
 
-
-$router->add('POST', '/login_process', function() {
-    require_once APP_PATH . '/Controllers/AuthController.php';
-    $auth = new AuthController();
-    $auth->login();
-});
-
-
 $router->add('POST', '/save_attendance', function() {
-    require_once APP_PATH . '/Controllers/AttendanceController.php';
-    $controller = new AttendanceController();
-    $controller->save();
+    require_once APP_PATH . '/Controllers/student_AttendanceController.php';
+    (new student_AttendanceController())->save();
 });
+
+
+$router->add('POST', '/submit_application', function() {
+    require_once APP_PATH . '/Controllers/student_ApplyController.php';
+    (new student_ApplyController())->submit();
+});
+
+
+$router->add('POST', '/submit_report_process', function() {
+    require_once APP_PATH . '/Controllers/student_ReportsController.php';
+    (new student_ReportsController())->submit();
+});
+
 
 $router->run();

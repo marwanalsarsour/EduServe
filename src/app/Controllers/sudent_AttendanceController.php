@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../Core/Database.php';
 
-class AttendanceController {
+class student_AttendanceController {
     
     
     public function index() {
