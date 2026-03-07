@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>تسجيل الدخول</title>
-  <link rel="icon" type="image/png" href="/images/logo.png">
+  <link rel="icon" type="image/png" href="/public/images/logo.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css" />
@@ -17,7 +17,7 @@
 
     <div class="container">
       <div class="text-center mt-5 mb-4 text-white">
-        <img src="/images/logo.png" alt="EduServe Logo" style="width: 180px;" class="mb-3">
+        <img src="/public/images/logo.png" alt="EduServe Logo" style="width: 180px;" class="mb-3">
         <h1 class="fw-bold mb-1">EduServe</h1>
         <p class="mb-0 opacity-75">Palestine Polytechnic University</p>
       </div>

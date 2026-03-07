@@ -47,3 +47,32 @@ body {
   direction: ltr;
   text-align: left;
 }
+
+
+/* هذا التنسيق سيعمل فقط في صفحة التقارير */
+.reports-page {
+    overflow-y: auto !important;
+    height: auto !important;
+    min-height: 100vh;
+}
+
+.reports-page .container {
+    padding-bottom: 80px;
+}
+
+/* لضمان أن العناوين في هذه الصفحة تحديداً جهة اليمين */
+.reports-page .text-end {
+    text-align: right !important;
+}
+
+/* تنسيق أرقام الخطوات في هذه الصفحة */
+.reports-page .step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-weight: bold;
+    margin-left: 15px; /* المسافة لليمين في نظام الـ RTL */
+}
