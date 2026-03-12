@@ -1,7 +1,6 @@
-version: '3.8'
+version: "3.8"
 
 services:
- 
   app:
     build:
       context: .
@@ -12,7 +11,6 @@ services:
     networks:
       - eduserve-network
 
- 
   web:
     image: nginx:latest
     container_name: eduserve-web
@@ -26,7 +24,6 @@ services:
     networks:
       - eduserve-network
 
-  
   db:
     image: mysql:8.0
     container_name: eduserve-db
@@ -38,10 +35,12 @@ services:
       MYSQL_PASSWORD: user_password
     ports:
       - "3306:3306"
+    # التعديل الأساسي هنا لحفظ البيانات
+    volumes:
+      - eduserve-db-data:/var/lib/mysql
     networks:
       - eduserve-network
 
-  
   phpmyadmin:
     image: phpmyadmin:latest
     container_name: eduserve-phpmyadmin
@@ -55,6 +54,9 @@ services:
       - db
     networks:
       - eduserve-network
+
+volumes:
+  eduserve-db-data:
 
 networks:
   eduserve-network:
