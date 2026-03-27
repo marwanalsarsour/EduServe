@@ -1,15 +1,10 @@
 <?php
-require_once __DIR__ . '/../Core/Database.php';
 
-class student_OpportunitiesController {
+class student_OpportunitiesController extends Controller {
     
     public function index() {
-        $db = (new Database())->getConnection();
-
-        
-        $stmt = $db->prepare("SELECT * FROM Opportunity WHERE Status = 'Open' ORDER BY CreatedAt DESC");
-        $stmt->execute();
-        $opportunities = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $studentModel = $this->model('StudentModel');
+        $opportunities = $studentModel->getOpenOpportunities();
         
         require_once VIEW_PATH . '/student/student_opportunities.php';
     }

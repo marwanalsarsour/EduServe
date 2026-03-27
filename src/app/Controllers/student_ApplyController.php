@@ -1,8 +1,6 @@
 <?php
-require_once __DIR__ . '/../Core/Database.php';
 
-class student_ApplyController {
-    
+class student_ApplyController extends Controller {
     
     public function index() {
         if (session_status() === PHP_SESSION_NONE) session_start();
@@ -13,15 +11,9 @@ class student_ApplyController {
             exit();
         }
 
-        $db = (new Database())->getConnection();
-        $stmt = $db->prepare("
-            SELECT o.*, org.Name as OrganizationName, o.OrganizationID 
-            FROM Opportunity o
-            JOIN Organization org ON o.OrganizationID = org.OrganizationID
-            WHERE o.OpportunityID = :id
-        ");
-        $stmt->execute(['id' => $opportunityId]);
-        $opportunity = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        $studentModel = $this->model('StudentModel');
+        $opportunity = $studentModel->getOpportunityById($opportunityId);
 
         if (!$opportunity) {
             die("الفرصة المطلوبة غير متوفرة حالياً.");
@@ -30,16 +22,13 @@ class student_ApplyController {
         require_once VIEW_PATH . '/student/student_apply.php';
     }
 
-    
     public function submit() {
         if (session_status() === PHP_SESSION_NONE) session_start();
         
-        $db = (new Database())->getConnection();
         $studentId = $_SESSION['user_id'];
         $opportunityId = $_POST['opportunity_id'];
         $entityId = $_POST['entity_id'];
 
-       
         $cvPath = null;
         if (isset($_FILES['cv_file']) && $_FILES['cv_file']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = BASE_PATH . '/public/uploads/cvs/';
@@ -51,19 +40,8 @@ class student_ApplyController {
             }
         }
 
-        
-        $stmt = $db->prepare("
-            INSERT INTO OpportunityRequest 
-            (requestDate, studentID, opportunityID, entityID, entityStatus, supervisorStatus, CV_Path) 
-            VALUES (NOW(), :sid, :oid, :eid, 'Pending', 'Pending', :cv)
-        ");
-        
-        $success = $stmt->execute([
-            'sid' => $studentId,
-            'oid' => $opportunityId,
-            'eid' => $entityId,
-            'cv'  => $cvPath
-        ]);
+        $studentModel = $this->model('StudentModel');
+        $success = $studentModel->submitOpportunityRequest($studentId, $opportunityId, $entityId, $cvPath);
 
         if ($success) {
             $_SESSION['msg'] = "تم إرسال طلبك بنجاح! بانتظار موافقة المؤسسة والمشرف الأكاديمي.";
