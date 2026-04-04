@@ -35,7 +35,6 @@ services:
       MYSQL_PASSWORD: user_password
     ports:
       - "3306:3306"
-    # التعديل الأساسي هنا لحفظ البيانات
     volumes:
       - eduserve-db-data:/var/lib/mysql
     networks:
