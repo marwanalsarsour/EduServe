@@ -1,6 +1,5 @@
 <?php
 
-
 class User {
     private $db;
 
@@ -8,12 +7,13 @@ class User {
         $this->db = $db_connection;
     }
 
-
     public function findByEmail($email) {
-        $query = "SELECT * FROM Users WHERE email = :email LIMIT 1";
+        $query = "SELECT id, name, email, password, role FROM Users WHERE email = :email LIMIT 1";
+        
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':email', $email);
         $stmt->execute();
+        
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }

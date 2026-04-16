@@ -31,7 +31,6 @@ $router->add('GET', '/student_dashboard', function() {
     (new StudentDashboardController())->index();
 });
 
-
 $router->add('GET', '/student_attendance', function() {
     require_once APP_PATH . '/Controllers/student_AttendanceController.php';
     (new student_AttendanceController())->index();
@@ -41,7 +40,6 @@ $router->add('POST', '/save_attendance', function() {
     require_once APP_PATH . '/Controllers/student_AttendanceController.php';
     (new student_AttendanceController())->save();
 });
-
 
 $router->add('GET', '/student_opportunities', function() {
     require_once APP_PATH . '/Controllers/student_OpportunitiesController.php';
@@ -68,7 +66,6 @@ $router->add('POST', '/submit_application', function() {
     (new student_ApplyController())->submit();
 });
 
-
 $router->add('GET', '/student_reports', function() {
     require_once APP_PATH . '/Controllers/student_ReportsController.php';
     (new student_ReportsController())->index();
@@ -84,12 +81,10 @@ $router->add('POST', '/submit_report_process', function() {
     (new student_ReportsController())->submit();
 });
 
-
 $router->add('GET', '/student_calendar', function() {
     require_once APP_PATH . '/Controllers/StudentCalendarController.php';
     (new StudentCalendarController())->index();
 });
-
 
 $router->add('GET', '/student_profile', function() {
     require_once APP_PATH . '/Controllers/student_ProfileController.php';
@@ -100,7 +95,6 @@ $router->add('POST', '/update_profile_process', function() {
     require_once APP_PATH . '/Controllers/student_ProfileController.php';
     (new student_ProfileController())->update();
 });
-
 
 $router->add('GET', '/student_notifications', function() {
     require_once APP_PATH . '/Controllers/student_NotificationsController.php';
@@ -113,4 +107,122 @@ $router->add('GET', '/student_certificates', function() {
 });
 
 
+$router->add('GET', '/supervisor_dashboard', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/SupervisorDashboardController.php';
+    (new SupervisorDashboardController())->index();
+});
+
+$router->add('GET', '/supervisor_profile', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/SupervisorProfileController.php';
+    (new SupervisorProfileController())->index();
+});
+
+$router->add('POST', '/update_supervisor_profile_process', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/SupervisorProfileController.php';
+    (new SupervisorProfileController())->update();
+});
+
+$router->add('POST', '/update_supervisor_password_process', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/SupervisorProfileController.php';
+    (new SupervisorProfileController())->changePassword();
+});
+
+$router->add('GET', '/supervisor-add-opportunity', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/OpportunityController.php';
+    (new OpportunityController())->create();
+});
+
+
+$router->add('POST', '/submit_opportunity_process', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/OpportunityController.php';
+    (new OpportunityController())->store();
+});
+
+$router->add('GET', '/supervisor-applications', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/ApplicationController.php';
+    (new ApplicationController())->index();
+});
+
+
+$router->add('POST', '/submit_application_action', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/ApplicationController.php';
+    (new ApplicationController())->handleAction();
+});
+
+$router->add('GET', '/supervisor-attendance', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/AttendanceReviewController.php';
+    (new AttendanceReviewController())->index();
+});
+
+$router->add('POST', '/submit_attendance_review_action', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/AttendanceReviewController.php';
+    (new AttendanceReviewController())->handleAction();
+});
+
+$router->add('GET', '/supervisor-edit-opportunity', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/OpportunityController.php';
+    (new OpportunityController())->edit();
+});
+
+$router->add('POST', '/submit_update_opportunity_process', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/OpportunityController.php';
+    (new OpportunityController())->update();
+});
+
+$router->add('GET', '/supervisor-employer-reports', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/CompanyReportController.php';
+    (new CompanyReportController())->index();
+});
+
+$router->add('GET', '/supervisor/supervisor-evaluation', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/EvaluationController.php';
+    (new EvaluationController())->create();
+});
+
+$router->add('POST', '/submit_save_evaluation_process', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/EvaluationController.php';
+    (new EvaluationController())->store();
+});
+
+$router->add('GET', '/supervisor/notifications', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/NotificationController.php';
+    (new NotificationController())->index();
+});
+
+$router->add('GET', '/supervisor/notifications/mark-read', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/NotificationController.php';
+    (new NotificationController())->markAllAsRead();
+});
+
+
+$router->add('GET', '/supervisor/opportunities', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/OpportunityController.php';
+    (new OpportunityController())->index();
+});
+
+
+$router->add('GET', '/supervisor/delete-opportunity/:id', function($id) {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/OpportunityController.php';
+    (new OpportunityController())->delete($id);
+});
+
+$router->add('GET', '/supervisor/supervisor-reports', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/ReportReviewController.php';
+    (new ReportReviewController())->index();
+});
+
+$router->add('POST', '/supervisor/reports/process/:id', function($id) {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/ReportReviewController.php';
+    (new ReportReviewController())->process($id);
+});
+
+$router->add('GET', '/supervisor/student-profile/:id', function($id) {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/StudentProfileController.php';
+    (new StudentProfileController())->show($id);
+});
+
+$router->add('GET', '/supervisor/students', function() {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/StudentManagementController.php';
+    (new StudentManagementController())->index();
+});
 $router->run();

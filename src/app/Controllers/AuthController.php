@@ -1,12 +1,11 @@
 <?php
 
-
 require_once __DIR__ . '/../Core/Database.php';
 require_once __DIR__ . '/../Models/User.php';
 
 class AuthController {
+    
     public function login() {
-        
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -14,33 +13,28 @@ class AuthController {
         $email = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
 
-        
         if (empty($email) || empty($password)) {
             header('Location: /login?error=empty_fields');
             exit();
         }
 
-       
         $database = new Database();
         $db = $database->getConnection();
         $userModel = new User($db);
 
-        
         $user = $userModel->findByEmail($email);
 
-        
+    
         if ($user && password_verify($password, $user['password'])) {
-            
             
             session_regenerate_id(true);
 
-            
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
             $_SESSION['user_role'] = $user['role'];
             $_SESSION['is_logged_in'] = true;
 
-            
+          
             switch ($user['role']) {
                 case 'student':
                     header('Location: /student_dashboard');
@@ -56,7 +50,6 @@ class AuthController {
             }
             exit();
         } else {
-           
             header('Location: /login?error=wrong_credentials');
             exit();
         }
@@ -66,10 +59,8 @@ class AuthController {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        
         $_SESSION = array();
         session_destroy();
-        
         header('Location: /login');
         exit();
     }
