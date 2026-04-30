@@ -225,4 +225,118 @@ $router->add('GET', '/supervisor/students', function() {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/StudentManagementController.php';
     (new StudentManagementController())->index();
 });
+
+$router->add('GET', '/volunteer_dashboard', function() {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerDashboardController.php';
+    (new VolunteerDashboardController())->index();
+});
+
+$router->add('GET', '/volunteer_approval', function() {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerApprovalController.php';
+    (new VolunteerApprovalController())->index();
+});
+
+$router->add('POST', '/volunteer_save_approval', function() {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerApprovalController.php';
+    (new VolunteerApprovalController())->save();
+});
+
+$router->add('GET', '/volunteer_attendance', function() {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerAttendanceController.php';
+    (new VolunteerAttendanceController())->index();
+});
+
+$router->add('POST', '/volunteer_attendance_approve', function() {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerAttendanceController.php';
+    (new VolunteerAttendanceController())->approve();
+});
+
+$router->add('GET', '/volunteer_employer_reports', function() {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerReportsController.php';
+    (new VolunteerReportsController())->index();
+});
+
+
+$router->add('GET', '/volunteer_evaluation', function() {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerGradingController.php';
+    (new VolunteerGradingController())->index();
+});
+
+
+$router->add('POST', '/volunteer_submit_grading', function() {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerGradingController.php';
+    (new VolunteerGradingController())->submit();
+});
+
+$router->add('GET', '/volunteer_notifications', function() {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerNotificationController.php';
+    (new VolunteerNotificationController())->index();
+});
+
+$router->add('GET', '/volunteer_opportunities', function() {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerOpportunityController.php';
+    (new VolunteerOpportunityController())->index();
+});
+
+$router->add('POST', '/store_opportunity', function() {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerOpportunityController.php';
+    (new VolunteerOpportunityController())->store();
+});
+
+$router->add('GET', '/volunteer_edit_opportunity', function() {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerOpportunityController.php';
+    $id = $_GET['id'] ?? null; 
+    (new VolunteerOpportunityController())->edit($id);
+});
+
+$router->add('POST', '/volunteer_update_opportunity', function() {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerOpportunityController.php';
+    (new VolunteerOpportunityController())->update();
+});
+
+$router->add('GET', '/delete_opportunity', function() {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerOpportunityController.php';
+    $id = $_GET['id'] ?? null;
+    (new VolunteerOpportunityController())->delete($id);
+});
+
+$router->add('GET', '/volunteer_profile', function() {
+    require_once APP_PATH . '/Controllers/VolunteerProfileController.php';
+    (new VolunteerProfileController())->index();
+});
+
+$router->add('POST', '/volunteer_profile_update', function() {
+    require_once APP_PATH . '/Controllers/VolunteerProfileController.php';
+    (new VolunteerProfileController())->update();
+});
+
+$router->add('POST', '/volunteer_password_update', function() {
+    require_once APP_PATH . '/Controllers/VolunteerProfileController.php';
+    (new VolunteerProfileController())->changePassword();
+});
+
+$router->add('GET', '/volunteer_requests', function() {
+    require_once APP_PATH . '/Controllers/VolunteerApplicationController.php';
+    (new VolunteerApplicationController())->index();
+});
+
+$router->add('GET', '/handle_application', function() {
+    require_once APP_PATH . '/Controllers/VolunteerApplicationController.php';
+    (new VolunteerApplicationController())->handleStatus();
+});
+
+$router->add('GET', '/volunteer_students', function() {
+    require_once APP_PATH . '/Controllers/VolunteerStudentController.php';
+    (new VolunteerStudentController())->index();
+});
+
+$router->add('GET', '/volunteer_view_student', function() {
+    require_once APP_PATH . '/Controllers/StudentReviewController.php';
+    (new StudentReviewController())->show();
+});
+
+$router->add('POST', '/student_review/process', function() {
+    require_once APP_PATH . '/Controllers/StudentReviewController.php';
+    (new StudentReviewController())->process();
+});
 $router->run();
