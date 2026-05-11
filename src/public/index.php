@@ -339,4 +339,98 @@ $router->add('POST', '/student_review/process', function() {
     require_once APP_PATH . '/Controllers/StudentReviewController.php';
     (new StudentReviewController())->process();
 });
+
+$router->add('GET', '/external_dashboard', function() {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalDashboardController.php';
+    (new ExternalDashboardController())->index();
+});
+
+$router->add('GET', '/external/applications', function() {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalApplicationsController.php';
+    (new ExternalApplicationsController())->index();
+});
+
+$router->add('POST', '/applications/approve', function() {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalApplicationsController.php';
+    (new ExternalApplicationsController())->approve();
+});
+
+$router->add('POST', '/applications/reject', function() {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalApplicationsController.php';
+    (new ExternalApplicationsController())->reject();
+});
+
+$router->add('GET', '/external/opportunities', function() {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalOpportunitiesController.php';
+    (new ExternalOpportunitiesController())->index();
+});
+
+$router->add('POST', '/external/opportunities/update', function() {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalOpportunitiesController.php';
+    (new ExternalOpportunitiesController())->update();
+});
+
+$router->add('POST', '/external/opportunities/delete', function() {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalOpportunitiesController.php';
+    (new ExternalOpportunitiesController())->delete();
+});
+
+$router->add('GET', '/external/opportunities/add', function() {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalOpportunitiesController.php';
+    (new ExternalOpportunitiesController())->create();
+});
+
+$router->add('POST', '/external/opportunities/store', function() {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalOpportunitiesController.php';
+    (new ExternalOpportunitiesController())->store();
+});
+
+$router->add('GET', '/external/certificates', function() {
+    (new ExternalCertificatesController())->index();
+});
+
+$router->add('POST', '/external/certificates/store', function() {
+    (new ExternalCertificatesController())->store();
+});
+
+$router->add('GET', '/external/officials', function() {
+    (new ExternalOfficialsController())->index();
+});
+
+$router->add('POST', '/external/officials/update', function() {
+    (new ExternalOfficialsController())->update();
+});
+
+$router->add('POST', '/external/officials/assign', function() {
+    (new ExternalOfficialsController())->assign();
+});
+
+$router->add('GET', '/external/officials/unassign/(\d+)', function($student_id) {
+    (new ExternalOfficialsController())->unassign($student_id);
+});
+
+$router->add('GET', '/external/trainees', function() {
+    require_once '../src/controllers/ExternalTraineesController.php';
+    (new ExternalTraineesController())->index();
+});
+
+$router->add('GET', '/external/trainers', function() {
+    require_once '../src/controllers/ExternalTrainersController.php';
+    (new ExternalTrainersController())->index();
+});
+
+$router->add('POST', '/assign-student', function() {
+    require_once '../src/controllers/ExternalTrainersController.php';
+    (new ExternalTrainersController())->assign();
+});
+
+$router->add('POST', '/update-trainer', function() {
+    require_once '../src/controllers/ExternalTrainersController.php';
+    (new ExternalTrainersController())->update(); 
+});
+
+$router->add('GET', '/external/notifications', function() {
+    require_once '../src/controllers/ExternalNotificationsController.php';
+    (new ExternalNotificationsController())->index();
+});
 $router->run();
