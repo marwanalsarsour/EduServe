@@ -433,4 +433,53 @@ $router->add('GET', '/external/notifications', function() {
     require_once '../src/controllers/ExternalNotificationsController.php';
     (new ExternalNotificationsController())->index();
 });
+$router->add('GET', '/trainer/dashboard', function() {
+    require_once '../src/controllers/Trainer_Controllers/TrainerDashboardController.php';
+    (new TrainerDashboardController())->index();
+});
+
+$router->add('GET', '/trainer/profile', function() {
+    require_once '../src/controllers/Trainer_Controllers/TrainerProfileController.php';
+    (new TrainerProfileController())->index();
+});
+
+$router->add('POST', '/trainer/profile/update', function() {
+    require_once '../src/controllers/Trainer_Controllers/TrainerProfileController.php';
+    (new TrainerProfileController())->update();
+});
+
+$router->add('GET', '/trainer/attendance', function() {
+    require_once '../src/controllers/Trainer_Controllers/TrainerAttendanceController.php';
+    (new TrainerAttendanceController())->index();
+});
+
+$router->add('POST', '/trainer/attendance/save', function() {
+    require_once '../src/controllers/Trainer_Controllers/TrainerAttendanceController.php';
+    (new TrainerAttendanceController())->save();
+});
+
+$router->add('GET', '/trainer/reports', function() {
+    require_once '../src/controllers/Trainer_Controllers/TrainerReportsController.php';
+    (new TrainerReportsController())->index();
+});
+
+$router->add('POST', '/trainer/reports/process-monthly', function() {
+    require_once '../src/controllers/Trainer_Controllers/TrainerReportsController.php';
+    (new TrainerReportsController())->processMonthly();
+});
+
+$router->add('POST', '/trainer/reports/process-final', function() {
+    require_once '../src/controllers/Trainer_Controllers/TrainerReportsController.php';
+    (new TrainerReportsController())->processFinal();
+});
+
+$router->add('GET', '/trainer/student-details/(\d+)', function($student_id) {
+    require_once '../src/controllers/Trainer_Controllers/TrainerStudentDetailsController.php';
+    (new TrainerStudentDetailsController())->show($student_id);
+});
+
+$router->add('GET', '/trainer/notifications', function() {
+    require_once '../src/controllers/Trainer_Controllers/TrainerNotificationsController.php';
+    (new TrainerNotificationsController())->index();
+});
 $router->run();

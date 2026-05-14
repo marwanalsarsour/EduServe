@@ -10,9 +10,16 @@
     <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 <body class="reports-page text-end bg-light">
-    <?php require_once '../layout/header.php'; ?>
+    <?php require_once '../src/views/layout/header.php'; ?>
 
     <div class="container py-5">
+        <?php if(isset($_GET['status']) && $_GET['status'] === 'success'): ?>
+            <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm border-0" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> تم تحديث بياناتك بنجاح!
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+
         <div class="row g-4 justify-content-center">
             
             <div class="col-lg-4">
@@ -20,17 +27,17 @@
                     <div class="mx-auto bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px;">
                         <i class="bi bi-person-vcard fs-1 text-primary"></i>
                     </div>
-                    <h5 class="fw-bold text-dark mb-1">م. تامر القاضي</h5>
+                    <h5 class="fw-bold text-dark mb-1"><?= htmlspecialchars($profile['name']) ?></h5>
                     <p class="text-muted small">مدرب ميداني لدى EduServe</p>
                     
                     <div class="bg-white border rounded-3 p-3 mt-3 text-end shadow-sm">
                         <div class="mb-2 border-bottom pb-2">
                             <small class="text-secondary d-block">جهة التدريب الحالية:</small>
-                            <span class="fw-bold text-dark">شركة الاتصالات الفلسطينية</span>
+                            <span class="fw-bold text-dark"><?= htmlspecialchars($profile['organization_name'] ?? 'لم يتم التحديد') ?></span>
                         </div>
                         <div class="mb-0 pt-1">
                             <small class="text-secondary d-block">تاريخ التسجيل:</small>
-                            <span class="fw-bold">01 يناير 2026</span>
+                            <span class="fw-bold"><?= date('d F Y', strtotime($profile['created_at'])) ?></span>
                         </div>
                     </div>
                 </div>
@@ -42,19 +49,22 @@
                         <h6 class="fw-bold mb-0 text-primary"><i class="bi bi-person-gear ms-2"></i>تعديل المعلومات الشخصية</h6>
                     </div>
                     <div class="card-body p-4">
-                        <form action="update_profile.php" method="POST">
+                        <form action="/trainer/profile/update" method="POST">
                             <div class="row g-4">
                                 <div class="col-md-12">
                                     <label class="small fw-bold text-secondary mb-2">الاسم الكامل للمدرب</label>
-                                    <input type="text" class="form-control bg-light border-0 py-2 shadow-sm" value="تامر القاضي" required>
+                                    <input type="text" name="name" class="form-control bg-light border-0 py-2 shadow-sm" 
+                                           value="<?= htmlspecialchars($profile['name']) ?>" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="small fw-bold text-secondary mb-2">البريد الإلكتروني المهني</label>
-                                    <input type="email" class="form-control bg-light border-0 py-2 shadow-sm" value="tamer@example.com" required>
+                                    <input type="email" name="email" class="form-control bg-light border-0 py-2 shadow-sm" 
+                                           value="<?= htmlspecialchars($profile['email']) ?>" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="small fw-bold text-secondary mb-2">رقم الجوال الشخصي</label>
-                                    <input type="text" class="form-control bg-light border-0 py-2 shadow-sm" value="0590000000">
+                                    <input type="text" name="phone" class="form-control bg-light border-0 py-2 shadow-sm" 
+                                           value="<?= htmlspecialchars($profile['phone'] ?? '') ?>">
                                 </div>
                             </div>
                             <div class="text-start mt-4">
@@ -70,15 +80,17 @@
                     </div>
                     <div class="card-body p-4">
                         <p class="small text-muted mb-4">قم بإدخال كلمة المرور الجديدة وتأكيدها مباشرة لتحديث أمان حسابك.</p>
-                        <form action="change_password.php" method="POST">
+                        <form action="/trainer/profile/update-password" method="POST">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="small fw-bold text-secondary mb-2">كلمة المرور الجديدة</label>
-                                    <input type="password" class="form-control bg-light border-0 py-2 shadow-sm" placeholder="********" required>
+                                    <input type="password" name="new_password" class="form-control bg-light border-0 py-2 shadow-sm" 
+                                           placeholder="********" required minlength="8">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="small fw-bold text-secondary mb-2">تأكيد كلمة المرور</label>
-                                    <input type="password" class="form-control bg-light border-0 py-2 shadow-sm" placeholder="********" required>
+                                    <input type="password" name="confirm_password" class="form-control bg-light border-0 py-2 shadow-sm" 
+                                           placeholder="********" required minlength="8">
                                 </div>
                             </div>
                             <div class="text-start mt-4">
