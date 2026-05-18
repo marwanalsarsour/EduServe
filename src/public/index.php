@@ -482,4 +482,49 @@ $router->add('GET', '/trainer/notifications', function() {
     require_once '../src/controllers/Trainer_Controllers/TrainerNotificationsController.php';
     (new TrainerNotificationsController())->index();
 });
+
+$router->add('GET', '/v_manager/dashboard', function() {
+    require_once '../src/controllers/V_Manager_Controllers/VManagerDashboardController.php';
+    (new VManagerDashboardController())->index();
+});
+
+$router->add('GET', '/v_manager/profile', function() {
+    require_once '../src/controllers/V_Manager_Controllers/VManagerProfileController.php';
+    (new VManagerProfileController())->index();
+});
+
+$router->add('POST', '/v_manager/profile/update', function() {
+    require_once '../src/controllers/V_Manager_Controllers/VManagerProfileController.php';
+    (new VManagerProfileController())->update();
+});
+
+$router->add('GET', '/v_manager/volunteers', function() {
+    require_once '../src/controllers/V_Manager_Controllers/VManagerVolunteersController.php';
+    (new VManagerVolunteersController())->index();
+});
+
+$router->add('GET', '/v_manager/student-details', function() {
+    require_once '../src/controllers/V_Manager_Controllers/VManagerStudentDetailsController.php';
+    (new VManagerStudentDetailsController())->index();
+});
+
+$router->add('GET', '/v_manager/reports', function() {
+    require_once '../src/controllers/V_Manager_Controllers/VManagerReportsController.php';
+    (new VManagerReportsController())->index();
+});
+
+$router->add('GET', '/v_manager/attendance', function() {
+    require_once '../src/controllers/V_Manager_Controllers/VManagerAttendanceController.php';
+    (new AttendanceController())->index();
+});
+
+$router->add('POST', '/v_manager/attendance/save', function() {
+    require_once '../src/controllers/V_Manager_Controllers/VManagerAttendanceController.php';
+    (new AttendanceController())->save();
+});
+
+$router->add('GET', '/v_manager/notifications', function() {
+    require_once '../src/controllers/V_Manager_Controllers/VManagerNotificationController.php';
+    (new NotificationController())->index();
+});
 $router->run();
