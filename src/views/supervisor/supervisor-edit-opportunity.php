@@ -1,3 +1,7 @@
+<?php 
+require_once VIEW_PATH . '/layout/header.php'; 
+?>
+
 <?php
 $op = $data['opportunity'] ?? null;
 if (!$op) { die("لا توجد بيانات لعرضها"); }
@@ -14,7 +18,7 @@ if (!$op) { die("لا توجد بيانات لعرضها"); }
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
 
-<?php require_once __DIR__ . '/../layout/header.php'; ?>
+
 
 <main class="flex-grow-1">
 <div class="container my-5">

@@ -1,3 +1,6 @@
+<?php 
+require_once VIEW_PATH . '/layout/header.php'; 
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -9,7 +12,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body class="bg-light d-flex flex-column min-vh-100">
-    <?php require_once '../layout/header.php'; ?>
+
 
     <div class="container my-5 flex-grow-1">
         <div class="row">

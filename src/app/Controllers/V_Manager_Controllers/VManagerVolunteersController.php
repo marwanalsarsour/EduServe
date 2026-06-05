@@ -7,7 +7,9 @@ class VManagerVolunteersController {
         if (session_status() === PHP_SESSION_NONE) session_start();
         global $db;
         $this->db = $db;
-        require_once '../src/models/VolunteerManagerModel.php';
+        
+        require_once APP_PATH . '/models/VolunteerManagerModel.php';
+        
         $this->model = new VolunteerManagerModel($this->db);
     }
 
@@ -18,7 +20,7 @@ class VManagerVolunteersController {
         $volunteers = $this->model->getMyVolunteers($manager_id, $search);
 
         foreach ($volunteers as &$v) {
-            $required = $v['required_hours'] > 0 ? $v['required_hours'] : 50; // افتراضي 50 ساعة
+            $required = $v['required_hours'] > 0 ? $v['required_hours'] : 50;
             $v['progress_percent'] = min(100, round(($v['completed_hours'] / $required) * 100));
             $v['required_limit'] = $required;
         }
@@ -28,6 +30,6 @@ class VManagerVolunteersController {
             'search' => $search
         ];
         
-        require_once '../src/views/v_manager/v_manager_list.php';
+        require_once VIEW_PATH . '/v_manager/v_manager_list.php';
     }
 }

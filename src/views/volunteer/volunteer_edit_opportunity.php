@@ -1,3 +1,6 @@
+<?php 
+require_once VIEW_PATH . '/layout/header.php'; 
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -9,7 +12,7 @@
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
 
-<?php require_once '../layout/header.php'; ?>
+
 
 <div class="container mt-5">
     <nav aria-label="breadcrumb">

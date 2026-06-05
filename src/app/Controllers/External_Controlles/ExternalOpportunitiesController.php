@@ -7,9 +7,12 @@ class ExternalOpportunitiesController {
     public function __construct() {
         global $db;
         $this->model = new ExternalEntityModel($db);
-        if (session_status() === PHP_SESSION_NONE) { session_start(); }
         
-        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'external_entity') {
+        if (session_status() === PHP_SESSION_NONE) { 
+            session_start(); 
+        }
+        
+        if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'جهة خارجية') {
             header('Location: /login');
             exit;
         }
@@ -22,11 +25,9 @@ class ExternalOpportunitiesController {
         require_once VIEW_PATH . '/external-organization/external_opoportunities-management.php';
     }
 
-
     public function create() {
         require_once VIEW_PATH . '/external-organization/external_adding-opportunities.php';
     }
-
 
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 <body class="bg-light">
-    <?php require_once '../src/views/layout/header.php'; ?>
 
     <div class="container my-5">
         <div class="d-flex justify-content-between align-items-center mb-4 text-start">

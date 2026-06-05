@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 <body class="bg-light text-end">
-    <?php require_once '../src/views/layout/header.php'; ?>
+
 
     <div class="container py-5">
         <div class="d-flex justify-content-between align-items-center mb-4">

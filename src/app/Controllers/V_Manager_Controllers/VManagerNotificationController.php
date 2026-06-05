@@ -7,7 +7,9 @@ class NotificationController {
         if (session_status() === PHP_SESSION_NONE) session_start();
         global $db;
         $this->db = $db;
-        require_once '../src/models/VolunteerManagerModel.php';
+        
+        require_once APP_PATH . '/models/VolunteerManagerModel.php';
+        
         $this->model = new VolunteerManagerModel($this->db);
     }
 
@@ -16,6 +18,6 @@ class NotificationController {
         
         $notifications = $this->model->getDynamicNotifications($manager_id);
         
-        require_once '../src/views/v_manager/v_manager_notifications.php';
+        require_once VIEW_PATH . '/v_manager/v_manager_notifications.php';
     }
 }

@@ -3,9 +3,13 @@ class ExternalOfficialsController {
     private $model;
 
     public function __construct() {
-        global $db;
-        $this->model = new ExternalEntityModel($db);
         if (session_status() === PHP_SESSION_NONE) session_start();
+        
+        global $db;
+        
+        require_once APP_PATH . '/models/ExternalEntityModel.php';
+        
+        $this->model = new ExternalEntityModel($db);
     }
 
     public function index() {
@@ -20,7 +24,7 @@ class ExternalOfficialsController {
             $unassignedStudents = $this->model->getUnassignedStudents($org_id);
         }
 
-        require_once '../src/views/external-organization/external_officials-management.php';
+        require_once VIEW_PATH . '/external-organization/external_officials-management.php';
     }
 
     public function update() {

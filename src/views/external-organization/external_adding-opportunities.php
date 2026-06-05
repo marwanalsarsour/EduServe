@@ -1,3 +1,6 @@
+<?php 
+require_once VIEW_PATH . '/layout/header.php'; 
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -15,11 +18,13 @@
         .btn-outline-danger:hover { background-color: red !important; color: white !important; }
         h4, h5, h6 { color: blue; }
         input, select, textarea { border-color: gray !important; }
+        .fade-field {
+            transition: all 0.3s ease-in-out;
+        }
     </style>
 </head>
 
 <body class="bg-light d-flex flex-column min-vh-100">
-    <?php require_once BASE_PATH . '/views/layout/header.php'; ?>
 
     <div class="flex-grow-1">
         <div class="container my-4">
@@ -41,11 +46,10 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">نوع الفرصة</label>
-                                        <select class="form-select" name="type" required>
+                                        <select class="form-select" id="opportunityType" name="type" required>
                                             <option value="">اختر النوع</option>
                                             <option value="internship">التدريب الميداني</option>
                                             <option value="volunteer">العمل التطوعي</option>
-                                            <option value="part-time">وظيفة جزئية</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">
@@ -72,11 +76,14 @@
                                         <input type="number" class="form-control" name="seats" min="1" required>
                                     </div>
                                 </div>
+                                
                                 <h5 class="mt-4 fw-bold">الوصف</h5>
                                 <textarea class="form-control" name="description" rows="4" placeholder="اكتب تفاصيل الفرصة هنا..." required></textarea>
                                 
-                                <h5 class="mt-4 fw-bold">المتطلبات الأساسية</h5>
-                                <textarea class="form-control" name="requirements" rows="4" placeholder="مثال: معرفة بـ PHP و MySQL" required></textarea>
+                                <div class="volunteer-hidden fade-field">
+                                    <h5 class="mt-4 fw-bold">المتطلبات الأساسية</h5>
+                                    <textarea class="form-control" id="requirementsInput" name="requirements" rows="4" placeholder="مثال: معرفة بـ PHP و MySQL" required></textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -114,5 +121,26 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const typeSelect = document.getElementById('opportunityType');
+            const volunteerHiddenSection = document.querySelector('.volunteer-hidden');
+            const requirementsInput = document.getElementById('requirementsInput');
+
+            function handleTypeChange() {
+                if (typeSelect.value === 'volunteer') {
+                    volunteerHiddenSection.style.display = 'none';
+                    requirementsInput.removeAttribute('required');
+                } else {
+                    volunteerHiddenSection.style.display = 'block';
+                    requirementsInput.setAttribute('required', 'required');
+                }
+            }
+
+            typeSelect.addEventListener('change', handleTypeChange);
+            handleTypeChange();
+        });
+    </script>
 </body>
 </html>

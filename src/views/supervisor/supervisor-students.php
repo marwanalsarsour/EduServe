@@ -1,3 +1,6 @@
+<?php 
+require_once VIEW_PATH . '/layout/header.php'; 
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -37,7 +40,7 @@
 </head>
 
 <body class="bg-light d-flex flex-column min-vh-100">
-<?php require_once '../layout/header.php'; ?>
+
 
 <div class="container my-5 flex-grow-1">
     <div class="row mb-4 align-items-center">

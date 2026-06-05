@@ -1,5 +1,7 @@
 <?php
 
+require_once APP_PATH . '/Models/ExternalEntityModel.php';
+
 class ExternalTraineesController {
     private $model;
     private $db;
@@ -12,21 +14,19 @@ class ExternalTraineesController {
         global $db; 
         $this->db = $db;
         
-        require_once '../src/models/ExternalEntityModel.php';
         $this->model = new ExternalEntityModel($this->db);
 
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'external_entity') {
+        $currentRole = $_SESSION['user_role'] ?? $_SESSION['role'] ?? '';
+
+        if (!isset($_SESSION['user_id']) || $currentRole !== 'جهة خارجية') {
             header('Location: /login');
             exit();
         }
     }
 
-
     public function index() {
         $org_id = $_SESSION['user_id'];
-        
         $org_type = $_SESSION['org_type'] ?? 'training'; 
-
 
         $trainees = $this->model->getTraineesByOrg($org_id);
 
@@ -36,6 +36,6 @@ class ExternalTraineesController {
             'supervisor_label' => ($org_type == 'volunteer') ? 'المشرف' : 'المدرب'
         ];
 
-        require_once '../src/views/external-organization/external_trainees-students.php';
+        require_once VIEW_PATH . '/external-organization/external_trainees-students.php';
     }
 }

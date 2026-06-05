@@ -11,7 +11,6 @@
     <style>.step-number { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin-left: 10px; font-weight: bold; }</style>
 </head>
 <body class="reports-page text-end bg-light"> 
-    <?php require_once '../src/views/layout/header.php'; ?>
 
     <div class="container my-5">
         <?php if(isset($_GET['success'])): ?>

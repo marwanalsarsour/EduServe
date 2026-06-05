@@ -8,7 +8,10 @@ define('VIEW_PATH', BASE_PATH . '/views');
 define('APP_PATH', BASE_PATH . '/app');
 
 require_once APP_PATH . '/Core/Router.php';
+require_once APP_PATH . '/Core/Database.php';
 
+$database = new Database();
+$db = $database->getConnection();
 $router = new Router();
 
 
@@ -20,511 +23,578 @@ $router->add('GET', '/login', function() {
     require_once VIEW_PATH . '/auth/login.view.php';
 });
 
-$router->add('POST', '/login_process', function() {
+$router->add('POST', '/login_process', function() use ($db) {
     require_once APP_PATH . '/Controllers/AuthController.php';
-    (new AuthController())->login();
+    (new AuthController($db))->login();
 });
 
-
-$router->add('GET', '/student_dashboard', function() {
+$router->add('GET', '/student_dashboard', function() use ($db) {
     require_once APP_PATH . '/Controllers/StudentDashboardController.php';
-    (new StudentDashboardController())->index();
+    (new StudentDashboardController($db))->index();
 });
 
-$router->add('GET', '/student_attendance', function() {
-    require_once APP_PATH . '/Controllers/student_AttendanceController.php';
-    (new student_AttendanceController())->index();
+$router->add('GET', '/student_attendance', function() use ($db) {
+    require_once APP_PATH . '/Controllers/sudent_AttendanceController.php';
+    (new student_AttendanceController($db))->index();
 });
 
-$router->add('POST', '/save_attendance', function() {
-    require_once APP_PATH . '/Controllers/student_AttendanceController.php';
-    (new student_AttendanceController())->save();
+$router->add('POST', '/save_attendance', function() use ($db) {
+    require_once APP_PATH . '/Controllers/sudent_AttendanceController.php';
+    (new student_AttendanceController($db))->save();
 });
 
-$router->add('GET', '/student_opportunities', function() {
+$router->add('GET', '/student_opportunities', function() use ($db) {
     require_once APP_PATH . '/Controllers/student_OpportunitiesController.php';
-    (new student_OpportunitiesController())->index();
+    (new student_OpportunitiesController($db))->index();
 });
 
-$router->add('GET', '/student_opportunity-details', function(){
+$router->add('GET', '/student_opportunity-details', function() use ($db) {
     require_once APP_PATH . '/Controllers/student_OpportunityDetailsController.php';
-    (new student_OpportunityDetailsController())->index();
+    (new student_OpportunityDetailsController($db))->index();
 });
 
-$router->add('GET', '/student_my-application', function(){
+$router->add('GET', '/student_my-application', function() use ($db) {
     require_once APP_PATH . '/Controllers/student_MyApplicationsController.php';
-    (new student_MyApplicationsController())->index();
+    (new student_MyApplicationsController($db))->index();
 });
 
-$router->add('GET', '/student_apply', function() {
+$router->add('GET', '/student_apply', function() use ($db) {
     require_once APP_PATH . '/Controllers/student_ApplyController.php';
-    (new student_ApplyController())->index();
+    (new student_ApplyController($db))->index();
 });
 
-$router->add('POST', '/submit_application', function() {
+$router->add('POST', '/submit_application', function() use ($db) {
     require_once APP_PATH . '/Controllers/student_ApplyController.php';
-    (new student_ApplyController())->submit();
+    (new student_ApplyController($db))->submit();
 });
 
-$router->add('GET', '/student_reports', function() {
+$router->add('GET', '/student_reports', function() use ($db) {
     require_once APP_PATH . '/Controllers/student_ReportsController.php';
-    (new student_ReportsController())->index();
+    (new student_ReportsController($db))->index();
 });
 
-$router->add('GET', '/student_report-submit', function(){
+$router->add('GET', '/student_report-submit', function() use ($db) {
     require_once APP_PATH . '/Controllers/student_ReportsController.php';
-    (new student_ReportsController())->showSubmitForm(); 
+    (new student_ReportsController($db))->showSubmitForm(); 
 });
 
-$router->add('POST', '/submit_report_process', function() {
+$router->add('POST', '/submit_report_process', function() use ($db) {
     require_once APP_PATH . '/Controllers/student_ReportsController.php';
-    (new student_ReportsController())->submit();
+    (new student_ReportsController($db))->submit();
 });
 
-$router->add('GET', '/student_calendar', function() {
+$router->add('GET', '/student_calendar', function() use ($db) {
     require_once APP_PATH . '/Controllers/StudentCalendarController.php';
-    (new StudentCalendarController())->index();
+    (new StudentCalendarController($db))->index();
 });
 
-$router->add('GET', '/student_profile', function() {
+$router->add('GET', '/student_profile', function() use ($db) {
     require_once APP_PATH . '/Controllers/student_ProfileController.php';
-    (new student_ProfileController())->index();
+    (new student_ProfileController($db))->index();
 });
 
-$router->add('POST', '/update_profile_process', function() {
+$router->add('POST', '/update_profile_process', function() use ($db) {
     require_once APP_PATH . '/Controllers/student_ProfileController.php';
-    (new student_ProfileController())->update();
+    (new student_ProfileController($db))->update();
 });
 
-$router->add('GET', '/student_notifications', function() {
+$router->add('GET', '/student_notifications', function() use ($db) {
     require_once APP_PATH . '/Controllers/student_NotificationsController.php';
-    (new student_NotificationsController())->index();
+    (new student_NotificationsController($db))->index();
 });
 
-$router->add('GET', '/student_certificates', function() {
+$router->add('GET', '/student_certificates', function() use ($db) {
     require_once APP_PATH . '/Controllers/student_CertificatesController.php';
-    (new student_CertificatesController())->index();
+    (new student_CertificatesController($db))->index();
 });
 
 
-$router->add('GET', '/supervisor_dashboard', function() {
+$router->add('GET', '/supervisor_dashboard', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/SupervisorDashboardController.php';
-    (new SupervisorDashboardController())->index();
+    (new SupervisorDashboardController($db))->index();
 });
 
-$router->add('GET', '/supervisor_profile', function() {
+$router->add('GET', '/supervisor_profile', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/SupervisorProfileController.php';
-    (new SupervisorProfileController())->index();
+    (new SupervisorProfileController($db))->index();
 });
 
-$router->add('POST', '/update_supervisor_profile_process', function() {
+$router->add('POST', '/update_supervisor_profile_process', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/SupervisorProfileController.php';
-    (new SupervisorProfileController())->update();
+    (new SupervisorProfileController($db))->update();
 });
 
-$router->add('POST', '/update_supervisor_password_process', function() {
+$router->add('POST', '/update_supervisor_password_process', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/SupervisorProfileController.php';
-    (new SupervisorProfileController())->changePassword();
+    (new SupervisorProfileController($db))->changePassword();
 });
 
-$router->add('GET', '/supervisor-add-opportunity', function() {
+$router->add('GET', '/supervisor-add-opportunity', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/OpportunityController.php';
-    (new OpportunityController())->create();
+    (new OpportunityController($db))->create();
 });
 
-
-$router->add('POST', '/submit_opportunity_process', function() {
+$router->add('POST', '/submit_opportunity_process', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/OpportunityController.php';
-    (new OpportunityController())->store();
+    (new OpportunityController($db))->store();
 });
 
-$router->add('GET', '/supervisor-applications', function() {
+$router->add('GET', '/supervisor-applications', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/ApplicationController.php';
-    (new ApplicationController())->index();
+    (new ApplicationController($db))->index();
 });
 
-
-$router->add('POST', '/submit_application_action', function() {
+$router->add('POST', '/submit_application_action', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/ApplicationController.php';
-    (new ApplicationController())->handleAction();
+    (new ApplicationController($db))->handleAction();
 });
 
-$router->add('GET', '/supervisor-attendance', function() {
+$router->add('GET', '/supervisor-attendance', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/AttendanceReviewController.php';
-    (new AttendanceReviewController())->index();
+    (new AttendanceReviewController($db))->index();
 });
 
-$router->add('POST', '/submit_attendance_review_action', function() {
+$router->add('POST', '/submit_attendance_review_action', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/AttendanceReviewController.php';
-    (new AttendanceReviewController())->handleAction();
+    (new AttendanceReviewController($db))->handleAction();
 });
 
-$router->add('GET', '/supervisor-edit-opportunity', function() {
+$router->add('GET', '/supervisor-edit-opportunity', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/OpportunityController.php';
-    (new OpportunityController())->edit();
+    (new OpportunityController($db))->edit();
 });
 
-$router->add('POST', '/submit_update_opportunity_process', function() {
+$router->add('POST', '/submit_update_opportunity_process', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/OpportunityController.php';
-    (new OpportunityController())->update();
+    (new OpportunityController($db))->update();
 });
 
-$router->add('GET', '/supervisor-employer-reports', function() {
+$router->add('GET', '/supervisor-employer-reports', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/CompanyReportController.php';
-    (new CompanyReportController())->index();
+    (new CompanyReportController($db))->index();
 });
 
-$router->add('GET', '/supervisor/supervisor-evaluation', function() {
+$router->add('GET', '/supervisor/supervisor-evaluation', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/EvaluationController.php';
-    (new EvaluationController())->create();
+    (new EvaluationController($db))->create();
 });
 
-$router->add('POST', '/submit_save_evaluation_process', function() {
+$router->add('POST', '/submit_save_evaluation_process', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/EvaluationController.php';
-    (new EvaluationController())->store();
+    (new EvaluationController($db))->store();
 });
 
-$router->add('GET', '/supervisor/notifications', function() {
+$router->add('GET', '/supervisor/notifications', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/NotificationController.php';
-    (new NotificationController())->index();
+    (new NotificationController($db))->index();
 });
 
-$router->add('GET', '/supervisor/notifications/mark-read', function() {
+$router->add('GET', '/supervisor/notifications/mark-read', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/NotificationController.php';
-    (new NotificationController())->markAllAsRead();
+    (new NotificationController($db))->markAllAsRead();
 });
 
-
-$router->add('GET', '/supervisor/opportunities', function() {
+$router->add('GET', '/supervisor/opportunities', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/OpportunityController.php';
-    (new OpportunityController())->index();
+    (new OpportunityController($db))->index();
 });
 
-
-$router->add('GET', '/supervisor/delete-opportunity/:id', function($id) {
+$router->add('GET', '/supervisor/delete-opportunity/:id', function($id) use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/OpportunityController.php';
-    (new OpportunityController())->delete($id);
+    (new OpportunityController($db))->delete($id);
 });
 
-$router->add('GET', '/supervisor/supervisor-reports', function() {
+$router->add('GET', '/supervisor/supervisor-reports', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/ReportReviewController.php';
-    (new ReportReviewController())->index();
+    (new ReportReviewController($db))->index();
 });
 
-$router->add('POST', '/supervisor/reports/process/:id', function($id) {
+$router->add('POST', '/supervisor/reports/process/:id', function($id) use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/ReportReviewController.php';
-    (new ReportReviewController())->process($id);
+    (new ReportReviewController($db))->process($id);
 });
 
-$router->add('GET', '/supervisor/student-profile/:id', function($id) {
+$router->add('GET', '/supervisor/student-profile/:id', function($id) use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/StudentProfileController.php';
-    (new StudentProfileController())->show($id);
+    (new StudentProfileController($db))->show($id);
 });
 
-$router->add('GET', '/supervisor/students', function() {
+$router->add('GET', '/supervisor/students', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/StudentManagementController.php';
-    (new StudentManagementController())->index();
+    (new StudentManagementController($db))->index();
 });
 
-$router->add('GET', '/volunteer_dashboard', function() {
+$router->add('GET', '/volunteer_dashboard', function() use ($db) {
     require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerDashboardController.php';
-    (new VolunteerDashboardController())->index();
+    (new VolunteerDashboardController($db))->index();
 });
 
-$router->add('GET', '/volunteer_approval', function() {
+$router->add('GET', '/volunteer_approval', function() use ($db) {
     require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerApprovalController.php';
-    (new VolunteerApprovalController())->index();
+    (new VolunteerApprovalController($db))->index();
 });
 
-$router->add('POST', '/volunteer_save_approval', function() {
+$router->add('POST', '/volunteer_save_approval', function() use ($db) {
     require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerApprovalController.php';
-    (new VolunteerApprovalController())->save();
+    (new VolunteerApprovalController($db))->save();
 });
 
-$router->add('GET', '/volunteer_attendance', function() {
+$router->add('GET', '/volunteer_attendance', function() use ($db) {
     require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerAttendanceController.php';
-    (new VolunteerAttendanceController())->index();
+    (new VolunteerAttendanceController($db))->index();
 });
 
-$router->add('POST', '/volunteer_attendance_approve', function() {
+$router->add('POST', '/volunteer_attendance_approve', function() use ($db) {
     require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerAttendanceController.php';
-    (new VolunteerAttendanceController())->approve();
+    (new VolunteerAttendanceController($db))->approve();
 });
 
-$router->add('GET', '/volunteer_employer_reports', function() {
+$router->add('GET', '/volunteer_employer_reports', function() use ($db) {
     require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerReportsController.php';
-    (new VolunteerReportsController())->index();
+    (new VolunteerReportsController($db))->index();
 });
 
-
-$router->add('GET', '/volunteer_evaluation', function() {
+$router->add('GET', '/volunteer_evaluation', function() use ($db) {
     require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerGradingController.php';
-    (new VolunteerGradingController())->index();
+    (new VolunteerGradingController($db))->index();
 });
 
-
-$router->add('POST', '/volunteer_submit_grading', function() {
+$router->add('POST', '/volunteer_submit_grading', function() use ($db) {
     require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerGradingController.php';
-    (new VolunteerGradingController())->submit();
+    (new VolunteerGradingController($db))->submit();
 });
 
-$router->add('GET', '/volunteer_notifications', function() {
+$router->add('GET', '/volunteer_notifications', function() use ($db) {
     require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerNotificationController.php';
-    (new VolunteerNotificationController())->index();
+    (new VolunteerNotificationController($db))->index();
 });
 
-$router->add('GET', '/volunteer_opportunities', function() {
+$router->add('GET', '/volunteer_opportunities', function() use ($db) {
     require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerOpportunityController.php';
-    (new VolunteerOpportunityController())->index();
+    (new VolunteerOpportunityController($db))->index();
 });
 
-$router->add('POST', '/store_opportunity', function() {
+$router->add('POST', '/store_opportunity', function() use ($db) {
     require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerOpportunityController.php';
-    (new VolunteerOpportunityController())->store();
+    (new VolunteerOpportunityController($db))->store();
 });
 
-$router->add('GET', '/volunteer_edit_opportunity', function() {
+$router->add('GET', '/volunteer_edit_opportunity', function() use ($db) {
     require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerOpportunityController.php';
     $id = $_GET['id'] ?? null; 
-    (new VolunteerOpportunityController())->edit($id);
+    (new VolunteerOpportunityController($db))->edit($id);
 });
 
-$router->add('POST', '/volunteer_update_opportunity', function() {
+$router->add('POST', '/volunteer_update_opportunity', function() use ($db) {
     require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerOpportunityController.php';
-    (new VolunteerOpportunityController())->update();
+    (new VolunteerOpportunityController($db))->update();
 });
 
-$router->add('GET', '/delete_opportunity', function() {
+$router->add('GET', '/delete_opportunity', function() use ($db) {
     require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerOpportunityController.php';
     $id = $_GET['id'] ?? null;
-    (new VolunteerOpportunityController())->delete($id);
+    (new VolunteerOpportunityController($db))->delete($id);
 });
 
-$router->add('GET', '/volunteer_profile', function() {
-    require_once APP_PATH . '/Controllers/VolunteerProfileController.php';
-    (new VolunteerProfileController())->index();
+$router->add('GET', '/volunteer_profile', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerProfileController.php';
+    (new VolunteerProfileController($db))->index();
 });
 
-$router->add('POST', '/volunteer_profile_update', function() {
-    require_once APP_PATH . '/Controllers/VolunteerProfileController.php';
-    (new VolunteerProfileController())->update();
+$router->add('POST', '/volunteer_profile_update', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerProfileController.php';
+    (new VolunteerProfileController($db))->update();
 });
 
-$router->add('POST', '/volunteer_password_update', function() {
-    require_once APP_PATH . '/Controllers/VolunteerProfileController.php';
-    (new VolunteerProfileController())->changePassword();
+$router->add('POST', '/volunteer_password_update', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerProfileController.php';
+    (new VolunteerProfileController($db))->changePassword();
 });
 
-$router->add('GET', '/volunteer_requests', function() {
-    require_once APP_PATH . '/Controllers/VolunteerApplicationController.php';
-    (new VolunteerApplicationController())->index();
+$router->add('GET', '/volunteer_requests', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerApplicationController.php';
+    (new VolunteerApplicationController($db))->index();
 });
 
-$router->add('GET', '/handle_application', function() {
-    require_once APP_PATH . '/Controllers/VolunteerApplicationController.php';
-    (new VolunteerApplicationController())->handleStatus();
+$router->add('GET', '/handle_application', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerApplicationController.php';
+    (new VolunteerApplicationController($db))->handleStatus();
 });
 
-$router->add('GET', '/volunteer_students', function() {
-    require_once APP_PATH . '/Controllers/VolunteerStudentController.php';
-    (new VolunteerStudentController())->index();
+$router->add('GET', '/volunteer_students', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerStudentController.php';
+    (new VolunteerStudentController($db))->index();
 });
 
-$router->add('GET', '/volunteer_view_student', function() {
-    require_once APP_PATH . '/Controllers/StudentReviewController.php';
-    (new StudentReviewController())->show();
+$router->add('GET', '/volunteer_view_student', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/StudentReviewController.php';
+    (new StudentReviewController($db))->show();
 });
 
-$router->add('POST', '/student_review/process', function() {
-    require_once APP_PATH . '/Controllers/StudentReviewController.php';
-    (new StudentReviewController())->process();
+$router->add('POST', '/student_review/process', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/StudentReviewController.php';
+    (new StudentReviewController($db))->process();
 });
 
-$router->add('GET', '/external_dashboard', function() {
+$router->add('GET', '/external_dashboard', function() use ($db) {
     require_once APP_PATH . '/Controllers/External_Controlles/ExternalDashboardController.php';
-    (new ExternalDashboardController())->index();
+    (new ExternalDashboardController($db))->index();
 });
 
-$router->add('GET', '/external/applications', function() {
+$router->add('GET', '/external/applications', function() use ($db) {
     require_once APP_PATH . '/Controllers/External_Controlles/ExternalApplicationsController.php';
-    (new ExternalApplicationsController())->index();
+    (new ExternalApplicationsController($db))->index();
 });
 
-$router->add('POST', '/applications/approve', function() {
+$router->add('POST', '/applications/approve', function() use ($db) {
     require_once APP_PATH . '/Controllers/External_Controlles/ExternalApplicationsController.php';
-    (new ExternalApplicationsController())->approve();
+    (new ExternalApplicationsController($db))->approve();
 });
 
-$router->add('POST', '/applications/reject', function() {
+$router->add('POST', '/applications/reject', function() use ($db) {
     require_once APP_PATH . '/Controllers/External_Controlles/ExternalApplicationsController.php';
-    (new ExternalApplicationsController())->reject();
+    (new ExternalApplicationsController($db))->reject();
 });
 
-$router->add('GET', '/external/opportunities', function() {
+$router->add('GET', '/external/opportunities', function() use ($db) {
     require_once APP_PATH . '/Controllers/External_Controlles/ExternalOpportunitiesController.php';
-    (new ExternalOpportunitiesController())->index();
+    (new ExternalOpportunitiesController($db))->index();
 });
 
-$router->add('POST', '/external/opportunities/update', function() {
+$router->add('POST', '/external/opportunities/update', function() use ($db) {
     require_once APP_PATH . '/Controllers/External_Controlles/ExternalOpportunitiesController.php';
-    (new ExternalOpportunitiesController())->update();
+    (new ExternalOpportunitiesController($db))->update();
 });
 
-$router->add('POST', '/external/opportunities/delete', function() {
+$router->add('POST', '/external/opportunities/delete', function() use ($db) {
     require_once APP_PATH . '/Controllers/External_Controlles/ExternalOpportunitiesController.php';
-    (new ExternalOpportunitiesController())->delete();
+    (new ExternalOpportunitiesController($db))->delete();
 });
 
-$router->add('GET', '/external/opportunities/add', function() {
+$router->add('GET', '/external/opportunities/add', function() use ($db) {
     require_once APP_PATH . '/Controllers/External_Controlles/ExternalOpportunitiesController.php';
-    (new ExternalOpportunitiesController())->create();
+    (new ExternalOpportunitiesController($db))->create();
 });
 
-$router->add('POST', '/external/opportunities/store', function() {
+$router->add('POST', '/external/opportunities/store', function() use ($db) {
     require_once APP_PATH . '/Controllers/External_Controlles/ExternalOpportunitiesController.php';
-    (new ExternalOpportunitiesController())->store();
+    (new ExternalOpportunitiesController($db))->store();
 });
 
-$router->add('GET', '/external/certificates', function() {
-    (new ExternalCertificatesController())->index();
+$router->add('GET', '/external/certificates', function() use ($db) {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalCertificatesController.php';
+    (new ExternalCertificatesController($db))->index();
 });
 
-$router->add('POST', '/external/certificates/store', function() {
-    (new ExternalCertificatesController())->store();
+$router->add('POST', '/external/certificates/store', function() use ($db) {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalCertificatesController.php';
+    (new ExternalCertificatesController($db))->store();
 });
 
-$router->add('GET', '/external/officials', function() {
-    (new ExternalOfficialsController())->index();
+$router->add('GET', '/external/officials', function() use ($db) {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalOfficialsController.php';
+    (new ExternalOfficialsController($db))->index();
 });
 
-$router->add('POST', '/external/officials/update', function() {
-    (new ExternalOfficialsController())->update();
+$router->add('POST', '/external/officials/update', function() use ($db) {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalOfficialsController.php';
+    (new ExternalOfficialsController($db))->update();
 });
 
-$router->add('POST', '/external/officials/assign', function() {
-    (new ExternalOfficialsController())->assign();
+$router->add('POST', '/external/officials/assign', function() use ($db) {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalOfficialsController.php';
+    (new ExternalOfficialsController($db))->assign();
 });
 
-$router->add('GET', '/external/officials/unassign/(\d+)', function($student_id) {
-    (new ExternalOfficialsController())->unassign($student_id);
+$router->add('GET', '/external/officials/unassign/(\d+)', function($student_id) use ($db) {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalOfficialsController.php';
+    (new ExternalOfficialsController($db))->unassign($student_id);
 });
 
-$router->add('GET', '/external/trainees', function() {
-    require_once '../src/controllers/ExternalTraineesController.php';
-    (new ExternalTraineesController())->index();
+$router->add('GET', '/external/trainees', function() use ($db) {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalTraineesController.php';
+    (new ExternalTraineesController($db))->index();
 });
 
-$router->add('GET', '/external/trainers', function() {
-    require_once '../src/controllers/ExternalTrainersController.php';
-    (new ExternalTrainersController())->index();
+$router->add('GET', '/external/trainers', function() use ($db) {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalTrainersController.php';
+    (new ExternalTrainersController($db))->index();
 });
 
-$router->add('POST', '/assign-student', function() {
-    require_once '../src/controllers/ExternalTrainersController.php';
-    (new ExternalTrainersController())->assign();
+$router->add('POST', '/assign-student', function() use ($db) {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalTrainersController.php';
+    (new ExternalTrainersController($db))->assign();
 });
 
-$router->add('POST', '/update-trainer', function() {
-    require_once '../src/controllers/ExternalTrainersController.php';
-    (new ExternalTrainersController())->update(); 
+$router->add('POST', '/update-trainer', function() use ($db) {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalTrainersController.php';
+    (new ExternalTrainersController($db))->update(); 
 });
 
-$router->add('GET', '/external/notifications', function() {
-    require_once '../src/controllers/ExternalNotificationsController.php';
-    (new ExternalNotificationsController())->index();
-});
-$router->add('GET', '/trainer/dashboard', function() {
-    require_once '../src/controllers/Trainer_Controllers/TrainerDashboardController.php';
-    (new TrainerDashboardController())->index();
+$router->add('GET', '/external/notifications', function() use ($db) {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalNotificationsController.php';
+    (new ExternalNotificationsController($db))->index();
 });
 
-$router->add('GET', '/trainer/profile', function() {
-    require_once '../src/controllers/Trainer_Controllers/TrainerProfileController.php';
-    (new TrainerProfileController())->index();
+$router->add('GET', '/trainer/dashboard', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Trainer_Controllers/TrainerDashboardController.php';
+    (new TrainerDashboardController($db))->index();
 });
 
-$router->add('POST', '/trainer/profile/update', function() {
-    require_once '../src/controllers/Trainer_Controllers/TrainerProfileController.php';
-    (new TrainerProfileController())->update();
+$router->add('GET', '/trainer/profile', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Trainer_Controllers/TrainerProfileController.php';
+    (new TrainerProfileController($db))->index();
 });
 
-$router->add('GET', '/trainer/attendance', function() {
-    require_once '../src/controllers/Trainer_Controllers/TrainerAttendanceController.php';
-    (new TrainerAttendanceController())->index();
+$router->add('POST', '/trainer/profile/update', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Trainer_Controllers/TrainerProfileController.php';
+    (new TrainerProfileController($db))->update();
 });
 
-$router->add('POST', '/trainer/attendance/save', function() {
-    require_once '../src/controllers/Trainer_Controllers/TrainerAttendanceController.php';
-    (new TrainerAttendanceController())->save();
+$router->add('GET', '/trainer/attendance', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Trainer_Controllers/TrainerAttendanceController.php';
+    (new TrainerAttendanceController($db))->index();
 });
 
-$router->add('GET', '/trainer/reports', function() {
-    require_once '../src/controllers/Trainer_Controllers/TrainerReportsController.php';
-    (new TrainerReportsController())->index();
+$router->add('POST', '/trainer/attendance/save', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Trainer_Controllers/TrainerAttendanceController.php';
+    (new TrainerAttendanceController($db))->save();
 });
 
-$router->add('POST', '/trainer/reports/process-monthly', function() {
-    require_once '../src/controllers/Trainer_Controllers/TrainerReportsController.php';
-    (new TrainerReportsController())->processMonthly();
+$router->add('GET', '/trainer/reports', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Trainer_Controllers/TrainerReportsController.php';
+    (new TrainerReportsController($db))->index();
 });
 
-$router->add('POST', '/trainer/reports/process-final', function() {
-    require_once '../src/controllers/Trainer_Controllers/TrainerReportsController.php';
-    (new TrainerReportsController())->processFinal();
+$router->add('POST', '/trainer/reports/process-monthly', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Trainer_Controllers/TrainerReportsController.php';
+    (new TrainerReportsController($db))->processMonthly();
 });
 
-$router->add('GET', '/trainer/student-details/(\d+)', function($student_id) {
-    require_once '../src/controllers/Trainer_Controllers/TrainerStudentDetailsController.php';
-    (new TrainerStudentDetailsController())->show($student_id);
+$router->add('POST', '/trainer/reports/process-final', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Trainer_Controllers/TrainerReportsController.php';
+    (new TrainerReportsController($db))->processFinal();
 });
 
-$router->add('GET', '/trainer/notifications', function() {
-    require_once '../src/controllers/Trainer_Controllers/TrainerNotificationsController.php';
-    (new TrainerNotificationsController())->index();
+$router->add('GET', '/trainer/student-details/(\d+)', function($student_id) use ($db) {
+    require_once APP_PATH . '/Controllers/Trainer_Controllers/TrainerStudentDetailsController.php';
+    (new TrainerStudentDetailsController($db))->show($student_id);
 });
 
-$router->add('GET', '/v_manager/dashboard', function() {
-    require_once '../src/controllers/V_Manager_Controllers/VManagerDashboardController.php';
-    (new VManagerDashboardController())->index();
+$router->add('GET', '/trainer/notifications', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Trainer_Controllers/TrainerNotificationsController.php';
+    (new TrainerNotificationsController($db))->index();
 });
 
-$router->add('GET', '/v_manager/profile', function() {
-    require_once '../src/controllers/V_Manager_Controllers/VManagerProfileController.php';
-    (new VManagerProfileController())->index();
+$router->add('GET', '/v_manager/dashboard', function() use ($db) {
+    require_once APP_PATH . '/Controllers/V_Manager_Controllers/VManagerDashboardController.php';
+    (new VManagerDashboardController($db))->index();
 });
 
-$router->add('POST', '/v_manager/profile/update', function() {
-    require_once '../src/controllers/V_Manager_Controllers/VManagerProfileController.php';
-    (new VManagerProfileController())->update();
+$router->add('GET', '/v_manager/profile', function() use ($db) {
+    require_once APP_PATH . '/Controllers/V_Manager_Controllers/VManagerProfileController.php';
+    (new VManagerProfileController($db))->index();
 });
 
-$router->add('GET', '/v_manager/volunteers', function() {
-    require_once '../src/controllers/V_Manager_Controllers/VManagerVolunteersController.php';
-    (new VManagerVolunteersController())->index();
+$router->add('POST', '/v_manager/profile/update', function() use ($db) {
+    require_once APP_PATH . '/Controllers/V_Manager_Controllers/VManagerProfileController.php';
+    (new VManagerProfileController($db))->update();
 });
 
-$router->add('GET', '/v_manager/student-details', function() {
-    require_once '../src/controllers/V_Manager_Controllers/VManagerStudentDetailsController.php';
-    (new VManagerStudentDetailsController())->index();
+$router->add('GET', '/v_manager/volunteers', function() use ($db) {
+    require_once APP_PATH . '/Controllers/V_Manager_Controllers/VManagerVolunteersController.php';
+    (new VManagerVolunteersController($db))->index();
 });
 
-$router->add('GET', '/v_manager/reports', function() {
-    require_once '../src/controllers/V_Manager_Controllers/VManagerReportsController.php';
-    (new VManagerReportsController())->index();
+$router->add('GET', '/v_manager/student-details', function() use ($db) {
+    require_once APP_PATH . '/Controllers/V_Manager_Controllers/VManagerStudentDetailsController.php';
+    (new VManagerStudentDetailsController($db))->index();
 });
 
-$router->add('GET', '/v_manager/attendance', function() {
-    require_once '../src/controllers/V_Manager_Controllers/VManagerAttendanceController.php';
-    (new AttendanceController())->index();
+$router->add('GET', '/v_manager/reports', function() use ($db) {
+    require_once APP_PATH . '/Controllers/V_Manager_Controllers/VManagerReportsController.php';
+    (new VManagerReportsController($db))->index();
 });
 
-$router->add('POST', '/v_manager/attendance/save', function() {
-    require_once '../src/controllers/V_Manager_Controllers/VManagerAttendanceController.php';
-    (new AttendanceController())->save();
+$router->add('GET', '/v_manager/attendance', function() use ($db) {
+    require_once APP_PATH . '/Controllers/V_Manager_Controllers/VManagerAttendanceController.php';
+    (new AttendanceController($db))->index();
 });
 
-$router->add('GET', '/v_manager/notifications', function() {
-    require_once '../src/controllers/V_Manager_Controllers/VManagerNotificationController.php';
-    (new NotificationController())->index();
+$router->add('POST', '/v_manager/attendance/save', function() use ($db) {
+    require_once APP_PATH . '/Controllers/V_Manager_Controllers/VManagerAttendanceController.php';
+    (new AttendanceController($db))->save();
+});
+
+$router->add('GET', '/v_manager/notifications', function() use ($db) {
+    require_once APP_PATH . '/Controllers/V_Manager_Controllers/VManagerNotificationController.php';
+    (new NotificationController($db))->index();
+});
+
+$router->add('GET', '/admin/admin_dashboard', function() use($db) {
+    require_once '../app/Controllers/Admin_Controllers/AdminDashboardController.php';
+    (new AdminDashboardController($db))->index();
+});
+
+
+$router->add('GET', '/admin/accounts', function() use($db) {
+    require_once '../app/Controllers/Admin_Controllers/AdminAccountsController.php';
+    (new AdminAccountsController($db))->index();
+});
+
+
+$router->add('POST', '/admin/update-user', function() use($db) {
+    require_once '../app/Controllers/Admin_Controllers/AdminAccountsController.php';
+    (new AdminAccountsController($db))->update();
+});
+
+$router->add('POST', '/admin/delete-user', function() use($db) {
+    require_once '../app/Controllers/Admin_Controllers/AdminAccountsController.php';
+    (new AdminAccountsController($db))->destroy();
+});
+
+$router->add('GET', '/admin/certificates', function() use($db) {
+    require_once '../app/Controllers/Admin_Controllers/AdminCertificatesController.php';
+    (new AdminCertificatesController($db))->index();
+});
+
+$router->add('POST', '/admin/process-signature', function() use($db) {
+    require_once '../app/Controllers/Admin_Controllers/AdminCertificatesController.php';
+    (new AdminCertificatesController($db))->process();
+});
+
+$router->add('GET', '/admin/statistics', function() use($db) {
+    require_once '../app/Controllers/Admin_Controllers/AdminStatisticsController.php';
+    (new AdminStatisticsController($db))->index();
+});
+
+$router->add('GET', '/admin/notifications', function() use ($db) {
+    require_once '../app/Controllers/Admin_Controllers/AdminNotificationsController.php';
+    (new AdminNotificationsController($db))->index();
+});
+
+$router->add('GET', '/admin/profile', function() use ($db) {
+    require_once __DIR__ . '/../app/Controllers/Admin_Controllers/AdminProfileController.php';
+    (new AdminProfileController($db))->index();
+});
+
+$router->add('POST', '/admin/profile/update', function() use ($db) {
+    require_once __DIR__ . '/../app/Controllers/Admin_Controllers/AdminProfileController.php';
+    (new AdminProfileController($db))->update();
+});
+
+$router->add('GET', '/register', function() use ($db) {
+    require_once __DIR__ . '/../app/controllers/RegisterController.php';
+    (new RegisterController($db))->showRegisterForm();
+});
+
+$router->add('POST', '/register_process', function() use ($db) {
+    require_once __DIR__ . '/../app/controllers/RegisterController.php';
+    (new RegisterController($db))->processRegistration();
+});
+
+$router->add('GET', '/logout', function() {
+    require_once APP_PATH . '/Controllers/AuthController.php';
+    (new AuthController())->logout();
 });
 $router->run();

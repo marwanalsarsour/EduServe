@@ -40,7 +40,7 @@ require_once VIEW_PATH . '/layout/header.php';
                             الأنشطة الأخيرة
                         </h5>
                         <div class="d-flex gap-2">
-                            <a href="/student_interactive-calendar" class="btn btn-sm btn-outline-primary">
+                            <a href="/student_calendar" class="btn btn-sm btn-outline-primary">
                                 <i class="bi bi-calendar-event ms-1"></i>
                                 التقويم التفاعلي
                             </a>

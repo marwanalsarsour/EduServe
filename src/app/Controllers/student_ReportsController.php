@@ -1,22 +1,53 @@
 <?php
 
-class student_ReportsController extends Controller {
+
+require_once __DIR__ . '/../Models/StudentModel.php'; 
+
+class student_ReportsController {
+    private $db;
+
+    public function __construct($db) {
+        $this->db = $db;
+    }
     
     public function index() {
         if (session_status() === PHP_SESSION_NONE) session_start();
-        if (!isset($_SESSION['user_id'])) { header("Location: /login"); exit(); }
+        
+        if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] !== 'طالب' && $_SESSION['user_role'] !== 'student')) { 
+            header("Location: /login"); 
+            exit(); 
+        }
 
         $studentId = $_SESSION['user_id'];
-        $model = $this->model('StudentModel');
+        
+        $model = new StudentModel($this->db);
         $reports = $model->getStudentReports($studentId);
 
         require_once VIEW_PATH . '/student/student_reports.php';
     }
 
+    public function showSubmitForm() {
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        
+        if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] !== 'طالب' && $_SESSION['user_role'] !== 'student')) { 
+            header("Location: /login"); 
+            exit(); 
+        }
+
+        require_once VIEW_PATH . '/student/student_report-submit.php';
+    }
+
     public function submit() {
         if (session_status() === PHP_SESSION_NONE) session_start();
+        
+        if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] !== 'طالب' && $_SESSION['user_role'] !== 'student')) { 
+            header("Location: /login"); 
+            exit(); 
+        }
+
         $studentId = $_SESSION['user_id'];
-        $model = $this->model('StudentModel');
+        
+        $model = new StudentModel($this->db);
 
         $reportType = $_POST['reportType'] ?? 'General';
         $content = $_POST['content'] ?? '';

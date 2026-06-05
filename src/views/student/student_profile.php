@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -52,12 +51,9 @@
 
                         <div class="text-center text-md-start">
                             <h4 id="studentName" class="fw-bold mb-1"><?= htmlspecialchars($student['fullName'] ?? 'غير معرف') ?></h4>
-                            <p class="mb-1 opacity-75">
-                                رقم جامعي: <span id="studentId"><?= htmlspecialchars($student['studentID'] ?? '00000') ?></span>
-                            </p>
+                            
                             <small class="badge bg-white text-primary">
-                                <span id="studentCollege"><?= htmlspecialchars($student['college'] ?? 'الكلية') ?></span> -
-                                <span id="studentMajor"><?= htmlspecialchars($student['major'] ?? 'التخصص') ?></span>
+                                <span id="studentMajor"><?= htmlspecialchars($student['majorName'] ?? 'التخصص') ?></span>
                             </small>
                         </div>
                     </div>
@@ -121,13 +117,13 @@
                         <div class="col-md-6">
                             <label class="form-label fw-bold">رقم الهاتف</label>
                             <input type="text" name="phone" class="form-control" 
-                                   value="<?= htmlspecialchars($student['phone'] ?? '') ?>">
+                                   value="<?= htmlspecialchars($student['phoneNumber'] ?? '') ?>">
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-bold">التخصص</label>
                             <input type="text" name="major" class="form-control" 
-                                   value="<?= htmlspecialchars($student['major'] ?? '') ?>" readonly>
+                                   value="<?= htmlspecialchars($student['majorName'] ?? '') ?>" readonly>
                             <div class="form-text">لا يمكن تغيير التخصص من الملف الشخصي.</div>
                         </div>
 
@@ -156,7 +152,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        
         document.getElementById('profileForm').onsubmit = function() {
             const pass = document.querySelector('input[name="password"]').value;
             const confirm = document.querySelector('input[name="confirm_password"]').value;

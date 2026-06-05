@@ -1,3 +1,6 @@
+<?php 
+require_once VIEW_PATH . '/layout/header.php'; 
+?>
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -52,7 +55,6 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-    <?php require_once BASE_PATH . '/views/layout/header.php'; ?>
 
     <div class="container py-4">
         <main>
@@ -69,7 +71,7 @@
                 <div class="card-body p-4 d-flex justify-content-between align-items-center">
                     <div>
                         <h2 class="fw-bold mb-1">أهلاً بك، <?= htmlspecialchars($orgData['name']) ?></h2>
-                        <p class="mb-0 fs-5">لديك <?= $stats['pending_apps'] ?> طلبات جديدة بانتظار مراجعتك اليوم.</p>
+                        <p class="mb-0 fs-5">لديك <?= $stats['pending_apps'] ?? 0 ?> طلبات جديدة بانتظار مراجعتك اليوم.</p>
                     </div>
                     <i class="bi bi-building fs-1 d-none d-md-block" style="font-size: 4rem !important; opacity: 0.5;"></i>
                 </div>
@@ -81,7 +83,7 @@
                         <div class="card-body text-center p-4">
                             <i class="bi bi-megaphone fs-1" style="color: blue;"></i>
                             <h6 class="mt-3 fw-bold" style="color: black;">الفرص المنشورة</h6>
-                            <h2 class="fw-bold"><?= $stats['opps_count'] ?></h2>
+                            <h2 class="fw-bold"><?= $stats['opps_count'] ?? 0 ?></h2>
                             <a href="/external/opportunities" class="btn btn-sm mt-2" style="color: blue; border: 1px solid blue;">عرض التفاصيل</a>
                         </div>
                     </div>
@@ -92,33 +94,41 @@
                         <div class="card-body text-center p-4">
                             <i class="bi bi-clock-history fs-1" style="color: orange;"></i>
                             <h6 class="mt-3 fw-bold" style="color: black;">طلبات جديدة</h6>
-                            <h2 class="fw-bold"><?= $stats['pending_apps'] ?></h2>
+                            <h2 class="fw-bold"><?= $stats['pending_apps'] ?? 0 ?></h2>
                             <a href="/external/applications" class="btn btn-sm mt-2" style="color: orange; border: 1px solid orange;">مراجعة الطلبات</a>
                         </div>
                     </div>
                 </div>
 
+                <?php if (isset($stats['entity_type']) && $stats['entity_type'] === 'شركة'): ?>
                 <div class="col-12 col-sm-6 col-xl-3">
                     <div class="card border-0 shadow-sm stat-card h-100" style="border-top: 5px solid blue !important;">
                         <div class="card-body p-4 text-center">
                             <i class="bi bi-person-badge fs-2" style="color: blue;"></i>
                             <div class="small mt-2" style="color: gray;">المدرب المعتمد</div>
-                            <div class="fw-bold mb-3">أ. محمد الأحمد</div>
-                            <a href="/trainer_dashboard" class="btn btn-sm w-100" style="background-color: white; border: 1px solid blue; color: blue;">الملف الشخصي</a>
+                            <div class="fw-bold mb-3">
+                                <?= htmlspecialchars($stats['trainer_name']) ?>
+                            </div>
+                            <a href="/trainer/dashboard" class="btn btn-sm w-100" style="background-color: white; border: 1px solid blue; color: blue;">الملف الشخصي</a>
                         </div>
                     </div>
                 </div>
+                <?php endif; ?>
 
+                <?php if (isset($stats['entity_type']) && $stats['entity_type'] === 'مؤسسة'): ?>
                 <div class="col-12 col-sm-6 col-xl-3">
                     <div class="card border-0 shadow-sm stat-card h-100" style="border-top: 5px solid green !important;">
                         <div class="card-body p-4 text-center">
                             <i class="bi bi-person-workspace fs-2" style="color: green;"></i>
                             <div class="small mt-2" style="color: gray;">مسؤول النشاط</div>
-                            <div class="fw-bold mb-3">أ. سارة العلي</div>
-                            <a href="/v_manager_dashboard" class="btn btn-sm w-100" style="background-color: white; border: 1px solid green; color: green;">الملف الشخصي</a>
+                            <div class="fw-bold mb-3">
+                                <?= htmlspecialchars($stats['manager_name']) ?>
+                            </div>
+                            <a href="/v_manager/dashboard" class="btn btn-sm w-100" style="background-color: white; border: 1px solid green; color: green;">الملف الشخصي</a>
                         </div>
                     </div>
                 </div>
+                <?php endif; ?>
             </div>
 
             <div class="row g-4">
@@ -133,14 +143,14 @@
                                 <div class="col-md-6">
                                     <div class="p-4 rounded border bg-light">
                                         <i class="bi bi-person-check fs-2" style="color: green;"></i>
-                                        <h4 class="fw-bold mt-2"><?= $stats['active_trainees'] ?></h4>
+                                        <h4 class="fw-bold mt-2"><?= $stats['active_trainees'] ?? 0 ?></h4>
                                         <p class="mb-0 text-muted">متدرب يمارس نشاطه حالياً</p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="p-4 rounded border bg-light">
                                         <i class="bi bi-journal-text fs-2" style="color: blue;"></i>
-                                        <h4 class="fw-bold mt-2"><?= $stats['total_apps'] ?></h4>
+                                        <h4 class="fw-bold mt-2"><?= $stats['total_apps'] ?? 0 ?></h4>
                                         <p class="mb-0 text-muted">إجمالي سجلات النظام</p>
                                     </div>
                                 </div>

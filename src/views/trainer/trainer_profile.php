@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 <body class="reports-page text-end bg-light">
-    <?php require_once '../src/views/layout/header.php'; ?>
 
     <div class="container py-5">
         <?php if(isset($_GET['status']) && $_GET['status'] === 'success'): ?>

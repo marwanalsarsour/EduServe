@@ -1,9 +1,12 @@
+<?php 
+require_once VIEW_PATH . '/layout/header.php'; 
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $data['title'] ?></title>
+    <title><?= htmlspecialchars($data['title'] ?? 'لوحة التحكم') ?></title>
     <link rel="icon" type="image/png" href="/public/images/logo.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -15,8 +18,6 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-
-<?php require_once __DIR__ . '/../layout/header.php'; ?>
 
 <main class="flex-grow-1">
 <div class="container my-5">
@@ -41,7 +42,7 @@
                         <i class="bi bi-people fs-3 text-primary"></i>
                     </div>
                     <div class="text-muted small">إجمالي الطلاب</div>
-                    <div class="fs-4 fw-bold"><?= $data['stats']['students_count'] ?></div>
+                    <div class="fs-4 fw-bold"><?= htmlspecialchars($data['stats']['students_count'] ?? 0) ?></div>
                 </div>
             </div>
         </div>
@@ -53,7 +54,7 @@
                         <i class="bi bi-file-earmark-text fs-3 text-warning"></i>
                     </div>
                     <div class="text-muted small">تقارير قيد المراجعة</div>
-                    <div class="fs-4 fw-bold"><?= $data['stats']['pending_reports'] ?></div>
+                    <div class="fs-4 fw-bold"><?= htmlspecialchars($data['stats']['pending_reports'] ?? 0) ?></div>
                 </div>
             </div>
         </div>
@@ -65,7 +66,7 @@
                         <i class="bi bi-person-check fs-3 text-success"></i>
                     </div>
                     <div class="text-muted small">طلبات التدريب</div>
-                    <div class="fs-4 fw-bold"><?= $data['stats']['pending_applications'] ?></div>
+                    <div class="fs-4 fw-bold"><?= htmlspecialchars($data['stats']['pending_applications'] ?? 0) ?></div>
                 </div>
             </div>
         </div>
@@ -77,7 +78,7 @@
                         <i class="bi bi-bell fs-3 text-danger"></i>
                     </div>
                     <div class="text-muted small">تنبيهات جديدة</div>
-                    <div class="fs-4 fw-bold"><?= $data['stats']['unread_notifications'] ?></div>
+                    <div class="fs-4 fw-bold"><?= htmlspecialchars($data['stats']['unread_notifications'] ?? 0) ?></div>
                 </div>
             </div>
         </div>
@@ -88,12 +89,12 @@
             <div class="card shadow-sm h-100 border-0">
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-3"><i class="bi bi-bar-chart-line me-2 text-primary"></i>متوسط تقدم الطلاب</h5>
-                    <?php $progress = $data['stats']['average_progress']; ?>
+                    <?php $progress = $data['stats']['average_progress'] ?? 0; ?>
                     <div class="progress mb-2" style="height: 15px; border-radius: 10px;">
                         <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                             role="progressbar" style="width: <?= $progress ?>%"></div>
+                             role="progressbar" style="width: <?= (int)$progress ?>%"></div>
                     </div>
-                    <div class="fw-bold text-primary"><?= $progress ?>% اكتمل</div>
+                    <div class="fw-bold text-primary"><?= htmlspecialchars($progress) ?>% اكتمل</div>
                 </div>
             </div>
         </div>
@@ -102,8 +103,8 @@
             <div class="card shadow-sm h-100 border-0">
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-3"><i class="bi bi-check2-square me-2 text-success"></i>حالة التقارير</h5>
-                    <div class="fs-3 fw-bold text-success"><?= $data['stats']['approved_reports'] ?></div>
-                    <div class="text-muted small">تقارير معتمدة من إجمالي <?= $data['stats']['total_reports'] ?> تقرير تم رفعه</div>
+                    <div class="fs-3 fw-bold text-success"><?= htmlspecialchars($data['stats']['approved_reports'] ?? 0) ?></div>
+                    <div class="text-muted small">تقارير معتمدة من إجمالي <?= htmlspecialchars($data['stats']['total_reports'] ?? 0) ?> تقرير تم رفعه</div>
                 </div>
             </div>
         </div>
@@ -126,9 +127,9 @@
                         <tbody>
                             <?php foreach($data['recent_activity'] as $activity): ?>
                                 <tr>
-                                    <td class="fw-semibold"><?= htmlspecialchars($activity['student_name']) ?></td>
-                                    <td class="text-muted"><?= htmlspecialchars($activity['description']) ?></td>
-                                    <td><span class="badge bg-light text-dark"><?= $activity['date'] ?></span></td>
+                                    <td class="fw-semibold"><?= htmlspecialchars($activity['student_name'] ?? '') ?></td>
+                                    <td class="text-muted"><?= htmlspecialchars($activity['description'] ?? '') ?></td>
+                                    <td><span class="badge bg-light text-dark"><?= htmlspecialchars($activity['date'] ?? '') ?></span></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

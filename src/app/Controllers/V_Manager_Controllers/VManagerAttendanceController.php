@@ -7,14 +7,17 @@ class AttendanceController {
         if (session_status() === PHP_SESSION_NONE) session_start();
         global $db;
         $this->db = $db;
-        require_once '../src/models/VolunteerManagerModel.php';
+        
+        require_once APP_PATH . '/models/VolunteerManagerModel.php';
+        
         $this->model = new VolunteerManagerModel($this->db);
     }
 
     public function index() {
         $manager_id = $_SESSION['user_id'];
         $volunteers = $this->model->getVolunteersForAttendance($manager_id);
-        require_once '../src/views/v_manager/v_manager_attendance.php';
+        
+        require_once VIEW_PATH . '/v_manager/v_manager_attendance.php';
     }
 
     public function save() {

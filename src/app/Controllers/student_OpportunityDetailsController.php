@@ -1,5 +1,5 @@
 <?php
-
+require_once __DIR__ . '/../Models/StudentModel.php'; 
 class student_OpportunityDetailsController extends Controller {
     
     public function index() {

@@ -7,7 +7,9 @@ class TrainerStudentDetailsController {
         if (session_status() === PHP_SESSION_NONE) session_start();
         global $db;
         $this->db = $db;
-        require_once '../src/models/TrainerModel.php';
+        
+        require_once APP_PATH . '/models/TrainerModel.php';
+        
         $this->model = new TrainerModel($this->db);
     }
 
@@ -21,6 +23,6 @@ class TrainerStudentDetailsController {
         $completed_hours = $student['completed_hours'] ?? 0;
         $progress_percent = min(100, round(($completed_hours / $required_hours) * 100));
 
-        require_once '../src/views/trainer/trainer_student_details.php';
+        require_once VIEW_PATH . '/trainer/trainer_student_details.php';
     }
 }

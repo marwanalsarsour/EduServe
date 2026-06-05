@@ -3,18 +3,22 @@ class TrainerReportsController {
     private $model;
     private $db;
 
-    public function __construct() {
+    public function __construct($db = null) {
         if (session_status() === PHP_SESSION_NONE) session_start();
+        
         global $db;
         $this->db = $db;
-        require_once '../src/models/TrainerModel.php';
+        
+        require_once APP_PATH . '/models/TrainerModel.php';
+        
         $this->model = new TrainerModel($this->db);
     }
 
     public function index() {
         $trainer_id = $_SESSION['user_id'];
         $students = $this->model->getMyStudents($trainer_id);
-        require_once '../src/views/trainer/trainer_reports.php';
+        
+        require_once VIEW_PATH . '/trainer/trainer_reports.php';
     }
 
     public function processMonthly() {
@@ -28,6 +32,7 @@ class TrainerReportsController {
             ];
             $this->model->saveMonthlyReport($data);
             header('Location: /trainer/reports?success=monthly');
+            exit();
         }
     }
 
@@ -44,6 +49,7 @@ class TrainerReportsController {
             ];
             $this->model->saveFinalEvaluation($data);
             header('Location: /trainer/reports?success=final');
+            exit();
         }
     }
 }

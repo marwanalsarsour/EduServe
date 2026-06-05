@@ -1,3 +1,6 @@
+<?php 
+require_once VIEW_PATH . '/layout/header.php'; 
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -10,7 +13,6 @@
 </head>
 <body class="bg-light text-end">
 
-<?php require_once BASE_PATH . '/views/layout/header.php'; ?>
 
 <div class="container mt-5 pb-5">
     <div class="row justify-content-center">

@@ -7,7 +7,9 @@ class VManagerStudentDetailsController {
         if (session_status() === PHP_SESSION_NONE) session_start();
         global $db;
         $this->db = $db;
-        require_once '../src/models/VolunteerManagerModel.php';
+        
+        require_once APP_PATH . '/models/VolunteerManagerModel.php';
+        
         $this->model = new VolunteerManagerModel($this->db);
     }
 
@@ -28,6 +30,6 @@ class VManagerStudentDetailsController {
         $required = $student['required_hours'] > 0 ? $student['required_hours'] : 50;
         $progress = min(100, round(($student['completed_hours'] / $required) * 100));
 
-        require_once '../src/views/v_manager/v_manager_student_details.php';
+        require_once VIEW_PATH . '/v_manager/v_manager_student_details.php';
     }
 }

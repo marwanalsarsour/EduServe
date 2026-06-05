@@ -3,193 +3,248 @@
 class StudentModel {
     private $db;
 
-    public function __construct() {
-     
-        $this->db = new Database(); 
+    public function __construct($db_connection = null) {
+        if ($db_connection !== null) {
+            $this->db = $db_connection;
+        } else {
+            global $db_connection; 
+            $this->db = $db_connection;
+        }
     }
 
-    
-
     public function getDashboardSummary($studentId) {
-        $sql = "SELECT * FROM Student WHERE UserID = ?";
-        return $this->db->query($sql, [$studentId])->fetch();
+        $sql = "SELECT * FROM Student WHERE studentID = :studentId";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':studentId' => $studentId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function getLatestApplication($studentId) {
-        $sql = "SELECT ar.*, o.Title as OpportunityTitle, o.OrganizationName 
+        $sql = "SELECT ar.*, o.title as OpportunityTitle, ee.entityName as OrganizationName 
                 FROM OpportunityRequest ar
-                JOIN Opportunity o ON ar.OpportunityID = o.OpportunityID
-                WHERE ar.StudentID = ? 
-                ORDER BY ar.RequestDate DESC LIMIT 1";
-        return $this->db->query($sql, [$studentId])->fetch();
+                JOIN Opportunity o ON ar.opportunityID = o.opportunityID
+                JOIN ExternalEntity ee ON ar.entityID = ee.entityID
+                WHERE ar.studentID = :studentId 
+                ORDER BY ar.requestDate DESC LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':studentId' => $studentId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function getCertificateQuickSummary($studentId) {
-        
         $sql = "SELECT 
-                    (SELECT COUNT(*) FROM Certificates WHERE StudentID = ?) as total_certs,
-                    (SELECT OrganizationName FROM Certificates WHERE StudentID = ? ORDER BY IssueDate DESC LIMIT 1) as latest_org,
-                    (SELECT IssueDate FROM Certificates WHERE StudentID = ? ORDER BY IssueDate DESC LIMIT 1) as latest_date";
-        return $this->db->query($sql, [$studentId, $studentId, $studentId])->fetch();
+                    (SELECT COUNT(*) FROM Certificate WHERE studentID = :id1) as total_certs,
+                    (SELECT ee.entityName FROM Certificate c 
+                     JOIN ExternalEntity ee ON c.entityID = ee.entityID 
+                     WHERE c.studentID = :id2 ORDER BY c.issueDate DESC LIMIT 1) as latest_org,
+                    (SELECT issueDate FROM Certificate WHERE studentID = :id3 ORDER BY issueDate DESC LIMIT 1) as latest_date";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id1' => $studentId, ':id2' => $studentId, ':id3' => $studentId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function getAcceptedTrainingCount($studentId) {
-        $sql = "SELECT COUNT(*) as total FROM OpportunityRequest WHERE StudentID = ? AND EntityStatus = 'Accepted'";
-        $res = $this->db->query($sql, [$studentId])->fetch();
+        $sql = "SELECT COUNT(*) as total FROM OpportunityRequest WHERE studentID = :studentId AND entityStatus = 'مقبول'";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':studentId' => $studentId]);
+        $res = $stmt->fetch(PDO::FETCH_ASSOC);
         return $res['total'] ?? 0;
     }
 
-   
-
     public function getFullAttendance($studentId) {
-        $sql = "SELECT * FROM Attendance WHERE StudentID = ? ORDER BY AttendanceDate DESC";
-        return $this->db->query($sql, [$studentId])->fetchAll();
+        $sql = "SELECT * FROM Attendance WHERE studentID = :studentId ORDER BY date DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':studentId' => $studentId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getApprovedOpportunity($studentId) {
-      
-        $sql = "SELECT o.Title, o.OrganizationName, o.Type 
+        $sql = "SELECT o.title, ee.entityName as OrganizationName, o.type 
                 FROM Opportunity o
-                JOIN OpportunityRequest ar ON o.OpportunityID = ar.OpportunityID
-                WHERE ar.StudentID = ? AND ar.EntityStatus = 'Accepted'
+                JOIN OpportunityRequest ar ON o.opportunityID = ar.opportunityID
+                JOIN ExternalEntity ee ON o.entityID = ee.entityID
+                WHERE ar.studentID = :studentId AND ar.entityStatus = 'مقبول'
                 LIMIT 1";
-        return $this->db->query($sql, [$studentId])->fetch();
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':studentId' => $studentId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function updateAttendanceRecord($attendanceId, $studentId, $checkIn, $checkOut, $hours) {
         $sql = "UPDATE Attendance 
-                SET CheckIn = ?, CheckOut = ?, HoursWorked = ? 
-                WHERE AttendanceID = ? AND StudentID = ?";
-        return $this->db->query($sql, [$checkIn, $checkOut, $hours, $attendanceId, $studentId]);
+                SET checkIn = :checkIn, checkOut = :checkOut, hours = :hours 
+                WHERE attendanceID = :attendanceId AND studentID = :studentId";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':checkIn' => $checkIn,
+            ':checkOut' => $checkOut,
+            ':hours' => $hours,
+            ':attendanceId' => $attendanceId,
+            ':studentId' => $studentId
+        ]);
     }
-
-
 
     public function getCalendarEvents($studentId) {
         $sql = "
-            SELECT 'attendance' as type, Status as title, AttendanceDate as event_date, Notes as description, Status 
+            SELECT 'attendance' as type, status as title, date as event_date, notes as description, status 
             FROM Attendance 
-            WHERE StudentID = ?
+            WHERE studentID = :id1
             UNION ALL
-            SELECT 'report' as type, Title, SubmissionDate as event_date, Status as description, Status
-            FROM Reports 
-            WHERE StudentID = ?
+            SELECT 'report' as type, reportType as title, data as event_date, content as description, 'تم التسليم' as status
+            FROM StudentReport 
+            WHERE studentID = :id2
             ORDER BY event_date DESC
         ";
-        return $this->db->query($sql, [$studentId, $studentId])->fetchAll();
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id1' => $studentId, ':id2' => $studentId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    
-
     public function getOpenOpportunities() {
-        $sql = "SELECT * FROM Opportunity WHERE Status = 'Open' ORDER BY CreatedAt DESC";
-        return $this->db->query($sql)->fetchAll();
+        $sql = "SELECT o.*, ee.entityName FROM Opportunity o 
+                JOIN ExternalEntity ee ON o.entityID = ee.entityID 
+                WHERE o.status = 'نشط' 
+                ORDER BY o.opportunityID DESC";
+        $query = $this->db->query($sql);
+        return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getOpportunityById($id) {
-        $sql = "SELECT o.*, org.Name as OrganizationName, org.Email as OrgEmail, org.Phone as OrgPhone, o.OrganizationID 
+        $sql = "SELECT o.*, ee.entityName as OrganizationName, u.email as OrgEmail, u.phoneNumber as OrgPhone, o.entityID as OrganizationID 
                 FROM Opportunity o
-                JOIN Organization org ON o.OrganizationID = org.OrganizationID
-                WHERE o.OpportunityID = ?";
-        return $this->db->query($sql, [$id])->fetch();
+                JOIN ExternalEntity ee ON o.entityID = ee.entityID
+                JOIN Users u ON ee.entityID = u.userID
+                WHERE o.opportunityID = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    
-
-    public function submitOpportunityRequest($sid, $oid, $eid, $cv) {
+    public function submitOpportunityRequest($sid, $oid, $eid, $supervisorId, $cv) {
         $sql = "INSERT INTO OpportunityRequest 
-                (RequestDate, StudentID, OpportunityID, EntityID, EntityStatus, SupervisorStatus, CV_Path) 
-                VALUES (NOW(), ?, ?, ?, 'Pending', 'Pending', ?)";
-        return $this->db->query($sql, [$sid, $oid, $eid, $cv]);
+                (requestID, requestDate, studentID, opportunityID, entityID, supervisorID, entityStatus, supervisorStatus, CV_Path) 
+                VALUES (:requestID, NOW(), :sid, :oid, :eid, :supervisorID, 'قيد الانتظار', 'بانتظار المشرف', :cv)";
+        $stmt = $this->db->prepare($sql);
+        $generatedID = rand(100000, 999999);
+        return $stmt->execute([
+            ':requestID' => $generatedID,
+            ':sid' => $sid,
+            ':oid' => $oid,
+            ':eid' => $eid,
+            ':supervisorID' => $supervisorId,
+            ':cv' => $cv
+        ]);
     }
 
     public function getStudentApplications($studentId) {
-        $sql = "SELECT ar.*, o.Title, o.Type, org.Name as OrganizationName
+        $sql = "SELECT ar.*, o.title, o.type, ee.entityName as OrganizationName
                 FROM OpportunityRequest ar
-                JOIN Opportunity o ON ar.OpportunityID = o.OpportunityID
-                JOIN Organization org ON o.OrganizationID = org.OrganizationID
-                WHERE ar.StudentID = ?
-                ORDER BY ar.RequestDate DESC";
-        return $this->db->query($sql, [$studentId])->fetchAll();
+                JOIN Opportunity o ON ar.opportunityID = o.opportunityID
+                JOIN ExternalEntity ee ON ar.entityID = ee.entityID
+                WHERE ar.studentID = :studentId
+                ORDER BY ar.requestDate DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':studentId' => $studentId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getAcceptedOpportunityId($studentId) {
-        $sql = "SELECT OpportunityID FROM OpportunityRequest WHERE StudentID = ? AND EntityStatus = 'Accepted' LIMIT 1";
-        $res = $this->db->query($sql, [$studentId])->fetch();
-        return $res['OpportunityID'] ?? null;
+        $sql = "SELECT opportunityID FROM OpportunityRequest WHERE studentID = :studentId AND entityStatus = 'مقبول' LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':studentId' => $studentId]);
+        $res = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $res['opportunityID'] ?? null;
     }
 
-   
-
     public function getStudentCertificates($studentId) {
-        $sql = "SELECT * FROM Certificates WHERE StudentID = ? ORDER BY IssueDate DESC";
-        return $this->db->query($sql, [$studentId])->fetchAll();
+        $sql = "SELECT c.*, ee.entityName FROM Certificate c 
+                JOIN ExternalEntity ee ON c.entityID = ee.entityID 
+                WHERE c.studentID = :studentId ORDER BY c.issueDate DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':studentId' => $studentId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getCertificatesCount($studentId) {
-        $sql = "SELECT COUNT(*) as total FROM Certificates WHERE StudentID = ?";
-        $res = $this->db->query($sql, [$studentId])->fetch();
+        $sql = "SELECT COUNT(*) as total FROM Certificate WHERE studentID = :studentId";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':studentId' => $studentId]);
+        $res = $stmt->fetch(PDO::FETCH_ASSOC);
         return $res['total'] ?? 0;
     }
 
-   
-
     public function getStudentReports($studentId) {
-        $sql = "SELECT * FROM Reports WHERE StudentID = ? ORDER BY ReportID DESC";
-        return $this->db->query($sql, [$studentId])->fetchAll();
+        $sql = "SELECT * FROM StudentReport WHERE studentID = :studentId ORDER BY reportID DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':studentId' => $studentId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function submitReport($type, $content, $filePath, $studentId, $opportunityId) {
-        $sql = "INSERT INTO Reports (Title, Content, FilePath, StudentID, OpportunityID, SubmissionDate, Status) 
-                VALUES (?, ?, ?, ?, ?, NOW(), 'Pending')";
-        return $this->db->query($sql, [$type, $content, $filePath, $studentId, $opportunityId]);
+    public function submitReport($type, $content, $studentId, $opportunityId) {
+        $sql = "INSERT INTO StudentReport (reportID, reportType, content, data, studentID, opportunityID) 
+                VALUES (:reportID, :type, :content, NOW(), :studentId, :opportunityId)";
+        $stmt = $this->db->prepare($sql);
+        $generatedID = rand(100000, 999999);
+        return $stmt->execute([
+            ':reportID' => $generatedID,
+            ':type' => $type, 
+            ':content' => $content,
+            ':studentId' => $studentId,
+            ':opportunityId' => $opportunityId
+        ]);
     }
-
-   
 
     public function getStudentProfile($studentId) {
-        $sql = "SELECT u.Name, u.Email, s.* FROM Users u 
-                JOIN Student s ON u.UserID = s.UserID 
-                WHERE u.UserID = ?";
-        return $this->db->query($sql, [$studentId])->fetch();
+        $sql = "SELECT u.fullName, u.email, u.phoneNumber, s.* FROM Users u 
+                JOIN Student s ON u.userID = s.studentID 
+                WHERE u.userID = :studentId";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':studentId' => $studentId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function updateStudentProfile($id, $name, $email, $phone, $password = null) {
-        $sql = "UPDATE Student SET FullName = ?, Email = ?, Phone = ?";
-        $params = [$name, $email, $phone];
-
+        $sql = "UPDATE Users SET fullName = :name, email = :email, phoneNumber = :phone";
         if ($password) {
-            $sql .= ", Password = ?";
-            $params[] = password_hash($password, PASSWORD_DEFAULT);
+            $sql .= ", password = :password";
+        }
+        $sql .= " WHERE userID = :id";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':phone', $phone);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        
+        if ($password) {
+            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+            $stmt->bindParam(':password', $hashedPassword);
         }
 
-        $sql .= " WHERE UserID = ?";
-        $params[] = $id;
-
-        return $this->db->query($sql, $params);
+        return $stmt->execute();
     }
-
-    
 
     public function getSmartNotifications($studentId) {
         $notifications = [];
         
-        $sqlApps = "SELECT o.Title as CompanyName, ar.SupervisorStatus as academic_status, 
-                           ar.EntityStatus as external_status 
+        $sqlApps = "SELECT o.title as CompanyName, ar.supervisorStatus as academic_status, 
+                           ar.entityStatus as external_status 
                     FROM OpportunityRequest ar
-                    JOIN Opportunity o ON ar.OpportunityID = o.OpportunityID
-                    WHERE ar.StudentID = ? 
-                    ORDER BY ar.RequestDate DESC LIMIT 3";
-        $apps = $this->db->query($sqlApps, [$studentId])->fetchAll();
+                    JOIN Opportunity o ON ar.opportunityID = o.opportunityID
+                    WHERE ar.studentID = :studentId 
+                    ORDER BY ar.requestDate DESC LIMIT 3";
+        $stmt = $this->db->prepare($sqlApps);
+        $stmt->execute([':studentId' => $studentId]);
+        $apps = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($apps as $app) {
-            if ($app['academic_status'] == 'Accepted' && $app['external_status'] == 'Pending') {
+            if ($app['academic_status'] == 'معتمد' && $app['external_status'] == 'قيد الانتظار') {
                 $notifications[] = [
                     'title' => 'موافقة أكاديمية',
                     'message' => "تمت الموافقة على طلبك لفرصة " . $app['CompanyName'] . " من قبل المشرف، وبانتظار رد المؤسسة.",
                     'icon' => 'bi-person-check', 'color' => 'blue'
                 ];
-            } elseif ($app['academic_status'] == 'Accepted' && $app['external_status'] == 'Accepted') {
+            } elseif ($app['academic_status'] == 'معتمد' && $app['external_status'] == 'مقبول') {
                 $notifications[] = [
                     'title' => 'قبول نهائي!',
                     'message' => "تهانينا! تمت الموافقة النهائية على تدريبك في " . $app['CompanyName'] . ".",

@@ -3,11 +3,14 @@ class TrainerNotificationsController {
     private $model;
     private $db;
 
-    public function __construct() {
+    public function __construct($db = null) {
         if (session_status() === PHP_SESSION_NONE) session_start();
+        
         global $db;
         $this->db = $db;
-        require_once '../src/models/TrainerModel.php';
+        
+        require_once APP_PATH . '/models/TrainerModel.php';
+        
         $this->model = new TrainerModel($this->db);
     }
 
@@ -20,7 +23,8 @@ class TrainerNotificationsController {
         }
 
         $data = ['notifications' => $raw_notifications];
-        require_once '../src/views/trainer/trainer_notifications.php';
+        
+        require_once VIEW_PATH . '/trainer/trainer_notifications.php';
     }
 
     private function timeAgo($timestamp) {

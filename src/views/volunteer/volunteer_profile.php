@@ -1,3 +1,6 @@
+<?php 
+require_once VIEW_PATH . '/layout/header.php'; 
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -11,7 +14,6 @@
 </head>
 <body class="reports-page text-end bg-light">
     
-    <?php require_once BASE_PATH . '/views/layout/header.php'; ?>
 
     <div class="container py-5">
         <?php if (isset($_GET['status'])): ?>
@@ -40,7 +42,7 @@
                     <div class="mx-auto bg-warning-subtle rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px;">
                         <i class="bi bi-person-badge fs-1 text-warning"></i>
                     </div>
-                    <h5 class="fw-bold text-dark mb-1"><?= htmlspecialchars($user['name']) ?></h5>
+                    <h5 class="fw-bold text-dark mb-1"><?= htmlspecialchars($user['fullName'] ?? 'مشرف التطوع') ?></h5>
                     <p class="text-muted small">منسق العمل التطوعي - EduServe</p>
                     
                     <div class="bg-white border rounded-3 p-3 mt-3 text-end shadow-sm">
@@ -66,15 +68,15 @@
                             <div class="row g-4 text-end">
                                 <div class="col-md-12">
                                     <label class="small fw-bold text-secondary mb-2">الاسم الكامل للمشرف</label>
-                                    <input type="text" name="full_name" class="form-control bg-light border-0 py-2 shadow-sm" value="<?= htmlspecialchars($user['name']) ?>" required>
+                                    <input type="text" name="full_name" class="form-control bg-light border-0 py-2 shadow-sm" value="<?= htmlspecialchars($user['fullName'] ?? '') ?>" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="small fw-bold text-secondary mb-2">البريد الجامعي</label>
-                                    <input type="email" name="email" class="form-control bg-light border-0 py-2 shadow-sm" value="<?= htmlspecialchars($user['email']) ?>" required>
+                                    <input type="email" name="email" class="form-control bg-light border-0 py-2 shadow-sm" value="<?= htmlspecialchars($user['email'] ?? '') ?>" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="small fw-bold text-secondary mb-2">هاتف التواصل</label>
-                                    <input type="text" name="phone" class="form-control bg-light border-0 py-2 shadow-sm" value="<?= htmlspecialchars($user['phone'] ?? '') ?>">
+                                    <input type="text" name="phone" class="form-control bg-light border-0 py-2 shadow-sm" value="<?= htmlspecialchars($user['phoneNumber'] ?? '') ?>">
                                 </div>
                             </div>
                             <div class="text-start mt-4">
@@ -105,6 +107,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
     

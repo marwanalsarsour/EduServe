@@ -1,3 +1,6 @@
+<?php 
+require_once VIEW_PATH . '/layout/header.php'; 
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -9,12 +12,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
-    <?php require_once '../layout/header.php'; ?>
 
     <div class="container my-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="fw-bold mb-0">إدارة فرص التدريب</h4>
-            <a href="/supervisor/add-opportunity" class="btn btn-primary rounded-pill shadow-sm">
+            <a href="/supervisor-add-opportunity" class="btn btn-primary rounded-pill shadow-sm">
                 <i class="bi bi-plus-circle ms-1"></i> إضافة فرصة جديدة
             </a>
         </div>
@@ -46,7 +48,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <a href="/supervisor/edit-opportunity?id=<?= $opp['id'] ?>" class="btn btn-outline-warning btn-sm border-0">
+                                        <a href="/supervisor-edit-opportunity?id=<?= $opp['id'] ?>" class="btn btn-outline-warning btn-sm border-0">
                                             <i class="bi bi-pencil-square"></i> تعديل
                                         </a>
                                         <button onclick="confirmDelete(<?= $opp['id'] ?>)" class="btn btn-outline-danger btn-sm border-0">

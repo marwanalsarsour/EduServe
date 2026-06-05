@@ -16,7 +16,7 @@
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light text-end">
-    <?php require_once '../src/views/layout/header.php'; ?>
+
 
     <div class="container my-5">
         <div class="d-flex justify-content-between align-items-center mb-4">

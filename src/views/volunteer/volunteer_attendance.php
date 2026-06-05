@@ -1,3 +1,6 @@
+<?php 
+require_once VIEW_PATH . '/layout/header.php'; 
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -9,7 +12,7 @@
 </head>
 <body class="bg-light">
 
-<?php require_once BASE_PATH . '/views/layout/header.php'; ?>
+
 
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">

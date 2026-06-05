@@ -1,3 +1,6 @@
+<?php 
+require_once VIEW_PATH . '/layout/header.php'; 
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -12,7 +15,7 @@
     </style>
 </head>
 <body class="bg-light d-flex flex-column min-vh-100">
-    <?php require_once BASE_PATH . '/views/layout/header.php'; ?>
+
 
     <div class="container my-4">
         <div class="card shadow-sm border-0 mb-4">

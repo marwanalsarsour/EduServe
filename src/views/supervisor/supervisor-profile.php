@@ -1,3 +1,6 @@
+<?php 
+require_once VIEW_PATH . '/layout/header.php'; 
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -10,7 +13,6 @@
     <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 <body class="reports-page text-end bg-light">
-    <?php require_once __DIR__ . '/../layout/header.php'; ?>
 
     <div class="container py-5">
         <?php if(isset($_SESSION['success_msg'])): ?>

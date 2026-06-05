@@ -3,18 +3,22 @@ class TrainerAttendanceController {
     private $model;
     private $db;
 
-    public function __construct() {
+    public function __construct($db = null) {
         if (session_status() === PHP_SESSION_NONE) session_start();
+        
         global $db;
         $this->db = $db;
-        require_once '../src/models/TrainerModel.php';
+        
+        require_once APP_PATH . '/models/TrainerModel.php'; 
+        
         $this->model = new TrainerModel($this->db);
     }
 
     public function index() {
         $trainer_id = $_SESSION['user_id'];
         $attendance_list = $this->model->getTodayAttendance($trainer_id);
-        require_once '../src/views/trainer/trainer_attendance.php';
+        
+        require_once VIEW_PATH . '/trainer/trainer_attendance.php';
     }
 
     public function save() {
@@ -36,6 +40,7 @@ class TrainerAttendanceController {
                 $this->model->saveAttendance($saveData);
             }
             header('Location: /trainer/attendance?success=1');
+            exit();
         }
     }
 }

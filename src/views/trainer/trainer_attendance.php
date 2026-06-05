@@ -9,8 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body class="bg-light text-end">
-    <?php 
-    require_once '../src/views/layout/header.php'; 
+    <?php  
     $current_hour = (int)date('H');
     $is_locked = ($current_hour >= 17); 
     ?>

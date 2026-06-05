@@ -1,3 +1,6 @@
+<?php 
+require_once VIEW_PATH . '/layout/header.php'; 
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -10,7 +13,7 @@
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
 
-<?php require_once __DIR__ . '/../layout/header.php'; ?>
+
 
 <div class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-4">

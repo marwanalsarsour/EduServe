@@ -12,7 +12,7 @@ class ExternalDashboardController {
             session_start();
         }
 
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'external_entity') {
+        if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'جهة خارجية') {
             header('Location: /login');
             exit;
         }
@@ -21,15 +21,14 @@ class ExternalDashboardController {
     public function index() {
         $org_id = $_SESSION['user_id'];
         
-
         $orgData = $this->model->getOrgDetails($org_id);
         $stats = $this->model->getDashboardStats($org_id);
 
-
-        if (!$orgData) {
+        if ($orgData) {
+            $orgData['name'] = $orgData['entityName'] ?? $orgData['fullName'] ?? 'جهة خارجية معتمدة';
+        } else {
             $orgData = ['name' => 'جهة غير معروفة']; 
         }
-
 
         require_once VIEW_PATH . '/external-organization/external_dashboard.php';
     }

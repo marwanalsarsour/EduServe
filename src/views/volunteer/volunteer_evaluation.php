@@ -1,3 +1,6 @@
+<?php 
+require_once VIEW_PATH . '/layout/header.php'; 
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -7,7 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
 </head>
 <body class="bg-light">
-    <?php require_once BASE_PATH . '/views/layout/header.php'; ?>
+
 
     <div class="container my-5">
         <div class="card border-0 shadow-sm mx-auto" style="max-width: 600px;">
