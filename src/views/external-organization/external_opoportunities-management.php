@@ -10,12 +10,12 @@ require_once VIEW_PATH . '/layout/header.php';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        .form-label { fw-bold;color: dimgray; }
+        .form-label { font-weight: bold; color: dimgray; }
         .card-header-custom { background: white; border-bottom: 2px solid blue; }
+        .table-responsive { overflow-x: auto; }
     </style>
 </head>
 <body class="bg-light d-flex flex-column min-vh-100">
-
 
     <div class="container my-4">
         <div class="card shadow-sm border-0 mb-4">
@@ -45,18 +45,16 @@ require_once VIEW_PATH . '/layout/header.php';
                 <div class="row g-3">
                     <div class="col-md-6"><label class="form-label">اسم الفرصة</label><input name="title" id="fieldTitle" class="form-control" required></div>
                     <div class="col-md-3"><label class="form-label">عدد المقاعد</label><input name="seats" id="fieldSeats" type="number" class="form-control" required></div>
-                    <div class="col-md-3"><label class="form-label">الموعد النهائي</label><input name="deadline" id="fieldDeadline" type="date" class="form-control" required></div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">الحالة</label>
                         <select name="status" id="fieldStatus" class="form-select">
-                            <option value="open">مفتوحة</option>
-                            <option value="closed">مغلقة</option>
+                            <option value="نشط">نشط</option>
+                            <option value="مغلق">مغلق</option>
                         </select>
                     </div>
-                    <div class="col-md-4"><label class="form-label">النوع (مثلاً: تدريب ميداني)</label><input name="type" id="fieldType" class="form-control"></div>
-                    <div class="col-md-4"><label class="form-label">الموقع</label><input name="location" id="fieldLocation" class="form-control"></div>
+                    <div class="col-md-12"><label class="form-label">النوع</label><input name="type" id="fieldType" class="form-control" readonly></div>
                     <div class="col-12"><label class="form-label">الوصف التفصيلي</label><textarea name="description" id="fieldDescription" class="form-control" rows="3"></textarea></div>
-                    <div class="col-12"><label class="form-label">المتطلبات الأساسية</label><textarea name="requirements" id="fieldRequirements" class="form-control" rows="2"></textarea></div>
+                    <div class="col-12"><label class="form-label">المتطلبات الأساسية (الشروط)</label><textarea name="conditions" id="fieldConditions" class="form-control" rows="2"></textarea></div>
                 </div>
                 <div class="mt-4" id="saveContainer">
                     <button type="submit" class="btn btn-success px-4"><i class="bi bi-save"></i> حفظ التعديلات</button>
@@ -71,8 +69,8 @@ require_once VIEW_PATH . '/layout/header.php';
                         <tr>
                             <th>#</th>
                             <th>الفرصة</th>
+                            <th>النوع</th>
                             <th>المقاعد</th>
-                            <th>الموعد</th>
                             <th>الحالة</th>
                             <th>الإجراءات</th>
                         </tr>
@@ -81,22 +79,28 @@ require_once VIEW_PATH . '/layout/header.php';
                         <?php if (empty($opportunities)): ?>
                             <tr><td colspan="6" class="py-4 text-muted">لم تقم بنشر أي فرص بعد أو لا توجد نتائج للبحث.</td></tr>
                         <?php else: ?>
-                            <?php foreach ($opportunities as $idx => $opp): ?>
+                            <?php foreach ($opportunities as $idx => $opp): 
+                                $oppID = $opp['opportunityID'] ?? $opp['id'] ?? 0;
+                                $oppTitle = htmlspecialchars($opp['title'] ?? '');
+                                $oppType = htmlspecialchars($opp['type'] ?? '');
+                                $oppSeats = htmlspecialchars($opp['seats'] ?? 0);
+                                $oppStatus = $opp['status'] ?? 'نشط';
+                            ?>
                             <tr>
                                 <td><?= $idx + 1 ?></td>
-                                <td class="fw-bold"><?= htmlspecialchars($opp['title']) ?></td>
-                                <td><?= $opp['seats'] ?></td>
-                                <td><?= date('Y-m-d', strtotime($opp['deadline'])) ?></td>
+                                <td class="fw-bold"><?= $oppTitle ?></td>
+                                <td><span class="badge bg-light text-dark border"><?= $oppType ?></span></td>
+                                <td><?= $oppSeats ?></td>
                                 <td>
-                                    <span class="badge <?= $opp['status'] == 'open' ? 'bg-success' : 'bg-secondary' ?>">
-                                        <?= $opp['status'] == 'open' ? 'مفتوحة' : 'مغلقة' ?>
+                                    <span class="badge <?= ($oppStatus == 'نشط' || $oppStatus == 'open') ? 'bg-success' : 'bg-secondary' ?>">
+                                        <?= ($oppStatus == 'نشط' || $oppStatus == 'open') ? 'نشط' : 'مغلق' ?>
                                     </span>
                                 </td>
                                 <td>
                                     <div class="btn-group">
-                                        <button class="btn btn-sm btn-outline-primary" onclick='fillCard(<?= json_encode($opp) ?>, false)' title="عرض"><i class="bi bi-eye"></i></button>
-                                        <button class="btn btn-sm btn-outline-warning" onclick='fillCard(<?= json_encode($opp) ?>, true)' title="تعديل"><i class="bi bi-pencil"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete(<?= $opp['id'] ?>)" title="حذف"><i class="bi bi-trash"></i></button>
+                                        <button class="btn btn-sm btn-outline-primary" onclick='fillCard(<?= htmlspecialchars(json_encode($opp, JSON_UNESCAPED_UNICODE), ENT_QUOTES, "UTF-8") ?>, false)' title="عرض"><i class="bi bi-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-warning" onclick='fillCard(<?= htmlspecialchars(json_encode($opp, JSON_UNESCAPED_UNICODE), ENT_QUOTES, "UTF-8") ?>, true)' title="تعديل"><i class="bi bi-pencil"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="confirmDelete(<?= $oppID ?>)" title="حذف"><i class="bi bi-trash"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -133,19 +137,25 @@ require_once VIEW_PATH . '/layout/header.php';
             const card = document.getElementById('opportunityCard');
             card.classList.remove('d-none');
             
-            document.getElementById('fieldId').value = opp.id;
-            document.getElementById('fieldTitle').value = opp.title;
-            document.getElementById('fieldSeats').value = opp.seats;
-            document.getElementById('fieldDeadline').value = opp.deadline;
-            document.getElementById('fieldStatus').value = opp.status;
-            document.getElementById('fieldType').value = opp.type;
-            document.getElementById('fieldLocation').value = opp.location;
-            document.getElementById('fieldDescription').value = opp.description;
-            document.getElementById('fieldRequirements').value = opp.requirements;
-
+            document.getElementById('fieldId').value = opp.opportunityID || opp.id || '';
+            document.getElementById('fieldTitle').value = opp.title || '';
+            document.getElementById('fieldSeats').value = opp.seats || 0;
+            
+            // معالجة الحالة لتطابق القيم العربية (نشط / مغلق)
+            let statusVal = opp.status || 'نشط';
+            if(statusVal === 'open') statusVal = 'نشط';
+            if(statusVal === 'closed') statusVal = 'مغلق';
+            document.getElementById('fieldStatus').value = statusVal;
+            
+            document.getElementById('fieldType').value = opp.type || '';
+            document.getElementById('fieldDescription').value = opp.description || '';
+            document.getElementById('fieldConditions').value = opp.conditions || opp.requirements || '';
 
             const inputs = card.querySelectorAll('input, textarea, select');
-            inputs.forEach(el => { if(el.id !== 'fieldId') el.readOnly = !editable; if(el.tagName === 'SELECT') el.disabled = !editable; });
+            inputs.forEach(el => { 
+                if(el.id !== 'fieldId' && el.id !== 'fieldType') el.readOnly = !editable; 
+                if(el.tagName === 'SELECT') el.disabled = !editable; 
+            });
             
             document.getElementById('saveContainer').classList.toggle('d-none', !editable);
             document.getElementById('cardTitle').innerText = editable ? "تعديل الفرصة" : "تفاصيل الفرصة";

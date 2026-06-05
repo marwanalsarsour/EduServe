@@ -100,25 +100,28 @@ class StudentModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getOpenOpportunities() {
-        $sql = "SELECT o.*, ee.entityName FROM Opportunity o 
-                JOIN ExternalEntity ee ON o.entityID = ee.entityID 
-                WHERE o.status = 'نشط' 
-                ORDER BY o.opportunityID DESC";
-        $query = $this->db->query($sql);
-        return $query->fetchAll(PDO::FETCH_ASSOC);
-    }
+public function getOpenOpportunities() {
+    $sql = "SELECT o.*, ee.entityName AS OrganizationName 
+            FROM Opportunity o 
+            JOIN ExternalEntity ee ON o.entityID = ee.entityID 
+            WHERE o.status = 'نشط' AND o.isApproved = 1
+            ORDER BY o.opportunityID DESC";
+            
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
-    public function getOpportunityById($id) {
-        $sql = "SELECT o.*, ee.entityName as OrganizationName, u.email as OrgEmail, u.phoneNumber as OrgPhone, o.entityID as OrganizationID 
-                FROM Opportunity o
-                JOIN ExternalEntity ee ON o.entityID = ee.entityID
-                JOIN Users u ON ee.entityID = u.userID
-                WHERE o.opportunityID = :id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
+   public function getOpportunityById($id) {
+    $sql = "SELECT o.*, ee.entityName as OrganizationName, u.email as OrgEmail, u.phoneNumber as OrgPhone, o.entityID as OrganizationID 
+            FROM Opportunity o
+            JOIN ExternalEntity ee ON o.entityID = ee.entityID
+            JOIN Users u ON ee.entityID = u.userID
+            WHERE o.opportunityID = :id AND o.isApproved = 1"; // إضافة الشرط هنا
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':id' => $id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
 
     public function submitOpportunityRequest($sid, $oid, $eid, $supervisorId, $cv) {
         $sql = "INSERT INTO OpportunityRequest 
@@ -135,6 +138,15 @@ class StudentModel {
             ':cv' => $cv
         ]);
     }
+public function getAvailableOpportunities() {
+    $sql = "SELECT o.*, ee.entityName AS OrganizationName 
+            FROM Opportunity o
+            JOIN ExternalEntity ee ON o.entityID = ee.entityID
+            WHERE o.isApproved = 1 AND o.status = 'نشط'";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
     public function getStudentApplications($studentId) {
         $sql = "SELECT ar.*, o.title, o.type, ee.entityName as OrganizationName

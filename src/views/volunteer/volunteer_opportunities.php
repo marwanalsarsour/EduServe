@@ -33,31 +33,35 @@ require_once VIEW_PATH . '/layout/header.php';
                 </tr>
             </thead>
             <tbody>
-                <?php if(!empty($opportunities)): ?>
-                    <?php foreach($opportunities as $opp): ?>
-                    <tr>
-                        <td class="px-4 fw-bold"><?= htmlspecialchars($opp['title']) ?></td>
-                        <td><?= htmlspecialchars($opp['org_name']) ?></td>
-                        <td><?= $opp['hours'] ?> ساعة</td>
-                        <td>
-                            <span class="badge <?= $opp['status'] == 'active' ? 'bg-success' : 'bg-secondary' ?>">
-                                <?= $opp['status'] == 'active' ? 'نشط' : ($opp['status'] == 'closed' ? 'مغلق' : 'مسودة') ?>
-                            </span>
-                        </td>
-                        <td class="text-center">
-                            <a href="/volunteer_edit_opportunity?id=<?= $opp['id'] ?>" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <a href="/delete_opportunity?id=<?= $opp['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('هل أنت متأكد من حذف هذه الفرصة؟')">
-                                <i class="bi bi-trash"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr><td colspan="5" class="text-center py-4">لا توجد فرص تطوع مضافة حالياً.</td></tr>
-                <?php endif; ?>
-            </tbody>
+    <?php if(!empty($opportunities)): ?>
+        <?php foreach($opportunities as $opp): ?>
+        <tr>
+            <td class="px-4 fw-bold"><?= htmlspecialchars($opp['title'] ?? 'بدون عنوان') ?></td>
+            
+           <td><?= htmlspecialchars($opp['entity_name'] ?? 'جهة غير معروفة') ?></td>
+            
+            <td><?= ($opp['seats'] ?? 0) ?> مقاعد</td>
+            
+            <td>
+                <span class="badge <?= ($opp['status'] ?? '') == 'نشط' ? 'bg-success' : 'bg-secondary' ?>">
+                    <?= htmlspecialchars($opp['status'] ?? 'غير محدد') ?>
+                </span>
+            </td>
+            
+            <td class="text-center">
+                <a href="/volunteer_edit_opportunity?id=<?= $opp['opportunityID'] ?>" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <a href="/delete_opportunity?id=<?= $opp['opportunityID'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('هل أنت متأكد؟')">
+                    <i class="bi bi-trash"></i>
+                </a>
+            </td>
+        </tr>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <tr><td colspan="5" class="text-center py-4">لا توجد فرص تطوع مضافة حالياً.</td></tr>
+    <?php endif; ?>
+</tbody>
         </table>
     </div>
 </div>

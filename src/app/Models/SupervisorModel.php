@@ -44,26 +44,30 @@ class SupervisorModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getDashboardStats($supervisor_id) {
-        $stats = [];
-        
-        $stmt = $this->db->prepare("SELECT COUNT(DISTINCT studentID) FROM OpportunityRequest WHERE supervisorID = :sid");
-        $stmt->execute([':sid' => $supervisor_id]);
-        $stats['students_count'] = $stmt->fetchColumn();
+public function getDashboardStats($supervisor_id) {
+    $stats = [];
+    
+    $stmt = $this->db->prepare("SELECT COUNT(DISTINCT studentID) FROM OpportunityRequest WHERE supervisorID = :sid");
+    $stmt->execute([':sid' => $supervisor_id]);
+    $stats['students_count'] = $stmt->fetchColumn();
 
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM StudentReport r JOIN OpportunityRequest ar ON r.studentID = ar.studentID WHERE ar.supervisorID = :sid");
-        $stmt->execute([':sid' => $supervisor_id]);
-        $stats['pending_reports'] = $stmt->fetchColumn();
+    $stmt = $this->db->prepare("SELECT COUNT(*) FROM StudentReport r JOIN OpportunityRequest ar ON r.studentID = ar.studentID WHERE ar.supervisorID = :sid");
+    $stmt->execute([':sid' => $supervisor_id]);
+    $stats['pending_reports'] = $stmt->fetchColumn();
 
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM OpportunityRequest WHERE supervisorID = :sid AND supervisorStatus = 'بانتظار المشرف'");
-        $stmt->execute([':sid' => $supervisor_id]);
-        $stats['pending_applications'] = $stmt->fetchColumn();
+    $stmt = $this->db->prepare("SELECT COUNT(*) FROM OpportunityRequest WHERE supervisorID = :sid AND supervisorStatus = 'بانتظار المشرف'");
+    $stmt->execute([':sid' => $supervisor_id]);
+    $stats['pending_applications'] = $stmt->fetchColumn();
 
-        $stats['unread_notifications'] = 0;
-        $stats['average_progress'] = 0;
+    $stmt = $this->db->prepare("SELECT COUNT(*) FROM Opportunity WHERE isApproved = 0");
+    $stmt->execute();
+    $stats['pending_opportunities'] = $stmt->fetchColumn();
 
-        return $stats;
-    }
+    $stats['unread_notifications'] = 0;
+    $stats['average_progress'] = 0;
+
+    return $stats;
+}
 
     public function getRecentActivity($supervisor_id) {
         return [];
@@ -266,4 +270,23 @@ class SupervisorModel {
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function approveOpportunity($opportunityId, $supervisorId) {
+    $sql = "UPDATE Opportunity 
+            SET isApproved = 1, 
+                supervisorID = :supId, 
+                status = 'نشط' 
+            WHERE opportunityID = :oppId";
+    $stmt = $this->db->prepare($sql);
+    return $stmt->execute([
+        ':supId' => $supervisorId, 
+        ':oppId' => $opportunityId
+    ]);
+}
+
+public function getPendingOpportunities() {
+    $sql = "SELECT * FROM Opportunity WHERE isApproved = 0 AND type = 'تدريب'";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 }

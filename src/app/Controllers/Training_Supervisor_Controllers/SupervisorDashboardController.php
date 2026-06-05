@@ -24,7 +24,7 @@ class SupervisorDashboardController {
     
     public function index() {
         $supervisor_id = $_SESSION['user_id'];
-       
+        
         $data = [
             'supervisor'      => $this->model->getSupervisorData($supervisor_id),
             'stats'           => $this->model->getDashboardStats($supervisor_id),

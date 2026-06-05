@@ -82,36 +82,52 @@ class ExternalEntityModel {
         ]);
     }
 
-    public function getOpportunities($org_id, $search = '') {
-        $sql = "SELECT * FROM Opportunity WHERE entityID = :org_id AND title LIKE :search ORDER BY opportunityID DESC";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':org_id' => $org_id,
-            ':search' => "%$search%"
-        ]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+public function getOpportunities($org_id, $search = '') {
+    $sql = "SELECT * FROM Opportunity WHERE entityID = :org_id AND title LIKE :search ORDER BY opportunityID DESC";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([
+        ':org_id' => $org_id,
+        ':search' => "%$search%"
+    ]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
-    public function updateOpportunity($id, $data) {
-        $sql = "UPDATE Opportunity SET 
-                title = :title, seats = :seats, conditions = :conditions, type = :type 
-                WHERE opportunityID = :id";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':title'      => $data['title'], 
-            ':seats'      => $data['seats'], 
-            ':conditions' => $data['conditions'],
-            ':type'       => $data['type'], 
-            ':id'         => $id
-        ]);
-    }
+public function updateOpportunity($id, $data) {
+    $sql = "UPDATE Opportunity SET 
+                title       = :title, 
+                seats       = :seats, 
+                conditions  = :conditions, 
+                type        = :type,
+                status      = :status,
+                description = :description
+            WHERE opportunityID = :id";
+            
+    $stmt = $this->db->prepare($sql);
+
+    $requirements = $data['requirements'] ?? $data['conditions'] ?? '';
+    $conditions = !empty(trim($requirements)) ? $requirements : null;
+
+    $description = !empty(trim($data['description'] ?? '')) ? $data['description'] : null;
+
+    $status = $data['status'] ?? 'نشط';
+
+    return $stmt->execute([
+        ':title'       => $data['title'], 
+        ':seats'       => $data['seats'], 
+        ':conditions'  => $conditions,
+        ':type'        => $data['type'], 
+        ':status'      => $status,
+        ':description' => $description,
+        ':id'          => $id
+    ]);
+}
 
     public function deleteOpportunity($id) {
         $sql = "DELETE FROM Opportunity WHERE opportunityID = :id";
         return $this->db->prepare($sql)->execute([':id' => $id]);
     }
 
-    public function createOpportunity($org_id, $data) {
+public function createOpportunity($org_id, $data) {
         $sql = "INSERT INTO Opportunity (
                     opportunityID, title, type, seats, conditions, entityID, supervisorID
                 ) VALUES (:opportunityID, :title, :type, :seats, :conditions, :entityID, :supervisorID)";
@@ -119,17 +135,19 @@ class ExternalEntityModel {
         $stmt = $this->db->prepare($sql);
         $generatedID = rand(100000, 999999);
 
+        $requirements = $data['requirements'] ?? $data['conditions'] ?? '';
+        $conditions = !empty(trim($requirements)) ? $requirements : null;
+
         return $stmt->execute([
             ':opportunityID' => $generatedID,
-            ':title'        => $data['title'],
-            ':type'         => $data['type'], 
-            ':seats'        => $data['seats'],
-            ':conditions'   => $data['conditions'],
-            ':entityID'     => $org_id,
-            ':supervisorID' => $data['supervisorID'] 
+            ':title'         => $data['title'],
+            ':type'          => $data['type'], 
+            ':seats'         => $data['seats'],
+            ':conditions'    => $conditions, 
+            ':entityID'      => $org_id,
+            ':supervisorID'  => !empty($data['supervisorID']) ? $data['supervisorID'] : null 
         ]);
     }
-
 public function getAcceptedStudents($org_id) {
         $stmt = $this->db->prepare("
             SELECT DISTINCT u.userID, u.fullName 

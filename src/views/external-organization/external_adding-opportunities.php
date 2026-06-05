@@ -7,7 +7,7 @@ require_once VIEW_PATH . '/layout/header.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إضافة الفرص | EduServe</title>
-    <link rel="icon" href="/src/public/images/logo.png">
+    <link class="icon" href="/src/public/images/logo.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -18,8 +18,19 @@ require_once VIEW_PATH . '/layout/header.php';
         .btn-outline-danger:hover { background-color: red !important; color: white !important; }
         h4, h5, h6 { color: blue; }
         input, select, textarea { border-color: gray !important; }
+        
         .fade-field {
-            transition: all 0.3s ease-in-out;
+            opacity: 1;
+            max-height: 500px;
+            overflow: hidden;
+            transition: opacity 0.4s ease, max-height 0.4s ease, margin 0.4s ease;
+        }
+        .fade-field.d-none-fade {
+            opacity: 0;
+            max-height: 0;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -40,23 +51,20 @@ require_once VIEW_PATH . '/layout/header.php';
                                         <label class="form-label">اسم الفرصة</label>
                                         <input type="text" class="form-control" name="title" placeholder="مثال: تدريب في تطوير الويب" required>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">الموقع</label>
-                                        <input type="text" class="form-control" name="location" placeholder="الخليل" required>
-                                    </div>
+                                    
                                     <div class="col-md-6">
                                         <label class="form-label">نوع الفرصة</label>
                                         <select class="form-select" id="opportunityType" name="type" required>
                                             <option value="">اختر النوع</option>
-                                            <option value="internship">التدريب الميداني</option>
-                                            <option value="volunteer">العمل التطوعي</option>
+                                            <option value="تدريب">التدريب الميداني</option>
+                                            <option value="تطوع">العمل التطوعي</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">الحالة</label>
                                         <select class="form-select" name="status" required>
-                                            <option value="open">مفتوحة</option>
-                                            <option value="closed">مغلقة</option>
+                                            <option value="نشط">نشط</option>
+                                            <option value="مغلق">مغلق</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">
@@ -80,8 +88,8 @@ require_once VIEW_PATH . '/layout/header.php';
                                 <h5 class="mt-4 fw-bold">الوصف</h5>
                                 <textarea class="form-control" name="description" rows="4" placeholder="اكتب تفاصيل الفرصة هنا..." required></textarea>
                                 
-                                <div class="volunteer-hidden fade-field">
-                                    <h5 class="mt-4 fw-bold">المتطلبات الأساسية</h5>
+                                <div class="volunteer-hidden fade-field mt-4">
+                                    <h5 class="fw-bold">المتطلبات الأساسية</h5>
                                     <textarea class="form-control" id="requirementsInput" name="requirements" rows="4" placeholder="مثال: معرفة بـ PHP و MySQL" required></textarea>
                                 </div>
                             </div>
@@ -129,11 +137,12 @@ require_once VIEW_PATH . '/layout/header.php';
             const requirementsInput = document.getElementById('requirementsInput');
 
             function handleTypeChange() {
-                if (typeSelect.value === 'volunteer') {
-                    volunteerHiddenSection.style.display = 'none';
+                if (typeSelect.value === 'تطوع') {
+                    volunteerHiddenSection.classList.add('d-none-fade');
                     requirementsInput.removeAttribute('required');
+                    requirementsInput.value = ''; 
                 } else {
-                    volunteerHiddenSection.style.display = 'block';
+                    volunteerHiddenSection.classList.remove('d-none-fade');
                     requirementsInput.setAttribute('required', 'required');
                 }
             }

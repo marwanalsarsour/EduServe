@@ -7,17 +7,26 @@ class VolunteerSupervisorModel {
         $this->db = $db;
     }
 
-    public function getDashboardStats() {
-        $liveNotifications = $this->getLiveNotifications();
-        $realNotificationCount = count($liveNotifications);
+public function getDashboardStats() {
+    $liveNotifications = $this->getLiveNotifications();
+    $realNotificationCount = count($liveNotifications);
 
-        return [
-            'active_opportunities' => $this->getCustomCount('Opportunity', "status = 'نشط' AND type = 'تطوع'"),
-            'pending_applications' => $this->getCustomCount('OpportunityRequest', "supervisorStatus = 'بانتظار المشرف'"),
-            'pending_hours'        => $this->getCustomSum('Attendance', 'hours', "status = 'متأخر'"),
-            'today_notifications'  => $realNotificationCount 
-        ];
-    }
+    return [
+        'active_opportunities' => $this->getCustomCount('Opportunity', "status = 'نشط' AND type = 'تطوع'"),
+        'pending_applications' => $this->getCustomCount('OpportunityRequest', "supervisorStatus = 'بانتظار المشرف'"),
+        'pending_hours'        => $this->getCustomSum('Attendance', 'hours', "status = 'متأخر'"),
+        'today_notifications'  => $realNotificationCount,
+        'pending_opportunities' => $this->getCustomCount('Opportunity', "isApproved = 0 AND type = 'تطوع'")
+    ];
+}
+    public function approveVolunteerOpportunity($opportunityId) {
+    $sql = "UPDATE Opportunity 
+            SET isApproved = 1, 
+                status = 'نشط' 
+            WHERE opportunityID = :oppId";
+    $stmt = $this->db->prepare($sql);
+    return $stmt->execute([':oppId' => $opportunityId]);
+}
 
     public function getRecentApplications($limit = 5) {
         $sql = "SELECT opr.requestID as id, u.fullName as student_name, op.title as opportunity_title, opr.requestDate as created_at 
@@ -179,10 +188,15 @@ class VolunteerSupervisorModel {
         return $stmt->fetchColumn() ?: 0;
     }
 
-    public function getAllOpportunities() {
-        $sql = "SELECT * FROM Opportunity WHERE type = 'تطوع' ORDER BY createdAt DESC";
-        return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-    }
+public function getAllOpportunities() {
+    $sql = "SELECT Opportunity.*, ExternalEntity.entityName AS entity_name 
+            FROM Opportunity 
+            LEFT JOIN ExternalEntity ON Opportunity.entityID = ExternalEntity.entityID 
+            WHERE Opportunity.type = 'تطوع' 
+            ORDER BY Opportunity.createdAt DESC";
+            
+    return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+}
 
     public function addOpportunity($data) {
         $sql = "INSERT INTO Opportunity (opportunityID, title, type, seats, entityID, supervisorID, status, createdAt, description) 
@@ -287,4 +301,10 @@ class VolunteerSupervisorModel {
         $stmt->execute([':student_id' => $student_id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+public function getPendingOpportunities() {
+    $sql = "SELECT * FROM Opportunity WHERE isApproved = 0 AND type = 'تطوع'";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 }

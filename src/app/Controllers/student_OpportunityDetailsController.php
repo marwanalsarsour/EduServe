@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../Models/StudentModel.php'; 
-class student_OpportunityDetailsController extends Controller {
+
+class student_OpportunityDetailsController {
     
     public function index() {
         $id = $_GET['id'] ?? null;
@@ -9,8 +10,12 @@ class student_OpportunityDetailsController extends Controller {
             exit();
         }
 
-        $studentModel = $this->model('StudentModel');
-        $opportunity = $studentModel->getOpportunityFullDetails($id);
+        global $db, $db_connection, $conn;
+        $activeConnection = $db_connection ?? $db ?? $conn;
+
+        $studentModel = new StudentModel($activeConnection);
+        
+        $opportunity = $studentModel->getOpportunityById($id);
 
         if (!$opportunity) {
             die("الفرصة غير موجودة أو تم حذفها.");

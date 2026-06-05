@@ -9,7 +9,7 @@ require_once VIEW_PATH . '/layout/header.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الفرص المتاحة</title>
     <link rel="icon" type="image/png" href="/images/logo.png">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         .opportunity-card { transition: transform 0.2s; border: none; }
@@ -29,7 +29,7 @@ require_once VIEW_PATH . '/layout/header.php';
 
             <div class="input-group" style="max-width: 420px;">
                 <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                <input id="searchInput" type="text" class="form-control border-start-0" placeholder="ابحث حسب العنوان أو المؤسسة...">
+                <input id="searchInput" type="text" class="form-control border-start-0" placeholder="ابحث حسب العنوان...">
             </div>
         </div>
 
@@ -37,8 +37,8 @@ require_once VIEW_PATH . '/layout/header.php';
             <div class="col-12 col-md-4">
                 <select id="typeFilter" class="form-select shadow-sm">
                     <option value="all" selected>جميع أنواع الفرص</option>
-                    <option value="Training">تدريب ميداني</option>
-                    <option value="Volunteering">عمل تطوعي</option>
+                    <option value="تدريب">تدريب ميداني</option>
+                    <option value="تطوع">عمل تطوعي</option>
                 </select>
             </div>
         </div>
@@ -46,37 +46,42 @@ require_once VIEW_PATH . '/layout/header.php';
         <div id="opportunitiesList" class="row g-4">
             <?php if (!empty($opportunities)): ?>
                 <?php foreach ($opportunities as $op): 
-                   
-                    $isTraining = ($op['Type'] === 'Training');
-                    $badgeClass = $isTraining ? 'bg-info text-dark' : 'bg-success';
+                    $opType = $op['type'] ?? '';
+                    $isTraining = ($opType === 'تدريب');
+                    $badgeClass = $isTraining ? 'bg-info text-dark' : 'bg-success text-white';
                     $btnClass = $isTraining ? 'btn-outline-primary' : 'btn-outline-success';
+                    
+                    $title = htmlspecialchars($op['title'] ?? 'بدون عنوان');
+                    $descRaw = $op['description'] ?? 'لا يوجد وصف متاح لهذه الفرصة.';
+                    $desc = htmlspecialchars($descRaw);
+                    $oppID = $op['opportunityID'] ?? 0;
+                    $seats = htmlspecialchars($op['seats'] ?? 0);
                 ?>
-                    <div class="col-12 col-md-6 opportunity-item" data-type="<?php echo $op['Type']; ?>">
+                    <div class="col-12 col-md-6 opportunity-item" data-type="<?php echo $opType; ?>">
                         <div class="card h-100 shadow-sm opportunity-card">
                             <div class="card-body d-flex flex-column">
                                 <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
-                                    <h5 class="card-title op-title fw-bold mb-0"><?php echo htmlspecialchars($op['Title']); ?></h5>
+                                    <h5 class="card-title op-title fw-bold mb-0"><?php echo $title; ?></h5>
                                     <span class="badge <?php echo $badgeClass; ?> op-type">
-                                        <?php echo ($isTraining ? 'تدريب ميداني' : 'عمل تطوعي'); ?>
+                                        <?php echo htmlspecialchars($opType); ?>
                                     </span>
                                 </div>
 
-                                <h6 class="text-primary op-org mb-3"><?php echo htmlspecialchars($op['OrganizationName']); ?></h6>
+                                <h6 class="text-primary mb-3">عدد المقاعد المتاحة: <?php echo $seats; ?></h6>
 
                                 <div class="small text-muted mb-3">
-                                    <span class="op-location me-3"><i class="bi bi-geo-alt me-1"></i><?php echo htmlspecialchars($op['Location'] ?? 'غير محدد'); ?></span>
-                                    <span class="op-duration"><i class="bi bi-clock me-1"></i><?php echo htmlspecialchars($op['Duration'] ?? 'غير محدد'); ?></span>
+                                    <span class="op-location me-3"><i class="bi bi-geo-alt me-1"></i>موقع المؤسسة</span>
+                                    <span class="op-status"><i class="bi bi-info-circle me-1"></i>الحالة: <?php echo htmlspecialchars($op['status'] ?? 'نشط'); ?></span>
                                 </div>
 
                                 <p class="op-desc text-secondary mb-4">
                                     <?php 
-                                        $desc = htmlspecialchars($op['Description']);
                                         echo (mb_strlen($desc) > 120) ? mb_substr($desc, 0, 120) . '...' : $desc; 
                                     ?>
                                 </p>
 
                                 <div class="mt-auto">
-                                    <a href="/student_opportunity-details?id=<?php echo $op['OpportunityID']; ?>" class="btn <?php echo $btnClass; ?> btn-sm w-100">
+                                    <a href="/student_opportunity-details?id=<?php echo $oppID; ?>" class="btn <?php echo $btnClass; ?> btn-sm w-100">
                                         عرض التفاصيل والتقديم
                                     </a>
                                 </div>
@@ -110,10 +115,9 @@ require_once VIEW_PATH . '/layout/header.php';
 
             items.forEach(item => {
                 const title = item.querySelector('.op-title').textContent.toLowerCase();
-                const org = item.querySelector('.op-org').textContent.toLowerCase();
                 const type = item.getAttribute('data-type');
 
-                const matchesSearch = title.includes(searchTerm) || org.includes(searchTerm);
+                const matchesSearch = title.includes(searchTerm);
                 const matchesType = (selectedType === 'all' || type === selectedType);
 
                 if (matchesSearch && matchesType) {
@@ -128,6 +132,6 @@ require_once VIEW_PATH . '/layout/header.php';
         typeFilter.addEventListener('change', filterOpportunities);
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

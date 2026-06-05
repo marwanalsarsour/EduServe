@@ -14,6 +14,9 @@ require_once VIEW_PATH . '/layout/header.php';
         body { background-color: whitesmoke; }
         .card { transition: transform 0.2s; }
         .card:hover { transform: translateY(-5px); }
+        /* تنسيق مخصص لجعل 5 بطاقات في صف واحد */
+        .col-custom { flex: 0 0 20%; max-width: 20%; padding: 0 0.5rem; }
+        @media (max-width: 992px) { .col-custom { flex: 0 0 50%; max-width: 50%; margin-bottom: 1rem; } }
     </style>
 </head>
 
@@ -34,8 +37,8 @@ require_once VIEW_PATH . '/layout/header.php';
         </div>
     </div>
 
-    <div class="row g-4 mb-4">
-        <div class="col-12 col-md-3">
+    <div class="row g-0 mb-4">
+        <div class="col-custom">
             <div class="card shadow-sm text-center h-100 border-0">
                 <div class="card-body">
                     <div class="p-3 bg-primary bg-opacity-10 rounded-circle d-inline-block mb-2">
@@ -47,19 +50,19 @@ require_once VIEW_PATH . '/layout/header.php';
             </div>
         </div>
 
-        <div class="col-12 col-md-3">
+        <div class="col-custom">
             <div class="card shadow-sm text-center h-100 border-0">
                 <div class="card-body">
                     <div class="p-3 bg-warning bg-opacity-10 rounded-circle d-inline-block mb-2">
                         <i class="bi bi-file-earmark-text fs-3 text-warning"></i>
                     </div>
-                    <div class="text-muted small">تقارير قيد المراجعة</div>
+                    <div class="text-muted small">تقارير المراجعة</div>
                     <div class="fs-4 fw-bold"><?= htmlspecialchars($data['stats']['pending_reports'] ?? 0) ?></div>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 col-md-3">
+        <div class="col-custom">
             <div class="card shadow-sm text-center h-100 border-0">
                 <div class="card-body">
                     <div class="p-3 bg-success bg-opacity-10 rounded-circle d-inline-block mb-2">
@@ -71,7 +74,7 @@ require_once VIEW_PATH . '/layout/header.php';
             </div>
         </div>
 
-        <div class="col-12 col-md-3">
+        <div class="col-custom">
             <div class="card shadow-sm text-center h-100 border-0">
                 <div class="card-body">
                     <div class="p-3 bg-danger bg-opacity-10 rounded-circle d-inline-block mb-2">
@@ -79,6 +82,19 @@ require_once VIEW_PATH . '/layout/header.php';
                     </div>
                     <div class="text-muted small">تنبيهات جديدة</div>
                     <div class="fs-4 fw-bold"><?= htmlspecialchars($data['stats']['unread_notifications'] ?? 0) ?></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-custom">
+            <div class="card shadow-sm text-center h-100 border-0 position-relative">
+                <div class="card-body">
+                    <div class="p-3 bg-info bg-opacity-10 rounded-circle d-inline-block mb-2">
+                        <i class="bi bi-clipboard-check fs-3 text-info"></i>
+                    </div>
+                    <div class="text-muted small">فرص بانتظار الموافقة</div>
+                    <div class="fs-4 fw-bold text-info"><?= htmlspecialchars($data['stats']['pending_opportunities'] ?? 0) ?></div>
+                    <a href="/supervisor_pending-opportunities" class="stretched-link"></a>
                 </div>
             </div>
         </div>
@@ -113,7 +129,6 @@ require_once VIEW_PATH . '/layout/header.php';
     <div class="card shadow-sm border-0">
         <div class="card-body p-4">
             <h5 class="fw-bold mb-4"><i class="bi bi-clock-history me-2 text-secondary"></i>آخر أنشطة الطلاب</h5>
-            
             <?php if(!empty($data['recent_activity'])): ?>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
@@ -129,7 +144,7 @@ require_once VIEW_PATH . '/layout/header.php';
                                 <tr>
                                     <td class="fw-semibold"><?= htmlspecialchars($activity['student_name'] ?? '') ?></td>
                                     <td class="text-muted"><?= htmlspecialchars($activity['description'] ?? '') ?></td>
-                                    <td><span class="badge bg-light text-dark"><?= htmlspecialchars($activity['date'] ?? '') ?></span></td>
+                                    <td><span class="badge bg-light text-dark"><?= htmlspecialchars($activity['date'] ?? '') ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
