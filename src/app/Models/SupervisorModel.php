@@ -270,12 +270,13 @@ public function getDashboardStats($supervisor_id) {
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function approveOpportunity($opportunityId, $supervisorId) {
+public function approveOpportunity($opportunityId, $supervisorId) {
     $sql = "UPDATE Opportunity 
             SET isApproved = 1, 
                 supervisorID = :supId, 
                 status = 'نشط' 
             WHERE opportunityID = :oppId";
+            
     $stmt = $this->db->prepare($sql);
     return $stmt->execute([
         ':supId' => $supervisorId, 

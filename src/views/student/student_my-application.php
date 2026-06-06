@@ -12,7 +12,6 @@ require_once VIEW_PATH . '/layout/header.php';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        
         .badge-pending { background-color: Gold; color: Black; }
         .badge-approved { background-color: Green; color: White; }
         .badge-rejected { background-color: Red; color: White; }
@@ -50,7 +49,7 @@ require_once VIEW_PATH . '/layout/header.php';
                             <table class="table align-middle text-center mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="text-start">الفرصة</th>
+                                        <th class="text-start">الفرصة (ID)</th>
                                         <th>النوع</th>
                                         <th>تاريخ التقديم</th>
                                         <th>الحالة</th>
@@ -58,34 +57,36 @@ require_once VIEW_PATH . '/layout/header.php';
                                 </thead>
                                 <tbody>
                                     <?php foreach ($applications as $app): 
-                                        // تحديد كلاس الحالة بناءً على القيمة القادمة من الداتابيز
+                                        // مطابقة دقيقة لأسماء الأعمدة كما هي في قاعدة البيانات
+                                        $status = $app['supervisorStatus'] ?? 'غير محدد';
+                                        $type = $app['type'] ?? 'تطوع'; 
+                                        $reqDate = $app['requestDate'] ?? '1970-01-01';
+
+                                        // تحديد كلاس الحالة
                                         $statusClass = 'badge-pending';
-                                        $statusLabel = 'قيد الانتظار';
+                                        $statusLabel = $status;
                                         
-                                        if ($app['Status'] === 'Approved') {
+                                        if ($status === 'مقبول') {
                                             $statusClass = 'badge-approved';
-                                            $statusLabel = 'مقبول';
-                                        } elseif ($app['Status'] === 'Rejected') {
+                                        } elseif ($status === 'مرفوض') {
                                             $statusClass = 'badge-rejected';
-                                            $statusLabel = 'مرفوض';
                                         }
                                     ?>
                                         <tr>
                                             <td class="text-start fw-bold">
-                                                <?php echo htmlspecialchars($app['Title']); ?>
-                                                <div class="text-muted x-small fw-normal"><?php echo htmlspecialchars($app['OrganizationName'] ?? ''); ?></div>
+                                                <?php echo htmlspecialchars($app['opportunityID']); ?>
                                             </td>
                                             <td>
                                                 <span class="badge bg-light text-dark border">
-                                                    <?php echo ($app['Type'] === 'Training' ? 'تدريب ميداني' : 'عمل تطوعي'); ?>
+                                                    <?php echo htmlspecialchars($type); ?>
                                                 </span>
                                             </td>
                                             <td class="text-muted">
-                                                <?php echo date('Y-m-d', strtotime($app['RequestDate'])); ?>
+                                                <?php echo date('Y-m-d', strtotime($reqDate)); ?>
                                             </td>
                                             <td>
                                                 <span class="badge <?php echo $statusClass; ?> px-3 py-2 rounded-pill">
-                                                    <?php echo $statusLabel; ?>
+                                                    <?php echo htmlspecialchars($statusLabel); ?>
                                                 </span>
                                             </td>
                                         </tr>

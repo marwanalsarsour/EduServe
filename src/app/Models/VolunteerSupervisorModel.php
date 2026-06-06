@@ -19,13 +19,18 @@ public function getDashboardStats() {
         'pending_opportunities' => $this->getCustomCount('Opportunity', "isApproved = 0 AND type = 'تطوع'")
     ];
 }
-    public function approveVolunteerOpportunity($opportunityId) {
+public function approveVolunteerOpportunity($opportunityId, $supervisorId) {
     $sql = "UPDATE Opportunity 
             SET isApproved = 1, 
+                supervisorID = :supId, 
                 status = 'نشط' 
             WHERE opportunityID = :oppId";
+            
     $stmt = $this->db->prepare($sql);
-    return $stmt->execute([':oppId' => $opportunityId]);
+    return $stmt->execute([
+        ':supId' => $supervisorId, 
+        ':oppId' => $opportunityId
+    ]);
 }
 
     public function getRecentApplications($limit = 5) {
