@@ -50,13 +50,13 @@ require_once VIEW_PATH . '/layout/header.php';
                         </div>
                     </div>
                     <div id="recentActivity">
-                        <?php if (isset($latestRequest) && $latestRequest): ?>
+                        <?php if (isset($latestRequest) && !empty($latestRequest)): ?>
                             <div class="text-dark">
                                 <i class="bi bi-info-circle ms-2 text-primary"></i>
-                                قمت بالتقدم لفرصة: <strong><?php echo htmlspecialchars($latestRequest['OpportunityTitle']); ?></strong> 
-                                في (<?php echo htmlspecialchars($latestRequest['OrganizationName']); ?>) 
-                                بتاريخ <?php echo date('Y-m-d', strtotime($latestRequest['RequestDate'])); ?>
-                                <span class="badge bg-info text-dark p-2 ms-2"><?php echo $latestRequest['Status']; ?></span>
+                                قمت بالتقدم لفرصة: <strong><?php echo htmlspecialchars($latestRequest['OpportunityTitle'] ?? 'غير محدد'); ?></strong> 
+                                في (<?php echo htmlspecialchars($latestRequest['OrganizationName'] ?? 'غير محدد'); ?>) 
+                                بتاريخ <?php echo !empty($latestRequest['requestDate']) ? date('Y-m-d', strtotime($latestRequest['requestDate'])) : 'غير محدد'; ?>
+                                <span class="badge bg-info text-dark p-2 ms-2"><?php echo htmlspecialchars($latestRequest['supervisorStatus'] ?? 'قيد المراجعة'); ?></span>
                             </div>
                         <?php else: ?>
                             <div class="text-muted">لا يوجد أنشطة حديثة بعد.</div>

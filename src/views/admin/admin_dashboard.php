@@ -52,7 +52,7 @@ require_once VIEW_PATH . '/layout/header.php';
             </div>
             <div class="col-12 col-sm-6 col-md-3">
                 <div class="card border-0 shadow-sm rounded-4 p-4 bg-white border-custom-red">
-                    <small class="text-muted d-block mb-1 fw-bold">تقارير this الشهر</small>
+                    <small class="text-muted d-block mb-1 fw-bold">تقارير هذا الشهر</small>
                     <h2 class="fw-bold text-custom-red mb-0"><?= htmlspecialchars($stats['monthlyReports'] ?? 0) ?></h2>
                 </div>
             </div>

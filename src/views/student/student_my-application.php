@@ -15,7 +15,6 @@ require_once VIEW_PATH . '/layout/header.php';
         .badge-pending { background-color: Gold; color: Black; }
         .badge-approved { background-color: Green; color: White; }
         .badge-rejected { background-color: Red; color: White; }
-        
         .opportunity-card-table { border-radius: 10px; overflow: hidden; }
     </style>
 </head>
@@ -28,16 +27,13 @@ require_once VIEW_PATH . '/layout/header.php';
                     <h4 class="fw-bold mb-1">طلباتي</h4>
                     <p class="text-muted small mb-0">تتبع حالات طلبات الانضمام التي قمت بالتقديم عليها</p>
                 </div>
-
                 <a href="/student_opportunities" class="btn btn-primary">
-                    <i class="bi bi-plus-circle ms-1"></i>
-                    التقديم على فرصة جديدة
+                    <i class="bi bi-plus-circle ms-1"></i> التقديم على فرصة جديدة
                 </a>
             </div>
 
             <div class="card shadow-sm border-0 opportunity-card-table">
                 <div class="card-body p-4">
-
                     <?php if (empty($applications)): ?>
                         <div class="text-center text-muted py-5">
                             <i class="bi bi-inbox fs-1 d-block mb-3 text-secondary"></i>
@@ -49,7 +45,8 @@ require_once VIEW_PATH . '/layout/header.php';
                             <table class="table align-middle text-center mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="text-start">الفرصة (ID)</th>
+                                        <th class="text-start">الفرصة</th>
+                                        <th>الجهة</th>
                                         <th>النوع</th>
                                         <th>تاريخ التقديم</th>
                                         <th>الحالة</th>
@@ -57,36 +54,26 @@ require_once VIEW_PATH . '/layout/header.php';
                                 </thead>
                                 <tbody>
                                     <?php foreach ($applications as $app): 
-                                        // مطابقة دقيقة لأسماء الأعمدة كما هي في قاعدة البيانات
                                         $status = $app['supervisorStatus'] ?? 'غير محدد';
-                                        $type = $app['type'] ?? 'تطوع'; 
+                                        $type = $app['type'] ?? 'غير محدد'; 
                                         $reqDate = $app['requestDate'] ?? '1970-01-01';
+                                        $oppTitle = $app['title'] ?? 'بدون عنوان';
+                                        $orgName = $app['OrganizationName'] ?? '—';
 
-                                        // تحديد كلاس الحالة
                                         $statusClass = 'badge-pending';
-                                        $statusLabel = $status;
-                                        
-                                        if ($status === 'مقبول') {
-                                            $statusClass = 'badge-approved';
-                                        } elseif ($status === 'مرفوض') {
-                                            $statusClass = 'badge-rejected';
-                                        }
+                                        if ($status === 'مقبول') { $statusClass = 'badge-approved'; }
+                                        elseif ($status === 'مرفوض') { $statusClass = 'badge-rejected'; }
                                     ?>
                                         <tr>
-                                            <td class="text-start fw-bold">
-                                                <?php echo htmlspecialchars($app['opportunityID']); ?>
-                                            </td>
+                                            <td class="text-start fw-bold"><?php echo htmlspecialchars($oppTitle); ?></td>
+                                            <td><?php echo htmlspecialchars($orgName); ?></td>
                                             <td>
-                                                <span class="badge bg-light text-dark border">
-                                                    <?php echo htmlspecialchars($type); ?>
-                                                </span>
+                                                <span class="badge bg-light text-dark border"><?php echo htmlspecialchars($type); ?></span>
                                             </td>
-                                            <td class="text-muted">
-                                                <?php echo date('Y-m-d', strtotime($reqDate)); ?>
-                                            </td>
+                                            <td class="text-muted"><?php echo date('Y-m-d', strtotime($reqDate)); ?></td>
                                             <td>
                                                 <span class="badge <?php echo $statusClass; ?> px-3 py-2 rounded-pill">
-                                                    <?php echo htmlspecialchars($statusLabel); ?>
+                                                    <?php echo htmlspecialchars($status); ?>
                                                 </span>
                                             </td>
                                         </tr>
@@ -95,7 +82,6 @@ require_once VIEW_PATH . '/layout/header.php';
                             </table>
                         </div>
                     <?php endif; ?>
-
                 </div>
             </div>
         </div>
@@ -106,8 +92,6 @@ require_once VIEW_PATH . '/layout/header.php';
             <small>© 2026 EduServe - جامعة بوليتكنك فلسطين</small>
         </div>
     </footer>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

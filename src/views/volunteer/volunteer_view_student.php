@@ -13,7 +13,6 @@ require_once VIEW_PATH . '/layout/header.php';
 </head>
 <body class="bg-light text-end">
 
-
 <div class="container mt-5 pb-5">
     <div class="row justify-content-center">
         <div class="col-md-9">
@@ -43,8 +42,8 @@ require_once VIEW_PATH . '/layout/header.php';
                             <h6 class="fw-bold text-primary border-bottom pb-2">المعلومات الأكاديمية</h6>
                             <ul class="list-unstyled p-0">
                                 <li class="mb-2"><strong>التخصص:</strong> <?= htmlspecialchars($application['major']) ?></li>
-                                <li class="mb-2"><strong>المعدل التراكمي:</strong> <?= htmlspecialchars($application['gpa']) ?>%</li>
-                                <li class="mb-2"><strong>المستوى الدراسي:</strong> <?= htmlspecialchars($application['level']) ?></li>
+                                <li class="mb-2"><strong>السنة الأكاديمية:</strong> <?= htmlspecialchars($application['university_id']) ?></li>
+                                <li class="mb-2"><strong>الساعات التطوعية المطلوبة:</strong> <?= htmlspecialchars($application['req_hours']) ?></li>
                             </ul>
                         </div>
                         
@@ -61,13 +60,13 @@ require_once VIEW_PATH . '/layout/header.php';
                         <h6 class="fw-bold text-primary border-bottom pb-2">الفرصة المتقدم إليها حالياً</h6>
                         <div class="p-3 bg-light rounded shadow-sm border-start border-4 border-info">
                             <h6 class="mb-1 fw-bold"><?= htmlspecialchars($application['opportunity_title']) ?></h6>
-                            <p class="small text-muted mb-0">المؤسسة: <?= htmlspecialchars($application['org_name']) ?> | الساعات المطلوبة: <?= $application['req_hours'] ?> ساعة</p>
+                            <p class="small text-muted mb-0">المؤسسة: <?= htmlspecialchars($application['org_name']) ?> | الساعات المطلوبة: <?= htmlspecialchars($application['req_hours']) ?> ساعة</p>
                         </div>
                     </div>
 
                     <div class="d-flex justify-content-center gap-3 mt-5">
                         <form action="/student_review/process" method="POST" class="d-inline">
-                            <input type="hidden" name="app_id" value="<?= $application['id'] ?>">
+                            <input type="hidden" name="app_id" value="<?= $application['requestID'] ?>">
                             <button type="submit" name="accept_request" class="btn btn-success px-5 py-2 fw-bold shadow-sm" onclick="return confirm('تأكيد قبول انضمام الطالب للفرصة؟')">
                                 <i class="bi bi-check-lg ms-2"></i>قبول الانضمام
                             </button>
@@ -91,7 +90,7 @@ require_once VIEW_PATH . '/layout/header.php';
                 <button type="button" class="btn-close ms-0" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="/student_review/process" method="POST">
-                <input type="hidden" name="app_id" value="<?= $application['id'] ?>">
+                <input type="hidden" name="app_id" value="<?= $application['requestID'] ?>">
                 <div class="modal-body text-start">
                     <label class="form-label small fw-bold text-end d-block">سبب الرفض (سيتم إرساله للطالب):</label>
                     <textarea name="reject_reason" class="form-control text-end" rows="3" placeholder="مثال: نعتذر، التخصص المطلوب لا يتناسب مع متطلبات الفرصة..." required></textarea>

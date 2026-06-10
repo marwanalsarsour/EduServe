@@ -16,15 +16,26 @@ class VolunteerApplicationController {
 
     public function handleStatus() {
         $id = $_GET['id'] ?? null;
-        $action = $_GET['action'] ?? null; // 
-        
+        $action = $_GET['action'] ?? null;
+
         if ($id && $action) {
-            $status = ($action === 'approve') ? 'approved' : 'rejected';
+
+            if ($action === 'approve') {
+                $status = 'معتمد';
+            } elseif ($action === 'reject') {
+                $status = 'مرفوض';
+            } else {
+                header('Location: /volunteer_requests?status=error');
+                exit;
+            }
+
             $this->model->updateApplicationStatus($id, $status);
             header('Location: /volunteer_requests?status=success');
+
         } else {
             header('Location: /volunteer_requests?status=error');
         }
+
         exit;
     }
 }

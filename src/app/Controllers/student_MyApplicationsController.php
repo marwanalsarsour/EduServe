@@ -1,5 +1,4 @@
 <?php
-
 require_once __DIR__ . '/../Models/StudentModel.php'; 
 
 class student_MyApplicationsController {
@@ -20,7 +19,6 @@ class student_MyApplicationsController {
         }
 
         $studentId = $_SESSION['user_id'];
-
         $studentModel = new StudentModel($this->db);
         
         $applications = $studentModel->getStudentApplications($studentId);

@@ -16,13 +16,24 @@ class VolunteerOpportunityController {
 
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $status = $_POST['status'] ?? 'نشط';
+
+            if ($status === 'active') $status = 'نشط';
+            elseif ($status === 'closed') $status = 'مغلق';
+            elseif ($status === 'inactive') $status = 'مغلق';
+
             $data = [
-                'title'       => $_POST['title'],
-                'org'         => $_POST['org'],
-                'hours'       => $_POST['hours'],
-                'description' => $_POST['description']
+                'title'        => $_POST['title'],
+                'type'         => $_POST['type'],
+                'seats'        => $_POST['seats'],
+                'conditions'   => $_POST['conditions'] ?? null,
+                'entityID'     => $_POST['entityID'],
+                'supervisorID' => $_POST['supervisorID'],
+                'description'  => $_POST['description'] ?? null,
+                'status'       => $status,
+                'isApproved'   => 0
             ];
-            
+
             if ($this->model->addOpportunity($data)) {
                 header('Location: /volunteer_opportunities?status=created');
             } else {
@@ -34,22 +45,33 @@ class VolunteerOpportunityController {
 
     public function edit($id) {
         $opportunity = $this->model->getOpportunityById($id);
+
         if (!$opportunity) {
             header('Location: /volunteer_opportunities?error=not_found');
             exit;
         }
+
         require_once VIEW_PATH . '/volunteer/volunteer_edit_opportunity.php';
     }
 
     public function update() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
             $id = $_POST['opportunity_id'];
+
+            $status = $_POST['status'] ?? 'نشط';
+
+            if ($status === 'active') $status = 'نشط';
+            elseif ($status === 'closed') $status = 'مغلق';
+            elseif ($status === 'inactive') $status = 'مغلق';
+
             $data = [
-                'title'       => $_POST['title'],
-                'org'         => $_POST['org'],
-                'hours'       => $_POST['hours'],
-                'description' => $_POST['description'],
-                'status'      => $_POST['status']
+                'title'        => $_POST['title'],
+                'type'         => $_POST['type'],
+                'seats'        => $_POST['seats'],
+                'conditions'   => $_POST['conditions'] ?? null,
+                'description'  => $_POST['description'] ?? null,
+                'status'       => $status
             ];
 
             if ($this->model->updateOpportunity($id, $data)) {

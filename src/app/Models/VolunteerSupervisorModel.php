@@ -79,11 +79,24 @@ public function approveVolunteerOpportunity($opportunityId, $supervisorId) {
     }
 
     public function getOpportunityById($id) {
-        $sql = "SELECT * FROM Opportunity WHERE opportunityID = :id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
+    $sql = "SELECT
+                o.*,
+                ee.entityName AS entity_name,
+                u.fullName AS supervisor_name
+            FROM Opportunity o
+            LEFT JOIN ExternalEntity ee
+                ON o.entityID = ee.entityID
+            LEFT JOIN AcademicSupervisor s
+                ON o.supervisorID = s.supervisorID
+            LEFT JOIN Users u
+                ON s.supervisorID = u.userID
+            WHERE o.opportunityID = :id";
+
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':id' => $id]);
+
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
 
     public function updateOpportunity($id, $data) {
         $sql = "UPDATE Opportunity 
@@ -271,7 +284,7 @@ public function getAllOpportunities() {
     public function getActiveVolunteers() {
         $sql = "SELECT opr.requestID as application_id, u.userID as student_id, u.fullName as student_name, 
                        s.academicYear as university_id, op.title as opportunity_title, 
-                       s.requiredTrainingHours as required_hours,
+                       s.requiredVolunteerHours as required_hours,
                        COALESCE((SELECT SUM(hours) FROM Attendance WHERE studentID = u.userID AND status = 'حاضر'), 0) as completed_hours
                 FROM OpportunityRequest opr
                 JOIN Users u ON opr.studentID = u.userID
@@ -284,7 +297,7 @@ public function getAllOpportunities() {
 
     public function getApplicationDetails($app_id) {
         $sql = "SELECT opr.*, u.fullName as student_name, s.academicYear as university_id, s.majorName as major,
-                       op.title as opportunity_title, s.requiredTrainingHours as req_hours, ee.entityName as org_name
+                       op.title as opportunity_title, s.requiredVolunteerHours as req_hours, ee.entityName as org_name
                 FROM OpportunityRequest opr
                 JOIN Users u ON opr.studentID = u.userID
                 JOIN Student s ON opr.studentID = s.studentID

@@ -16,12 +16,13 @@ class VolunteerAttendanceController {
 
     public function approve() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $hour_id = $_POST['hour_id'];
-            if ($this->model->approveDailyAttendance($hour_id)) {
+            $attendanceID = $_POST['attendanceID'];
+            if ($this->model->approveDailyAttendance($attendanceID)) {
                 header('Location: /volunteer_attendance?status=success');
             } else {
                 header('Location: /volunteer_attendance?status=error');
             }
+            exit;
         }
     }
 }

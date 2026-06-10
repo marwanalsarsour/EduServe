@@ -1,5 +1,7 @@
 <?php
-
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
@@ -597,13 +599,11 @@ $router->add('GET', '/logout', function() {
     require_once APP_PATH . '/Controllers/AuthController.php';
     (new AuthController())->logout();
 });
-// مسار عرض الصفحة (تأكد من تمرير $db)
 $router->add('GET', '/supervisor_pending-opportunities', function() use ($db) {
     require_once __DIR__ . '/../app/Controllers/PendingOpportunitiesController.php';
     (new PendingOpportunitiesController($db))->index(); 
 });
 
-// مسار معالجة الموافقة (تأكد من تمرير $db)
 $router->add('POST', '/pending/approve', function() use ($db) {
     require_once __DIR__ . '/../app/Controllers/PendingOpportunitiesController.php';
     (new PendingOpportunitiesController($db))->approve();

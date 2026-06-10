@@ -12,7 +12,6 @@ require_once VIEW_PATH . '/layout/header.php';
 </head>
 <body class="bg-light text-end">
 
-
 <div class="container py-5">
     <div class="row mb-4">
         <div class="col-md-8">
@@ -41,18 +40,26 @@ require_once VIEW_PATH . '/layout/header.php';
                 <?php if (!empty($applications)): ?>
                     <?php foreach ($applications as $app): ?>
                     <tr>
-                        <td class="fw-bold px-4"><?= htmlspecialchars($app['student_name']) ?></td>
-                        <td><?= htmlspecialchars($app['major']) ?></td>
-                        <td><span class="badge bg-info-subtle text-info p-2"><?= htmlspecialchars($app['opportunity_title']) ?></span></td>
-                        <td><?= date('Y-m-d', strtotime($app['applied_at'])) ?></td>
+                        <td class="fw-bold px-4"><?= htmlspecialchars($app['student_name'] ?? 'غير معروف') ?></td>
+                        <td><?= htmlspecialchars($app['major'] ?? 'غير محدد') ?></td>
+                        <td><span class="badge bg-info-subtle text-info p-2"><?= htmlspecialchars($app['opportunity_title'] ?? 'غير محدد') ?></span></td>
                         <td>
-                            <a href="/view_student_cv?id=<?= $app['student_id'] ?>" class="btn btn-sm btn-outline-secondary">
+                            <?php 
+                            if (!empty($app['requestDate'])) {
+                                echo date('Y-m-d', strtotime($app['requestDate']));
+                            } else {
+                                echo 'غير متوفر';
+                            }
+                            ?>
+                        </td>
+                        <td>
+                            <a href="/volunteer_view_student?id=<?= $app['requestID'] ?>" class="btn btn-sm btn-outline-secondary">
                                 <i class="bi bi-file-earmark-person ms-1"></i>عرض السجل
                             </a>
                         </td>
                         <td>
-                            <a href="/handle_application?id=<?= $app['id'] ?>&action=approve" class="btn btn-sm btn-success px-3 ms-1" onclick="return confirm('تأكيد قبول الطالب؟')">قبول</a>
-                            <a href="/handle_application?id=<?= $app['id'] ?>&action=reject" class="btn btn-sm btn-danger px-3" onclick="return confirm('تأكيد رفض الطلب؟')">رفض</a>
+                            <a href="/handle_application?id=<?= $app['requestID'] ?>&action=approve" class="btn btn-sm btn-success px-3 ms-1" onclick="return confirm('تأكيد قبول الطالب؟')">قبول</a>
+                            <a href="/handle_application?id=<?= $app['requestID'] ?>&action=reject" class="btn btn-sm btn-danger px-3" onclick="return confirm('تأكيد رفض الطلب؟')">رفض</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
