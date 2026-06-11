@@ -36,8 +36,8 @@ require_once VIEW_PATH . '/layout/header.php';
                         <?php if(!empty($data['opportunities'])): ?>
                             <?php foreach($data['opportunities'] as $opp): ?>
                                 <tr>
-                                    <td class="fw-bold"><?= htmlspecialchars($opp['title']) ?></td>
-                                    <td><?= htmlspecialchars($opp['organization']) ?></td>
+                                    <td class="fw-bold"><?= htmlspecialchars($opp['title'] ?? 'بدون عنوان') ?></td>
+                                    <td><?= htmlspecialchars($opp['entityName'] ?? 'غير محدد') ?></td>
                                     <td>
                                         <?php 
                                             $statusClass = ($opp['status'] == 'active') ? 'bg-success' : 'bg-secondary';

@@ -38,15 +38,7 @@ require_once VIEW_PATH . '/layout/header.php';
                         <input type="text" name="title" class="form-control bg-light border-0 py-2" placeholder="مثال: مطور ويب Junior" required>
                     </div>
 
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small text-secondary">نوع التدريب</label>
-                        <select name="type" class="form-select bg-light border-0 py-2" required>
-                            <option value="">اختر النوع</option>
-                            <option value="volunteer">تطوعي</option>
-                            <option value="internship">تدريب عملي</option>
-                        </select>
-                    </div>
-
+                    
                     <div class="col-md-6">
                         <label class="form-label fw-bold small text-secondary">اسم الشركة / المؤسسة</label>
                         <input type="text" name="organization" class="form-control bg-light border-0 py-2" required>

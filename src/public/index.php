@@ -622,4 +622,7 @@ $router->add('POST', '/pending/approve', function() use ($db) {
     require_once __DIR__ . '/../app/Controllers/PendingOpportunitiesController.php';
     (new PendingOpportunitiesController($db))->approve();
 });
+$router->add('GET', '/supervisor/student-details/(\d+)', function($id) use ($db) {
+    require_once VIEW_PATH . '/supervisor/supervisor-student-details.php';
+});
 $router->run();

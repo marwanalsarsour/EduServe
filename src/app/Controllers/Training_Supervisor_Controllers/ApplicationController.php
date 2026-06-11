@@ -38,7 +38,7 @@ class ApplicationController {
             $id = $_POST['id'];
             $action = $_POST['action']; 
             
-            $status = ($action === 'accept') ? 'accepted' : 'rejected';
+            $status = ($action === 'accept') ? 'معتمد' : 'مرفوض';
 
             if ($this->model->updateApplicationStatus($id, $status)) {
                 $_SESSION['success_msg'] = "تم تحديث حالة الطلب بنجاح.";

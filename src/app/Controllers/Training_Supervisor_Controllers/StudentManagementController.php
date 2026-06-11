@@ -13,30 +13,39 @@ class StudentManagementController {
 
     public function index() {
         $search = $_GET['search'] ?? '';
+        // جلب البيانات من الموديل
         $raw_students = $this->model->getSupervisedStudents($_SESSION['user_id'], $search);
         
         $students = [];
         foreach ($raw_students as $s) {
+            // استخدام المعامل ?? 0 لحماية الكود من الـ Undefined index
+            // ملاحظة: تأكد أن أسماء الأعمدة هنا تطابق ما يعيده استعلام الـ SQL في الموديل
             $completed = $s['completed_hours'] ?? 0;
-            $required = $s['required_hours'] ?: 1; 
-            $percent = ($completed / $required) * 100;
+            $required  = $s['required_hours'] ?? 0; 
+            $pending_reports = $s['pending_reports_count'] ?? 0;
+            
+            // تجنب القسمة على صفر
+            $effective_required = ($required > 0) ? $required : 1; 
+            $percent = ($completed / $effective_required) * 100;
 
             $status_class = 'primary';
             if ($percent >= 100) $status_class = 'success';
             elseif ($percent < 20) $status_class = 'danger';
             elseif ($percent < 50) $status_class = 'warning';
 
-            $students[] = [
-                'id' => $s['id'],
-                'name' => $s['name'],
-                'major' => $s['major'],
-                'company' => $s['company'] ?? 'غير محدد',
-                'completed_hours' => (int)$completed,
-                'required_hours' => (int)$required,
-                'status' => ($percent >= 100 ? 'منتهي' : 'قيد التدريب'),
-                'status_class' => $status_class,
-                'has_alert' => ($s['pending_reports_count'] > 0) 
-            ];
+$students[] = [
+    'id'              => $s['id'] ?? 0,
+    'name'            => $s['name'] ?? 'غير معروف',
+    'major'           => $s['major'] ?? 'غير محدد',
+    'company'         => $s['company'] ?? 'غير محدد',
+    'completed_hours' => (int)$completed,
+    'required_hours'  => (int)$required,
+    'percent'         => round($percent), // أضفنا هذا المفتاح
+    'color'           => $status_class,   // أضفنا هذا المفتاح ليعمل كـ color
+    'status'          => ($percent >= 100 ? 'منتهي' : 'قيد التدريب'),
+    'status_class'    => $status_class,
+    'has_alert'       => ($pending_reports > 0) 
+];
         }
 
         $data = ['students' => $students];

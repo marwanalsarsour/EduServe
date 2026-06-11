@@ -51,8 +51,11 @@ class ExternalOpportunitiesController {
 
     public function delete() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
-            $this->model->deleteOpportunity($_POST['id']);
-            header('Location: /external/opportunities?success=deleted');
+            if ($this->model->deleteOpportunity($_POST['id'])) {
+                header('Location: /external/opportunities?success=deleted');
+            } else {
+                header('Location: /external/opportunities?error=failed_delete');
+            }
             exit;
         }
     }

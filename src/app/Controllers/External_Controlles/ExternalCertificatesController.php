@@ -47,6 +47,7 @@ class ExternalCertificatesController {
             $data['signature_path'] = $this->uploadFile($_FILES['signature'] ?? null, 'signatures');
             $data['stamp_path'] = $this->uploadFile($_FILES['stamp'] ?? null, 'stamps');
 
+            // دالة الحفظ في الموديل ستتولى توليد الـ certificateID وإرجاعه كـ verifyCode
             $verifyCode = $this->model->saveCertificate($data);
 
             if ($verifyCode) {
