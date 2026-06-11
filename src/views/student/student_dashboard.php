@@ -158,44 +158,57 @@ require_once VIEW_PATH . '/layout/header.php';
             </div>
 
             <div class="card shadow-sm border-0">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold mb-0"><i class="bi bi-patch-check ms-1"></i> الشهادات</h5>
-                        <a href="/student_certificates" class="btn btn-sm btn-outline-primary">
-                            عرض الشهادات
-                        </a>
-                    </div>
+    <div class="card-body p-4">
 
-                    <div class="row g-3">
-                        <div class="col-12 col-md-4">
-                            <div class="border rounded p-3 h-100 bg-light">
-                                <div class="text-muted small">إجمالي الشهادات</div>
-                                <div class="fs-4 fw-bold text-primary" id="certTotal"><?php echo $certInfo['total_certs'] ?? 0; ?></div>
-                            </div>
-                        </div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">
+                <i class="bi bi-person-badge ms-1"></i>
+                الملف الرقمي (Portfolio)
+            </h5>
 
-                        <div class="col-12 col-md-4">
-                            <div class="border rounded p-3 h-100 bg-light">
-                                <div class="text-muted small">آخر شهادة حاصل عليها</div>
-                                <div class="fw-semibold text-truncate" id="certLatestTitle"><?php echo htmlspecialchars($certInfo['latest_org'] ?? '—'); ?></div>
-                                <div class="text-muted small" id="certLatestDate"><?php echo $certInfo['latest_date'] ?? 'لا يوجد'; ?></div>
-                            </div>
-                        </div>
+            <a href="/student_Portfolio" class="btn btn-sm btn-primary">
+                <i class="bi bi-box-arrow-up-right ms-1"></i>
+                عرض الملف الرقمي
+            </a>
+        </div>
 
-                        <div class="col-12 col-md-4">
-                            <div class="border rounded p-3 h-100 bg-light">
-                                <div class="text-muted small">حالة الشهادات</div>
-                                <div id="certStatus" class="fw-semibold">
-                                     <?php echo (isset($certInfo['total_certs']) && $certInfo['total_certs'] > 0) ? '<span class="text-success">مكتمل</span>' : '<span class="text-warning">قيد التنفيذ</span>'; ?>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="row g-3">
 
-                    <div class="text-muted small mt-3">
-                        * ستظهر الشهادات هنا بعد إتمام الساعات المقررة واعتمادها من قبل المشرفين.
+            <div class="col-12 col-md-4">
+                <div class="border rounded p-3 h-100 bg-light">
+                    <div class="text-muted small">إجمالي الشهادات</div>
+                    <div class="fs-4 fw-bold text-primary">
+                        <?= $certsCount ?? 0 ?>
                     </div>
                 </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="border rounded p-3 h-100 bg-light">
+                    <div class="text-muted small">التدريبات المنجزة</div>
+                    <div class="fs-4 fw-bold text-success">
+                        <?= $trainingCount ?? 0 ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="border rounded p-3 h-100 bg-light">
+                    <div class="text-muted small">الأعمال التطوعية</div>
+                    <div class="fs-4 fw-bold text-danger">
+                        <?= $volunteerCount ?? 0 ?>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="alert alert-light border mt-4 mb-0">
+            <i class="bi bi-info-circle ms-1"></i>
+            يحتوي الملف الرقمي على الشهادات، التدريبات المنجزة، الأعمال التطوعية والإنجازات التي حصل عليها الطالب خلال مسيرته الأكاديمية.
+             </div>
+
+             </div>
             </div>
 
         </div>

@@ -29,7 +29,7 @@ require_once VIEW_PATH . '/layout/header.php';
             <table class="table mb-0 align-middle">
                 <thead class="bg-dark text-white">
                     <tr>
-                        <th class="text-start px-4">الطالب ID</th>
+                        <th class="text-start px-4">اسم الطالب</th>
                         <th>التاريخ</th>
                         <th>وقت الحضور</th>
                         <th>وقت الانصراف</th>
@@ -43,7 +43,7 @@ require_once VIEW_PATH . '/layout/header.php';
                     <?php if(!empty($attendance_records)): ?>
                         <?php foreach($attendance_records as $record): ?>
                             <tr>
-                                <td class="fw-bold text-start px-4"><?= htmlspecialchars($record['studentID']) ?></td>
+                                <td class="fw-bold text-start px-4"><?= htmlspecialchars($record['student_name']) ?></td>
                                 <td><?= htmlspecialchars($record['date']) ?></td>
                                 <td><?= !empty($record['checkIn']) ? date('h:i A', strtotime($record['checkIn'])) : '--:--' ?></td>
                                 <td><?= !empty($record['checkOut']) ? date('h:i A', strtotime($record['checkOut'])) : '--:--' ?></td>

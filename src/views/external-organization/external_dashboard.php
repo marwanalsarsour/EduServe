@@ -26,7 +26,6 @@ require_once VIEW_PATH . '/layout/header.php';
 
         .stat-card { 
             transition: transform 0.2s; 
-            cursor: pointer; 
             background-color: white;
             border: 1px solid gray;
             border-radius: 12px;
@@ -109,7 +108,15 @@ require_once VIEW_PATH . '/layout/header.php';
                             <div class="fw-bold mb-3">
                                 <?= htmlspecialchars($stats['trainer_name']) ?>
                             </div>
-                            <a href="/trainer/dashboard" class="btn btn-sm w-100" style="background-color: white; border: 1px solid blue; color: blue;">الملف الشخصي</a>
+
+                            <div class="d-grid gap-2">
+                                <a href="/trainer/dashboard" class="btn btn-sm w-100" style="background-color: white; border: 1px solid blue; color: blue;">
+                                    الذهاب للوحة التحكم
+                                </a>
+                                <a href="/trainer/profile" class="btn btn-sm btn-primary w-100">
+                                    <i class="bi bi-pencil-square"></i> تعديل الملف الشخصي
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -124,7 +131,15 @@ require_once VIEW_PATH . '/layout/header.php';
                             <div class="fw-bold mb-3">
                                 <?= htmlspecialchars($stats['manager_name']) ?>
                             </div>
-                            <a href="/v_manager/dashboard" class="btn btn-sm w-100" style="background-color: white; border: 1px solid green; color: green;">الملف الشخصي</a>
+
+                            <div class="d-grid gap-2">
+                                <a href="/v_manager/dashboard" class="btn btn-sm w-100" style="background-color: white; border: 1px solid green; color: green;">
+                                    الذهاب للوحة التحكم
+                                </a>
+                                <a href="/v_manager/profile" class="btn btn-sm" style="background-color: green; border-color: green; color: white; width:100%;">
+                                    <i class="bi bi-pencil-square"></i> تعديل الملف الشخصي
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

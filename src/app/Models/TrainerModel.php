@@ -40,31 +40,39 @@ class TrainerModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getTrainerProfile($trainer_id) {
-        $sql = "SELECT u.*, ee.entityName as organization_name 
-                FROM Users u
-                LEFT JOIN ExternalEntity ee ON u.userID = ee.entityID
-                WHERE u.userID = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$trainer_id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
+ public function getTrainerProfile($trainer_id)
+{
+    $sql = "SELECT
+                entityID,
+                entityName,
+                location,
+                employeeName,
+                employeeEmail
+            FROM ExternalEntity
+            WHERE entityID = ?";
 
-    public function updateProfile($trainer_id, $data) {
-        $sql = "UPDATE Users SET fullName = ?, email = ?, phoneNumber = ? WHERE userID = ?";
-        return $this->db->prepare($sql)->execute([
-            $data['name'],
-            $data['email'],
-            $data['phone'],
-            $trainer_id
-        ]);
-    }
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([$trainer_id]);
 
-    public function updatePassword($trainer_id, $new_password) {
-        $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
-        $sql = "UPDATE Users SET password = ? WHERE userID = ?";
-        return $this->db->prepare($sql)->execute([$hashed_password, $trainer_id]);
-    }
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+   public function updateProfile($trainer_id, $data)
+{
+    $sql = "UPDATE ExternalEntity
+            SET employeeName = ?,
+                employeeEmail = ?,
+                location = ?
+            WHERE entityID = ?";
+
+    return $this->db->prepare($sql)->execute([
+        $data['employeeName'],
+        $data['employeeEmail'],
+        $data['location'],
+        $trainer_id
+    ]);
+}
+
 
     public function getTodayAttendance($trainer_id) {
         $today = date('Y-m-d');

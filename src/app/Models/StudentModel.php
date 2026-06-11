@@ -43,13 +43,36 @@ class StudentModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getAcceptedTrainingCount($studentId) {
-        $sql = "SELECT COUNT(*) as total FROM OpportunityRequest WHERE studentID = :studentId AND entityStatus = 'مقبول'";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':studentId' => $studentId]);
-        $res = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $res['total'] ?? 0;
-    }
+   public function getAcceptedTrainingCount($studentId) {
+    $sql = "SELECT COUNT(*) as total
+            FROM OpportunityRequest r
+            JOIN Opportunity o ON r.opportunityID = o.opportunityID
+            WHERE r.studentID = :studentId
+              AND r.entityStatus = 'مقبول'
+              AND o.type = 'Training'";
+              
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':studentId' => $studentId]);
+    $res = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $res['total'] ?? 0;
+}
+public function getStudentTrainings($studentId) {
+    $sql = "SELECT 
+                o.title, 
+                e.entityName AS OrganizationName, 
+                o.createdAt AS completionDate
+            FROM OpportunityRequest r
+            JOIN Opportunity o ON r.opportunityID = o.opportunityID
+            JOIN ExternalEntity e ON o.entityID = e.entityID
+            WHERE r.studentID = :studentId
+              AND r.entityStatus = 'مقبول'
+              AND o.type = 'Training'
+            ORDER BY o.createdAt DESC";
+
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':studentId' => $studentId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
     public function getFullAttendance($studentId) {
         $sql = "SELECT * FROM Attendance WHERE studentID = :studentId ORDER BY date DESC";
@@ -117,7 +140,7 @@ public function getOpenOpportunities() {
             FROM Opportunity o
             JOIN ExternalEntity ee ON o.entityID = ee.entityID
             JOIN Users u ON ee.entityID = u.userID
-            WHERE o.opportunityID = :id AND o.isApproved = 1"; // إضافة الشرط هنا
+            WHERE o.opportunityID = :id AND o.isApproved = 1"; 
     $stmt = $this->db->prepare($sql);
     $stmt->execute([':id' => $id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -235,6 +258,34 @@ public function getAvailableOpportunities() {
 
         return $stmt->execute();
     }
+  public function getVolunteerCount($studentId) {
+    $sql = "SELECT COUNT(*) as total
+            FROM OpportunityRequest r
+            JOIN Opportunity o ON r.opportunityID = o.opportunityID
+            WHERE r.studentID = :studentId
+              AND o.type = 'Volunteer'
+              AND r.entityStatus = 'مقبول'";
+              
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':studentId' => $studentId]);
+    $res = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $res['total'] ?? 0;
+}
+
+public function getStudentVolunteerWorks($studentId) {
+    $sql = "SELECT o.title, ee.entityName as OrganizationName
+            FROM OpportunityRequest r
+            JOIN Opportunity o ON r.opportunityID = o.opportunityID
+            JOIN ExternalEntity ee ON o.entityID = ee.entityID
+            WHERE r.studentID = :studentId
+              AND o.type = 'Volunteer'
+              AND r.entityStatus = 'مقبول'
+            ORDER BY r.requestDate DESC"; 
+            
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':studentId' => $studentId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
     public function getSmartNotifications($studentId) {
         $notifications = [];

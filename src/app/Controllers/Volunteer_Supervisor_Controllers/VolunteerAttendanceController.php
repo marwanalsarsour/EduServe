@@ -10,7 +10,7 @@ class VolunteerAttendanceController {
     }
 
     public function index() {
-        $attendance_records = $this->model->getPendingAttendance();
+        $attendance_records = $this->model->getPendingAcademicAttendance();
         require_once VIEW_PATH . '/volunteer/volunteer_attendance.php';
     }
 

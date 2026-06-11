@@ -42,7 +42,6 @@
                     <thead class="bg-white border-bottom text-secondary small">
                         <tr>
                             <th class="py-3 px-4">المتطوع</th>
-                            <th class="py-3 text-center">الرقم الجامعي</th>
                             <th class="py-3 text-center">التقدم الدراسي</th>
                             <th class="py-3 text-center">الساعات المنجزة</th>
                             <th class="py-3 text-center">الإجراءات</th>
@@ -63,7 +62,6 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="text-center text-muted"><?= htmlspecialchars($v['student_id_number']) ?></td>
                                     <td class="text-center" style="width: 200px;">
                                         <div class="d-flex align-items-center justify-content-center">
                                             <span class="small me-2"><?= $v['progress_percent'] ?>%</span>

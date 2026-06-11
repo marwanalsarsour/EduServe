@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../Models/StudentModel.php'; 
+require_once __DIR__ . '/../Models/StudentModel.php';
 
 class StudentDashboardController {
     private $db;
@@ -14,18 +14,24 @@ class StudentDashboardController {
             session_start();
         }
 
-        if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] !== 'طالب' && $_SESSION['user_role'] !== 'student')) {
+        if (
+            !isset($_SESSION['user_id']) ||
+            ($_SESSION['user_role'] !== 'طالب' &&
+             $_SESSION['user_role'] !== 'student')
+        ) {
             header('Location: /login');
             exit();
         }
 
         $studentId = $_SESSION['user_id'];
-        
-        $model = new StudentModel($this->db);
 
+        $model = new StudentModel($this->db);
         $studentData = $model->getStudentProfile($studentId);
         $latestRequest = $model->getLatestApplication($studentId);
         $certInfo = $model->getCertificateQuickSummary($studentId);
+        $certsCount = $model->getCertificatesCount($studentId);
+        $trainingCount = $model->getAcceptedTrainingCount($studentId);
+        $volunteerCount = $model->getVolunteerCount($studentId);
 
         require_once VIEW_PATH . '/student/student_dashboard.php';
     }

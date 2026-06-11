@@ -74,13 +74,32 @@ class ExternalEntityModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function updateApplicationStatus($app_id, $status) {
-        $sql = "UPDATE OpportunityRequest SET entityStatus = :status WHERE requestID = :app_id";
-        return $this->db->prepare($sql)->execute([
-            ':status' => $status, 
-            ':app_id' => $app_id
+public function updateApplicationStatus($app_id, $status) {
+    
+    $sql = "UPDATE OpportunityRequest 
+            SET entityStatus = :status 
+            WHERE requestID = :app_id";
+
+    $this->db->prepare($sql)->execute([
+        ':status' => $status,
+        ':app_id' => $app_id
+    ]);
+    if ($status == 'مقبول') {
+
+        $sql2 = "UPDATE Attendance att
+                 JOIN OpportunityRequest orq 
+                    ON att.studentID = orq.studentID 
+                   AND att.opportunityID = orq.opportunityID
+                 SET att.academicSupervisorID = orq.supervisorID
+                 WHERE orq.requestID = :id";
+
+        $this->db->prepare($sql2)->execute([
+            ':id' => $app_id
         ]);
     }
+
+    return true;
+}
 
 public function getOpportunities($org_id, $search = '') {
     $sql = "SELECT * FROM Opportunity WHERE entityID = :org_id AND title LIKE :search ORDER BY opportunityID DESC";
@@ -159,29 +178,23 @@ public function getAcceptedStudents($org_id) {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function saveCertificate($data) {
-        $verifyCode = 'EDU-' . strtoupper(uniqid());
-        
-        $stmt = $this->db->prepare("
-            INSERT INTO Certificates (studentID, entityID, certificateTitle, certificateContent, hours, issueDate, trainerName, verifyCode, signaturePath, stampPath, createdAt) 
-            VALUES (:student_id, :entity_id, :title, :content, :hours, :issue_date, :trainer_name, :verify_code, :signature, :stamp, NOW())
-        ");
-        
-        $result = $stmt->execute([
-            ':student_id'   => $data['student_id'],
-            ':entity_id'    => $data['organization_id'],
-            ':title'        => $data['cert_title'],
-            ':content'      => $data['content'],
-            ':hours'        => !empty($data['hours']) ? $data['hours'] : 0,
-            ':issue_date'   => $data['issue_date'],
-            ':trainer_name' => $data['trainer_name'],
-            ':verify_code'  => $verifyCode,
-            ':signature'    => $data['signature_path'],
-            ':stamp'        => $data['stamp_path']
-        ]);
+public function saveCertificate($data) {
 
-        return $result ? $verifyCode : false;
-    }
+    $stmt = $this->db->prepare("
+        INSERT INTO Certificate (issueDate, isApproved, studentID, entityID, opportunityID) 
+        VALUES (:issue_date, :is_approved, :student_id, :entity_id, :opportunity_id)
+    ");
+
+    $result = $stmt->execute([
+        ':issue_date'     => $data['issue_date'],
+        ':is_approved'    => 0, 
+        ':student_id'     => $data['student_id'],
+        ':entity_id'      => $data['organization_id'],
+        ':opportunity_id' => $data['opportunity_id'] ?? null
+    ]);
+
+    return $result;
+}
 public function getOrganizationDetails($org_id) {
     $stmt = $this->db->prepare("
         SELECT userID, fullName 
@@ -208,23 +221,45 @@ public function getOrganizationDetails($org_id) {
             ':org_id' => $org_id
         ]);
     }
-
-    public function getTraineesByOrg($org_id) {
-        $sql = "SELECT 
-                    u.userID as student_id, 
-                    u.fullName as student_name, 
-                    s.majorName, 
-                    (SELECT SUM(hours) FROM Attendance WHERE studentID = u.userID AND entityID = :org_id) as total_hours,
-                    opr.entityStatus as application_status
-                FROM Users u
-                JOIN Student s ON u.userID = s.studentID
-                JOIN OpportunityRequest opr ON u.userID = opr.studentID
-                WHERE opr.entityID = :org_id AND opr.entityStatus = 'مقبول'";
-                
+ public function getOrganizationById($org_id) {
+        $sql = "SELECT entityID, entityName, location, employeeName, employeeEmail 
+                FROM ExternalEntity 
+                WHERE entityID = :org_id 
+                LIMIT 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':org_id' => $org_id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+    public function getSupervisorByOrg($org_id) {
+    $sql = "SELECT employeeName FROM ExternalEntity WHERE entityID = :org_id LIMIT 1";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':org_id' => $org_id]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row['employeeName'] ?? 'لم يحدد';
+}
+   public function getTraineesByOrg($org_id) {
+    $supervisor = $this->getSupervisorByOrg($org_id); 
+
+    $sql = "SELECT 
+                u.userID as student_id, 
+                u.fullName as student_name, 
+                s.majorName, 
+                (SELECT SUM(hours) FROM Attendance WHERE studentID = u.userID AND entityID = :org_id) as total_hours,
+                opr.entityStatus as application_status
+            FROM Users u
+            JOIN Student s ON u.userID = s.studentID
+            JOIN OpportunityRequest opr ON u.userID = opr.studentID
+            WHERE opr.entityID = :org_id AND opr.entityStatus = 'مقبول'";
+    
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':org_id' => $org_id]);
+    $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($students as &$student) {
+        $student['supervisor_name'] = $supervisor;
+    }
+
+    return $students;
+}
 
     public function getRecentEventsAsNotifications($org_id) {
         $sql = "

@@ -81,20 +81,21 @@ require_once VIEW_PATH . '/layout/header.php';
                                 <td><?= $idx + 1 ?></td>
                                 <td class="fw-bold"><?= htmlspecialchars($app['student_name']) ?></td>
                                 <td><?= htmlspecialchars($app['opportunity_title']) ?></td>
-                                <td><?= date('Y/m/d', strtotime($app['created_at'])) ?></td>
+                                <td><?= date('Y/m/d', strtotime($app['requestDate'])) ?></td>
                                 <td>
                                     <?php 
-                                        $badge = ['pending' => 'bg-warning text-dark', 'accepted' => 'bg-success', 'rejected' => 'bg-danger'];
-                                        $text = ['pending' => 'قيد الانتظار', 'accepted' => 'مقبول', 'rejected' => 'مرفوض'];
+                                        $status = $app['entityStatus'];
+                                        $badge = ['قيد الانتظار' => 'bg-warning text-dark', 'معتمد' => 'bg-success',
+                                         'مقبول' => 'bg-success', 'مرفوض' => 'bg-danger'];
                                     ?>
-                                    <span class="badge <?= $badge[$app['status']] ?>"><?= $text[$app['status']] ?></span>
+                                    <span class="badge <?= $badge[$status] ?? 'bg-secondary' ?>"> <?= htmlspecialchars($status) ?></span>
                                 </td>
                                 <td>
                                     <div class="btn-group">
                                         <button class="btn btn-sm btn-outline-primary" onclick='showDetails(<?= json_encode($app) ?>)' title="عرض"><i class="bi bi-eye"></i></button>
-                                        <?php if ($app['status'] === 'pending'): ?>
-                                            <button class="btn btn-sm btn-outline-success" onclick="openModal('approveModal', <?= $app['id'] ?>)"><i class="bi bi-check-lg"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger" onclick="openModal('rejectModal', <?= $app['id'] ?>)"><i class="bi bi-x-lg"></i></button>
+                                        <?php if ($app['entityStatus'] === 'قيد الانتظار'): ?>
+                                            <button class="btn btn-sm btn-outline-success" onclick="openModal('approveModal', <?= $app['requestID'] ?>)"><i class="bi bi-check-lg"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="openModal('rejectModal', <?= $app['requestID'] ?>)"><i class="bi bi-x-lg"></i></button>
                                         <?php endif; ?>
                                     </div>
                                 </td>
@@ -146,26 +147,48 @@ require_once VIEW_PATH . '/layout/header.php';
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function showDetails(app) {
-            document.getElementById('viewCard').classList.remove('d-none');
-            document.getElementById('det-name').innerText = app.student_name;
-            document.getElementById('det-major').innerText = app.major;
-            document.getElementById('det-email').innerText = app.email;
-            document.getElementById('det-motivation').innerText = app.motivation || 'لا يوجد نص توضيحي.';
-            document.getElementById('det-cv-link').href = '/public/uploads/cv/' + app.cv_path;
-            window.scrollTo({ top: 100, behavior: 'smooth' });
+   <script>
+    function showDetails(app) {
+        document.getElementById('viewCard').classList.remove('d-none');
+
+        document.getElementById('det-name').innerText =
+            app.student_name || '';
+
+        document.getElementById('det-major').innerText =
+            app.majorName || '';
+
+        document.getElementById('det-email').innerText =
+            app.email || '';
+
+        document.getElementById('det-motivation').innerText =
+            app.motivation || 'لا يوجد نص توضيحي.';
+
+        document.getElementById('det-cv-link').href =
+            app.CV_Path || '#';
+
+        window.scrollTo({
+            top: 100,
+            behavior: 'smooth'
+        });
+    }
+
+    function closeView() {
+        document.getElementById('viewCard').classList.add('d-none');
+    }
+
+    function openModal(modalId, appId) {
+        if (modalId === 'approveModal') {
+            document.getElementById('approve_id').value = appId;
         }
 
-        function closeView() {
-            document.getElementById('viewCard').classList.add('d-none');
+        if (modalId === 'rejectModal') {
+            document.getElementById('reject_id').value = appId;
         }
 
-        function openModal(modalId, appId) {
-            if (modalId === 'approveModal') document.getElementById('approve_id').value = appId;
-            if (modalId === 'rejectModal') document.getElementById('reject_id').value = appId;
-            new bootstrap.Modal(document.getElementById(modalId)).show();
-        }
-    </script>
+        new bootstrap.Modal(
+            document.getElementById(modalId)
+        ).show();
+    }
+</script>
 </body>
 </html>

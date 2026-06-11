@@ -11,8 +11,16 @@
 </head>
 <body class="bg-light text-end">
 
-
     <div class="container py-5">
+
+        <!-- رسائل النجاح أو الخطأ -->
+        <?php if(!empty($successMessage)): ?>
+            <div class="alert alert-success"><?= htmlspecialchars($successMessage) ?></div>
+        <?php endif; ?>
+        <?php if(!empty($errorMessage)): ?>
+            <div class="alert alert-danger"><?= htmlspecialchars($errorMessage) ?></div>
+        <?php endif; ?>
+
         <div class="mb-4">
             <a href="/v_manager/volunteers" class="text-decoration-none text-secondary small">
                 <i class="bi bi-arrow-right ms-1"></i> العودة لقائمة المتطوعين
@@ -20,30 +28,44 @@
         </div>
 
         <div class="row g-4">
+            <!-- بطاقة المتطوع -->
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm rounded-4 p-4 text-center">
                     <div class="bg-danger-subtle rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
                         <i class="bi bi-person-badge fs-2 text-danger"></i>
                     </div>
-                    <h5 class="fw-bold text-dark"><?= htmlspecialchars($student['name']) ?></h5>
-                    <p class="text-muted small mb-1">رقم الطالب: <?= htmlspecialchars($student['student_id_number']) ?></p>
-                    <p class="text-muted extra-small"><?= htmlspecialchars($student['major']) ?></p>
+                    <h5 class="fw-bold text-dark"><?= htmlspecialchars($student['name'] ?? 'غير معروف') ?></h5>
+                    <p class="text-muted extra-small"><?= htmlspecialchars($student['majorName'] ?? $student['major'] ?? 'غير محدد') ?></p>
                     <hr>
                     
+                    <?php
+                        $requiredHours = $student['requiredVolunteerHours'] ?? $student['required_hours'] ?? 50;
+                        $completedHours = $student['completed_hours'] ?? 0;
+                        $progress = min(100, round(($completedHours / $requiredHours) * 100));
+                    ?>
+
                     <div class="d-flex justify-content-between mb-2 small">
                         <span>إجمالي الساعات المنجزة:</span>
-                        <span class="fw-bold text-danger"><?= $student['completed_hours'] ?> من <?= $student['required_hours'] ?> س</span>
+                        <span class="fw-bold text-danger"><?= $completedHours ?> من <?= $requiredHours ?> س</span>
                     </div>
                     <div class="progress rounded-pill mb-3" style="height: 10px;">
                         <div class="progress-bar bg-danger" style="width: <?= $progress ?>%"></div>
                     </div>
                     <p class="small text-muted mb-4">نسبة الإنجاز: <?= $progress ?>%</p>
 
-                    <button class="btn btn-dark w-100 rounded-pill fw-bold shadow-sm" 
-                            <?= ($student['completed_hours'] < $student['required_hours']) ? 'disabled' : '' ?>>
-                        تأكيد إنهاء التطوع
-                    </button>
-                    <?php if($student['completed_hours'] < $student['required_hours']): ?>
+                   
+                    <form method="POST" action="/v_manager/complete-volunteer">
+                        <input type="hidden" name="studentID" value="<?= $student['studentID'] ?? $student['id'] ?>">
+                        <button
+                            type="submit"
+                            name="complete_volunteer"
+                            class="btn btn-dark w-100 rounded-pill fw-bold shadow-sm"
+                            <?= ($completedHours < $requiredHours) ? 'disabled' : '' ?>
+                        >
+                            تأكيد إنهاء التطوع
+                        </button>
+                    </form>
+                    <?php if($completedHours < $requiredHours): ?>
                         <p class="extra-small text-danger mt-2">لا يمكن إنهاء التطوع قبل استكمال الساعات</p>
                     <?php endif; ?>
                 </div>
@@ -52,8 +74,8 @@
             <div class="col-lg-8">
                 <div class="card border-0 shadow-sm rounded-4 p-4">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h6 class="fw-bold mb-0 text-danger"><i class="bi bi-clock-history ms-2"></i>سجل الحضور المعتمد</h6>
-                        <span class="badge bg-light text-dark border"><?= count($attendance) ?> تسجيلات</span>
+                        <h6 class="fw-bold mb-0 text-danger"><i class="bi bi-clock-history ms-2"></i>سجل الحضور</h6>
+                        <span class="badge bg-light text-dark border"><?= count($attendance) ?></span>
                     </div>
                     
                     <div class="table-responsive">
@@ -70,15 +92,27 @@
                                 <?php if(!empty($attendance)): ?>
                                     <?php foreach($attendance as $row): ?>
                                         <tr>
-                                            <td class="fw-bold small"><?= $row['date'] ?></td>
-                                            <td><?= $row['total_hours'] ?> ساعات</td>
-                                            <td class="small text-muted"><?= htmlspecialchars($row['notes'] ?: 'لا توجد ملاحظات') ?></td>
+                                            <td class="fw-bold small"><?= htmlspecialchars($row['date'] ?? '') ?></td>
+                                            <td><?= htmlspecialchars($row['total_hours'] ?? 0) ?> ساعات</td>
+                                            <td class="small text-muted"><?= htmlspecialchars($row['notes'] ?? 'لا توجد ملاحظات') ?></td>
                                             <td class="text-center">
-                                                <?php if($row['status'] == 'present'): ?>
-                                                    <span class="badge bg-success-subtle text-success rounded-pill px-3">تم الاعتماد</span>
-                                                <?php else: ?>
-                                                    <span class="badge bg-warning-subtle text-warning rounded-pill px-3">غائب / مرفوض</span>
-                                                <?php endif; ?>
+                                                <?php
+                                                    $status = $row['status'] ?? '';
+                                                    if($status == 'حاضر'):
+                                                        $badgeClass = 'bg-success-subtle text-success';
+                                                        $label = 'حاضر';
+                                                    elseif($status == 'معذر' || $status == 'مُعذر'):
+                                                        $badgeClass = 'bg-info-subtle text-info';
+                                                        $label = 'معذر';
+                                                    elseif($status == 'غائب'):
+                                                        $badgeClass = 'bg-danger-subtle text-danger';
+                                                        $label = 'غائب';
+                                                    else:
+                                                        $badgeClass = 'bg-secondary-subtle text-secondary';
+                                                        $label = htmlspecialchars($status);
+                                                    endif;
+                                                ?>
+                                                <span class="badge <?= $badgeClass ?> rounded-pill px-3"><?= $label ?></span>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -92,6 +126,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 

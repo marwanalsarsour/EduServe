@@ -105,11 +105,10 @@ $router->add('GET', '/student_notifications', function() use ($db) {
     (new student_NotificationsController($db))->index();
 });
 
-$router->add('GET', '/student_certificates', function() use ($db) {
-    require_once APP_PATH . '/Controllers/student_CertificatesController.php';
-    (new student_CertificatesController($db))->index();
+$router->add('GET', '/external/student-portfolio/{id}', function($id) use ($db) {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalStudentPortfolioController.php';
+    (new ExternalStudentPortfolioController($db))->show($id);
 });
-
 
 $router->add('GET', '/supervisor_dashboard', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/SupervisorDashboardController.php';
@@ -248,7 +247,7 @@ $router->add('GET', '/volunteer_attendance', function() use ($db) {
 
 $router->add('POST', '/volunteer_attendance_approve', function() use ($db) {
     require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerAttendanceController.php';
-    (new VolunteerAttendanceController($db))->approve();
+    (new VolunteerAttendanceController())->approve();
 });
 
 $router->add('GET', '/volunteer_employer_reports', function() use ($db) {
@@ -437,7 +436,15 @@ $router->add('GET', '/external/notifications', function() use ($db) {
     require_once APP_PATH . '/Controllers/External_Controlles/ExternalNotificationsController.php';
     (new ExternalNotificationsController($db))->index();
 });
-
+$router->add('GET', '/external/student-portfolio', function() use ($db) {
+    require_once APP_PATH . '/Controllers/External_Controlles/ExternalStudentPortfolioController.php';
+    $id = $_GET['id'] ?? null;
+    if ($id) {
+        (new ExternalStudentPortfolioController($db))->show($id);
+    } else {
+        echo "الطالب غير محدد";
+    }
+});
 $router->add('GET', '/trainer/dashboard', function() use ($db) {
     require_once APP_PATH . '/Controllers/Trainer_Controllers/TrainerDashboardController.php';
     (new TrainerDashboardController($db))->index();
@@ -511,6 +518,13 @@ $router->add('GET', '/v_manager/volunteers', function() use ($db) {
 $router->add('GET', '/v_manager/student-details', function() use ($db) {
     require_once APP_PATH . '/Controllers/V_Manager_Controllers/VManagerStudentDetailsController.php';
     (new VManagerStudentDetailsController($db))->index();
+});
+$router->add('POST', '/v_manager/complete-volunteer', function() use ($db) {
+    require_once APP_PATH . '/Controllers/V_Manager_Controllers/VManagerStudentDetailsController.php';
+    $controller = new VManagerStudentDetailsController();
+    if (isset($_POST['studentID'])) {
+        $controller->handleCompleteVolunteer($_POST['studentID']);
+    }
 });
 
 $router->add('GET', '/v_manager/reports', function() use ($db) {

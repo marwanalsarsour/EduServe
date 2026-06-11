@@ -47,20 +47,55 @@ public function approveVolunteerOpportunity($opportunityId, $supervisorId) {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getPendingAttendance() {
-        $sql = "SELECT att.attendanceID, att.date, att.hours, u.fullName as student_name, att.notes
-                FROM Attendance att
-                JOIN Users u ON att.studentID = u.userID
-                WHERE att.status = 'متأخر' 
-                ORDER BY att.date DESC";
-        return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-    }
+public function getPendingAcademicAttendance() {
+    $sql = "SELECT 
+        att.attendanceID,
+        att.studentID,
+        u.fullName AS student_name,
+        att.date,
+        att.checkIn,
+        att.checkOut,
+        att.hours,
+        att.status,
+        att.academicStatus,
+        att.notes
+    FROM Attendance att
+    JOIN Users u 
+        ON att.studentID = u.userID
+    WHERE att.academicStatus = 'بانتظار الاعتماد'
+    ORDER BY att.date DESC";
 
-    public function approveDailyAttendance($hour_id) {
-        $sql = "UPDATE Attendance SET status = 'حاضر' WHERE attendanceID = :id";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([':id' => $hour_id]);
-    }
+    return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function approveDailyAttendance($attendanceID) {
+    $sql1 = "SELECT orq.supervisorID
+             FROM Attendance att
+             JOIN OpportunityRequest orq 
+                ON att.studentID = orq.studentID 
+               AND att.opportunityID = orq.opportunityID
+             WHERE att.attendanceID = :id";
+
+    $stmt1 = $this->db->prepare($sql1);
+    $stmt1->execute([':id' => $attendanceID]);
+    $row = $stmt1->fetch(PDO::FETCH_ASSOC);
+
+    if (!$row) return false;
+
+    $supervisorID = $row['supervisorID'];
+    $sql2 = "UPDATE Attendance 
+             SET academicStatus = 'معتمد',
+                 academicSupervisorID = :supervisorID,
+                 academicApprovedAt = NOW()
+             WHERE attendanceID = :id";
+
+    $stmt2 = $this->db->prepare($sql2);
+
+    return $stmt2->execute([
+        ':id' => $attendanceID,
+        ':supervisorID' => $supervisorID
+    ]);
+}
 
     public function getStudentsForApproval() {
         $sql = "SELECT opr.requestID as application_id, u.fullName as student_name, op.title as opportunity_title, 

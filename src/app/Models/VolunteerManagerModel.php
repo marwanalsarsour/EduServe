@@ -26,21 +26,40 @@ class VolunteerManagerModel {
         return $result['total'] ?? 0;
     }
 
-    public function getManagerProfile($manager_id) {
-        $sql = "SELECT u.*, ee.entityName as organization_name 
-                FROM Users u
-                LEFT JOIN ExternalEntity ee ON u.userID = ee.entityID
-                WHERE u.userID = ? AND u.role = 'جهة خارجية'";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$manager_id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
+  public function getManagerProfile($manager_id)
+{
+    $sql = "SELECT 
+                entityID,
+                entityName,
+                location,
+                employeeName,
+                employeeEmail
+            FROM ExternalEntity
+            WHERE entityID = ?";
 
-    public function updateProfile($manager_id, $name, $email, $phone) {
-        $sql = "UPDATE Users SET fullName = ?, email = ?, phoneNumber = ? WHERE userID = ?";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([$name, $email, $phone, $manager_id]);
-    }
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([$manager_id]);
+
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+  public function updateProfile($manager_id, $employeeName, $employeeEmail, $location)
+{
+    $sql = "UPDATE ExternalEntity
+            SET employeeName = ?,
+                employeeEmail = ?,
+                location = ?
+            WHERE entityID = ?";
+
+    $stmt = $this->db->prepare($sql);
+
+    return $stmt->execute([
+        $employeeName,
+        $employeeEmail,
+        $location,
+        $manager_id
+    ]);
+}
 
     public function getMyVolunteers($manager_id, $search = '') {
         $params = [$manager_id];
@@ -70,16 +89,28 @@ class VolunteerManagerModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getStudentFullDetails($student_id) {
-        $sql = "SELECT u.userID as id, u.fullName as name, s.academicYear as student_id_number, s.majorName as major, s.requiredVolunteerHours as required_hours, 
-                (SELECT COALESCE(SUM(hours), 0) FROM Attendance WHERE studentID = ? AND status = 'حاضر') as completed_hours
-                FROM Users u
-                JOIN Student s ON u.userID = s.studentID
-                WHERE u.userID = ? AND u.role = 'طالب'";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$student_id, $student_id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
+  public function getStudentFullDetails($student_id) {
+    $sql = "SELECT 
+                u.userID as id,
+                u.fullName as name,
+                s.academicYear as student_id_number,
+                s.majorName as major,
+                s.requiredVolunteerHours as required_hours,
+                (
+                    SELECT COALESCE(SUM(hours), 0)
+                    FROM Attendance
+                    WHERE studentID = ?
+                    AND status = 'حاضر'
+                ) as completed_hours
+            FROM Users u
+            JOIN Student s ON u.userID = s.studentID
+            WHERE u.userID = ? AND u.role = 'طالب'";
+
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([$student_id, $student_id]);
+
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
 
     public function getStudentAttendanceLogs($student_id) {
         $sql = "SELECT date, hours as total_hours, notes, status 
@@ -90,6 +121,13 @@ class VolunteerManagerModel {
         $stmt->execute([$student_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+public function markVolunteerComplete($studentID) {
+    $sql = "UPDATE Student 
+            SET volunteerCompleted = 1, volunteerCompletedAt = NOW() 
+            WHERE studentID = ?";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([$studentID]);
+}
 
     public function getReportsSummary($manager_id) {
         $sql = "
@@ -146,17 +184,37 @@ class VolunteerManagerModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function saveAttendance($data) {
-        $sql = "INSERT INTO Attendance (attendanceID, date, status, hours, notes, studentID, entityID, opportunityID) 
-                VALUES (:attendanceID, :date, :status, :hours, :notes, :studentID, :entityID, :opportunityID)
-                ON DUPLICATE KEY UPDATE 
-                status = VALUES(status), 
-                hours = VALUES(hours), 
-                notes = VALUES(notes)";
-                
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute($data);
-    }
+public function saveAttendance($data) {
+    $sqlLookup = "SELECT entityID, opportunityID 
+                  FROM OpportunityRequest 
+                  WHERE studentID = :studentID 
+                  ORDER BY requestDate DESC LIMIT 1";
+
+    $stmt = $this->db->prepare($sqlLookup);
+    $stmt->execute(['studentID' => $data['studentID']]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $entityID = $row['entityID'] ?? null;
+    $opportunityID = $row['opportunityID'] ?? null;
+    $sql = "INSERT INTO Attendance (date, status, hours, notes, studentID, entityID, opportunityID)
+            VALUES (:date, :status, :hours, :notes, :studentID, :entityID, :opportunityID)
+            ON DUPLICATE KEY UPDATE 
+                status = VALUES(status),
+                hours  = VALUES(hours),
+                notes  = VALUES(notes)";
+
+    $stmt = $this->db->prepare($sql);
+
+    return $stmt->execute([
+        'date'          => $data['date'],
+        'status'        => $data['status'],
+        'hours'         => $data['hours'],
+        'notes'         => $data['notes'],
+        'studentID'     => $data['studentID'],
+        'entityID'      => $entityID,
+        'opportunityID' => $opportunityID
+    ]);
+}
 
     public function getDynamicNotifications($manager_id) {
         $sql = "

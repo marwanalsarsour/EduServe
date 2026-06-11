@@ -15,7 +15,6 @@ require_once VIEW_PATH . '/layout/header.php';
 
 <body class="d-flex flex-column min-vh-100 bg-light">
 
-
     <div class="container my-4">
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-body p-4">
@@ -36,8 +35,9 @@ require_once VIEW_PATH . '/layout/header.php';
                     <div class="col-md-4">
                         <select id="statusFilter" class="form-select">
                             <option value="">كل الحالات</option>
-                            <option value="active">نشط</option>
-                            <option value="completed">منتهي</option>
+                            <option value="مقبول">مقبول</option>
+                            <option value="قيد الانتظار">قيد الانتظار</option>
+                            <option value="مرفوض">مرفوض</option>
                         </select>
                     </div>
                     <div class="col-md-3">
@@ -67,14 +67,32 @@ require_once VIEW_PATH . '/layout/header.php';
                         <tbody id="studentsTable">
                             <?php if (!empty($trainees)): ?>
                                 <?php foreach ($trainees as $index => $student): 
-                                    $statusClass = ($student['internship_status'] == 'active') ? 'bg-success' : 'bg-secondary';
-                                    $statusText = ($student['internship_status'] == 'active') ? 'نشط' : 'منتهي';
+                                    $status = $student['application_status'] ?? 'غير معروف';
+                                    switch ($status) {
+                                        case 'مقبول':
+                                            $statusClass = 'bg-success';
+                                            $statusText = 'مقبول';
+                                            break;
+                                        case 'قيد الانتظار':
+                                            $statusClass = 'bg-warning text-dark';
+                                            $statusText = 'قيد الانتظار';
+                                            break;
+                                        case 'مرفوض':
+                                            $statusClass = 'bg-danger';
+                                            $statusText = 'مرفوض';
+                                            break;
+                                        default:
+                                            $statusClass = 'bg-secondary';
+                                            $statusText = 'غير معروف';
+                                    }
+                                    $major = $student['majorName'] ?? 'غير محدد';
+                                    $supervisor = $student['supervisor_name'] ?? 'لم يحدد';
                                 ?>
-                                <tr class="student-row" data-status="<?= $student['internship_status'] ?>">
+                                <tr class="student-row" data-status="<?= $status ?>">
                                     <td><?= $index + 1 ?></td>
                                     <td class="student-name fw-bold"><?= htmlspecialchars($student['student_name']) ?></td>
-                                    <td><?= htmlspecialchars($student['major'] ?? 'غير محدد') ?></td>
-                                    <td><?= htmlspecialchars($student['supervisor_name'] ?? 'لم يحدد') ?></td>
+                                    <td><?= htmlspecialchars($major) ?></td>
+                                    <td><?= htmlspecialchars($supervisor) ?></td>
                                     <td>
                                         <span class="badge rounded-pill bg-light text-dark border">
                                             <?= $student['total_hours'] ?? 0 ?> ساعة
@@ -83,12 +101,13 @@ require_once VIEW_PATH . '/layout/header.php';
                                     <td><span class="badge <?= $statusClass ?>"><?= $statusText ?></span></td>
                                     <td>
                                         <div class="d-flex justify-content-center gap-2">
-                                            <a href="/external/student-profile/<?= $student['student_id'] ?>" 
-                                               class="btn btn-sm btn-outline-info" title="عرض ملف الطالب">
+                                            <a href="/external/student-portfolio?id=<?= $student['student_id'] ?>"
+                                                class="btn btn-sm btn-outline-info"
+                                                title="عرض ملف الطالب">
                                                 <i class="bi bi-person-badge"></i>
                                             </a>
 
-                                            <?php if ($student['internship_status'] == 'completed'): ?>
+                                            <?php if ($status == 'مقبول'): ?>
                                             <a href="/external/certificates?student_id=<?= $student['student_id'] ?>" 
                                                class="btn btn-sm btn-success" title="إصدار شهادة">
                                                 <i class="bi bi-award"></i>

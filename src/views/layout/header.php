@@ -62,10 +62,10 @@ switch (trim($user_role)) {
     case 'external_entity':
         $navLinks = [
             ['text' => 'لوحة التحكم', 'url' => '/external_dashboard'],
-            ['text' => 'طلبات التوظيف', 'url' => '/external/applications'],
+            ['text' => 'ادارة الطلبات ', 'url' => '/external/applications'],
             ['text' => 'إدارة الفرص', 'url' => '/external/opportunities'],
             ['text' => 'الشهادات المعتمدة', 'url' => '/external/certificates'],
-            ['text' => 'المتدربين', 'url' => '/external/trainees']
+            ['text' => 'المتدربين/المتطوعين', 'url' => '/external/trainees']
         ];
         $profileUrl = '/external_dashboard';
         $notificationsUrl = '/external/notifications';

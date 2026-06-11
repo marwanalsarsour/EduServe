@@ -1,32 +1,57 @@
 <?php
-class TrainerProfileController {
+
+class TrainerProfileController
+{
     private $model;
     private $db;
 
-    public function __construct() {
-        if (session_status() === PHP_SESSION_NONE) session_start();
-        global $db;
+    public function __construct($db)
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         $this->db = $db;
-        require_once '../src/models/TrainerModel.php';
+
+        require_once APP_PATH . '/Models/TrainerModel.php';
+
         $this->model = new TrainerModel($this->db);
     }
 
-    public function index() {
+    public function index()
+    {
         $trainer_id = $_SESSION['user_id'];
+
         $profile = $this->model->getTrainerProfile($trainer_id);
-        require_once '../src/views/trainer/trainer_profile.php';
+
+        if (!$profile) {
+            $profile = [
+                'employeeName' => '',
+                'employeeEmail' => '',
+                'entityName' => '',
+                'location' => ''
+            ];
+        }
+
+        require_once VIEW_PATH . '/trainer/trainer_profile.php';
     }
 
-    public function update() {
+    public function update()
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
             $trainer_id = $_SESSION['user_id'];
+
             $data = [
-                'name' => $_POST['name'],
-                'email' => $_POST['email'],
-                'phone' => $_POST['phone']
+                'employeeName'  => $_POST['employeeName'] ?? '',
+                'employeeEmail' => $_POST['employeeEmail'] ?? '',
+                'location'      => $_POST['location'] ?? ''
             ];
+
             $this->model->updateProfile($trainer_id, $data);
+
             header('Location: /trainer/profile?status=success');
+            exit();
         }
     }
 }

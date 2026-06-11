@@ -13,11 +13,9 @@ class ExternalTraineesController {
 
         global $db; 
         $this->db = $db;
-        
         $this->model = new ExternalEntityModel($this->db);
 
         $currentRole = $_SESSION['user_role'] ?? $_SESSION['role'] ?? '';
-
         if (!isset($_SESSION['user_id']) || $currentRole !== 'جهة خارجية') {
             header('Location: /login');
             exit();
@@ -26,14 +24,18 @@ class ExternalTraineesController {
 
     public function index() {
         $org_id = $_SESSION['user_id'];
-        $org_type = $_SESSION['org_type'] ?? 'training'; 
 
-        $trainees = $this->model->getTraineesByOrg($org_id);
+        $org = $this->model->getOrganizationById($org_id);
+        $org_name = $org['entityName'] ?? '';
+
+        $org_type = (strpos($org_name, 'مؤسسة') !== false) ? 'volunteer' : 'training';
+
+        $trainees = $this->model->getTraineesByOrg($org_id, $org_type);
 
         $labels = [
-            'title' => ($org_type == 'volunteer') ? 'المتطوعين' : 'المتدربين',
-            'desc' => ($org_type == 'volunteer') ? 'عرض جميع المتطوعين داخل المؤسسة' : 'عرض جميع الطلاب المتدربين داخل الشركة',
-            'supervisor_label' => ($org_type == 'volunteer') ? 'المشرف' : 'المدرب'
+            'title' => ($org_type === 'volunteer') ? 'المتطوعين' : 'المتدربين',
+            'desc' => ($org_type === 'volunteer') ? 'عرض جميع المتطوعين داخل المؤسسة' : 'عرض جميع الطلاب المتدربين داخل الشركة',
+            'supervisor_label' => ($org_type === 'volunteer') ? 'المسؤول' : 'المدرب'
         ];
 
         require_once VIEW_PATH . '/external-organization/external_trainees-students.php';
