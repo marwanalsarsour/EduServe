@@ -280,14 +280,25 @@ public function getOpportunitiesBySupervisor($supervisor_id) {
     }
 
 public function getPendingReports($supervisor_id) {
-    $query = "SELECT r.reportID as id, u.fullName as student_name, r.reportType as week_number, r.data as created_at, r.content as report_content 
-              FROM StudentReport r
-              JOIN Users u ON r.studentID = u.userID
-              JOIN OpportunityRequest ar ON r.studentID = ar.studentID
-              WHERE ar.supervisorID = :sid
-              ORDER BY r.data DESC";
+
+    $query = "
+        SELECT 
+            r.reportID as id,
+            u.fullName as student_name,
+            r.reportType,
+            r.data as created_at,
+            r.content as report_content,
+            r.filePath
+        FROM StudentReport r
+        JOIN Users u ON r.studentID = u.userID
+        JOIN OpportunityRequest ar ON r.opportunityID = ar.opportunityID
+        WHERE ar.supervisorID = :sid
+        ORDER BY r.data DESC
+    ";
+
     $stmt = $this->db->prepare($query);
     $stmt->execute([':sid' => $supervisor_id]);
+
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -321,7 +332,6 @@ public function getSupervisedStudents($supervisor_id, $searchTerm = '') {
                 u.fullName as name, 
                 s.majorName as major, 
                 s.requiredTrainingHours as required_hours,
-                /* حساب ساعات التدريب: نحصر الحساب في الجهات التي يبدأ اسمها بـ 'شركة' */
                 (SELECT SUM(a.hours) 
                  FROM Attendance a 
                  JOIN ExternalEntity ee ON a.entityID = ee.entityID
@@ -330,8 +340,7 @@ public function getSupervisedStudents($supervisor_id, $searchTerm = '') {
                    AND ee.entityName LIKE 'شركة%') as completed_hours,
                 
                 (SELECT COUNT(*) FROM StudentReport WHERE studentID = u.userID) as pending_reports_count,
-                
-                /* جلب اسم الشركة */
+            
                 (SELECT ee.entityName 
                  FROM ExternalEntity ee 
                  JOIN OpportunityRequest ar_sub ON ee.entityID = ar_sub.entityID 
@@ -381,5 +390,93 @@ public function getPendingOpportunities() {
     $stmt = $this->db->prepare($sql);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+private function time_elapsed_string($datetime) {
+
+    $time = strtotime($datetime);
+    $diff = time() - $time;
+
+    if ($diff < 60) return "الآن";
+    if ($diff < 3600) return floor($diff / 60) . " دقيقة";
+    if ($diff < 86400) return floor($diff / 3600) . " ساعة";
+
+    return floor($diff / 86400) . " يوم";
+}
+public function getLiveNotifications() {
+
+    $notifications = [];
+    $sql1 = "
+        SELECT 
+            u.fullName AS name,
+            o.title,
+            r.requestDate AS created_at,
+            o.type
+        FROM OpportunityRequest r
+        JOIN Users u ON r.studentID = u.userID
+        JOIN Opportunity o ON r.opportunityID = o.opportunityID
+        WHERE r.supervisorStatus = 'بانتظار المشرف'
+        ORDER BY r.requestDate DESC
+        LIMIT 5
+    ";
+
+    $requests = $this->db->query($sql1)->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($requests as $req) {
+        $notifications[] = [
+            'title' => $req['type'] == 'تدريب'
+                ? 'طلب تدريب جديد'
+                : 'طلب تطوع جديد',
+            'message' => "الطالب {$req['name']} قدم على فرصة ({$req['title']}).",
+            'time_ago' => $this->time_elapsed_string($req['created_at']),
+            'is_read' => false
+        ];
+    }
+    $sql2 = "
+        SELECT 
+            u.fullName AS name,
+            r.reportType,
+            r.data AS created_at
+        FROM StudentReport r
+        JOIN Users u ON r.studentID = u.userID
+        ORDER BY r.data DESC
+        LIMIT 5
+    ";
+
+    $reports = $this->db->query($sql2)->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($reports as $rep) {
+        $notifications[] = [
+            'title' => 'تقرير جديد',
+            'message' => "الطالب {$rep['name']} رفع تقرير ({$rep['reportType']}).",
+            'time_ago' => $this->time_elapsed_string($rep['created_at']),
+            'is_read' => false
+        ];
+    }
+    $sql3 = "
+        SELECT 
+            o.title,
+            e.entityName,
+            o.createdAt
+        FROM Opportunity o
+        JOIN ExternalEntity e ON o.entityID = e.entityID
+        ORDER BY o.createdAt DESC
+        LIMIT 5
+    ";
+
+    $opps = $this->db->query($sql3)->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($opps as $op) {
+        $notifications[] = [
+            'title' => 'فرصة جديدة',
+            'message' => "تمت إضافة فرصة ({$op['title']}) من {$op['entityName']}.",
+            'time_ago' => $this->time_elapsed_string($op['createdAt']),
+            'is_read' => false
+        ];
+    }
+    usort($notifications, function($a, $b) {
+        return strtotime($b['time_ago']) <=> strtotime($a['time_ago']);
+    });
+
+    return array_slice($notifications, 0, 15);
 }
 }

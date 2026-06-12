@@ -15,20 +15,21 @@ class ReportReviewController {
     }
 
     public function index() {
-        // جلب التقارير (التي لا تحتاج لأعمدة status/feedback)
-        $reports = $this->model->getPendingReports($_SESSION['user_id']);
-        $data = ['reports' => $reports];
-        require_once VIEW_PATH . '/supervisor/supervisor-reports.php';
-    }
+
+    $reports = $this->model->getPendingReports($_SESSION['user_id']);
+
+    $data = [
+        'reports' => $reports
+    ];
+
+    require_once VIEW_PATH . '/supervisor/supervisor-reports.php';
+}
 
     public function process($id) {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $status = $_POST['status'] ?? 'pending'; 
             $feedback = $_POST['feedback'] ?? '';
 
-            // هنا الكنترولر سيتعامل مع العملية بنجاح بدون محاولة 
-            // تعديل أعمدة غير موجودة في جدول StudentReport
-            // يمكنك إضافة منطق خاص هنا إذا أنشأت جدولاً جديداً للمراجعات
             
             $_SESSION['notifications'][] = [
                 'title' => ($status == 'approved' ? 'تم قبول تقريرك' : 'تم رفض تقريرك'),

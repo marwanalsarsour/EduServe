@@ -206,13 +206,29 @@ public function getAvailableOpportunities() {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getAcceptedOpportunityId($studentId) {
-        $sql = "SELECT opportunityID FROM OpportunityRequest WHERE studentID = :studentId AND entityStatus = 'مقبول' LIMIT 1";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':studentId' => $studentId]);
-        $res = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $res['opportunityID'] ?? null;
-    }
+ public function getAcceptedTrainingOpportunityId($studentId) {
+
+    $sql = "
+        SELECT o.opportunityID
+        FROM OpportunityRequest r
+        INNER JOIN Opportunity o
+            ON r.opportunityID = o.opportunityID
+        WHERE r.studentID = :studentId
+          AND r.entityStatus = 'مقبول'
+          AND o.type = 'تدريب'
+        LIMIT 1
+    ";
+
+    $stmt = $this->db->prepare($sql);
+
+    $stmt->execute([
+        ':studentId' => $studentId
+    ]);
+
+    $res = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $res['opportunityID'] ?? null;
+}
 
     public function getStudentCertificates($studentId) {
         $sql = "SELECT c.*, ee.entityName FROM Certificate c 
@@ -231,26 +247,75 @@ public function getAvailableOpportunities() {
         return $res['total'] ?? 0;
     }
 
-    public function getStudentReports($studentId) {
-        $sql = "SELECT * FROM StudentReport WHERE studentID = :studentId ORDER BY reportID DESC";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':studentId' => $studentId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+  public function getStudentReports($studentId) {
 
-    public function submitReport($type, $content, $studentId, $opportunityId) {
-        $sql = "INSERT INTO StudentReport (reportID, reportType, content, data, studentID, opportunityID) 
-                VALUES (:reportID, :type, :content, NOW(), :studentId, :opportunityId)";
-        $stmt = $this->db->prepare($sql);
-        $generatedID = rand(100000, 999999);
-        return $stmt->execute([
-            ':reportID' => $generatedID,
-            ':type' => $type, 
-            ':content' => $content,
-            ':studentId' => $studentId,
-            ':opportunityId' => $opportunityId
-        ]);
-    }
+    $sql = "
+        SELECT
+            reportID,
+            reportType,
+            content,
+            data,
+            filePath,
+            studentID,
+            opportunityID
+        FROM StudentReport
+        WHERE studentID = :studentId
+        ORDER BY reportID DESC
+    ";
+
+    $stmt = $this->db->prepare($sql);
+
+    $stmt->execute([
+        ':studentId' => $studentId
+    ]);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function submitReport(
+    $type,
+    $content,
+    $filePath,
+    $studentId,
+    $opportunityId
+) {
+
+    $sql = "
+        INSERT INTO StudentReport
+        (
+            reportID,
+            reportType,
+            content,
+            data,
+            studentID,
+            opportunityID,
+            filePath
+        )
+        VALUES
+        (
+            :reportID,
+            :type,
+            :content,
+            CURDATE(),
+            :studentId,
+            :opportunityId,
+            :filePath
+        )
+    ";
+
+    $stmt = $this->db->prepare($sql);
+
+    $generatedID = rand(100000, 999999);
+
+    return $stmt->execute([
+        ':reportID' => $generatedID,
+        ':type' => $type,
+        ':content' => $content,
+        ':studentId' => $studentId,
+        ':opportunityId' => $opportunityId,
+        ':filePath' => $filePath
+    ]);
+}
 
     public function getStudentProfile($studentId) {
         $sql = "SELECT u.fullName, u.email, u.phoneNumber, s.* FROM Users u 
