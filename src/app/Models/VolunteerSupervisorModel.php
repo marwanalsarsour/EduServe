@@ -48,22 +48,26 @@ public function approveVolunteerOpportunity($opportunityId, $supervisorId) {
     }
 
 public function getPendingAcademicAttendance() {
-    $sql = "SELECT 
-        att.attendanceID,
-        att.studentID,
-        u.fullName AS student_name,
-        att.date,
-        att.checkIn,
-        att.checkOut,
-        att.hours,
-        att.status,
-        att.academicStatus,
-        att.notes
-    FROM Attendance att
-    JOIN Users u 
-        ON att.studentID = u.userID
-    WHERE att.academicStatus = 'بانتظار الاعتماد'
-    ORDER BY att.date DESC";
+
+    $sql = "SELECT
+                att.attendanceID,
+                att.studentID,
+                u.fullName AS student_name,
+                att.date,
+                att.checkIn,
+                att.checkOut,
+                att.hours,
+                att.status,
+                att.academicStatus,
+                att.notes
+            FROM Attendance att
+            JOIN Users u
+                ON att.studentID = u.userID
+            JOIN ExternalEntity ee
+                ON att.entityID = ee.entityID
+            WHERE att.academicStatus = 'بانتظار الاعتماد'
+              AND ee.entityName LIKE 'مؤسسة%'
+            ORDER BY att.date DESC";
 
     return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -251,19 +255,40 @@ public function getAllOpportunities() {
     return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 }
 
-    public function addOpportunity($data) {
-        $sql = "INSERT INTO Opportunity (opportunityID, title, type, seats, entityID, supervisorID, status, createdAt, description) 
-                VALUES (:id, :title, 'تطوع', :seats, :entityID, :supervisorID, 'نشط', NOW(), :description)";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':id'          => $data['id'],
-            ':title'       => $data['title'],
-            ':seats'       => $data['seats'],
-            ':entityID'    => $data['entityID'],
-            ':supervisorID'=> $data['supervisorID'],
-            ':description' => $data['description']
-        ]);
-    }
+  public function addOpportunity($data) {
+    $stmt = $this->db->query("SELECT COALESCE(MAX(opportunityID), 0) + 1 AS next_id FROM Opportunity");
+    $nextId = $stmt->fetch(PDO::FETCH_ASSOC)['next_id'];
+
+    $sql = "INSERT INTO Opportunity
+            (opportunityID, title, type, seats, entityID, supervisorID, status, createdAt, description)
+            VALUES
+            (:id, :title, :type, :seats, :entityID, :supervisorID, :status, NOW(), :description)";
+
+    $stmt = $this->db->prepare($sql);
+
+    return $stmt->execute([
+        ':id'           => $nextId,
+        ':title'        => $data['title'],
+        ':type'         => $data['type'],
+        ':seats'        => $data['seats'],
+        ':entityID'     => $data['entityID'],
+        ':supervisorID' => $data['supervisorID'],
+        ':status'       => $data['status'],
+        ':description'  => $data['description']
+    ]);
+}
+public function getOrganizations()
+{
+    $sql = "SELECT entityID, entityName
+            FROM ExternalEntity
+            WHERE entityName LIKE 'مؤسسة%'
+            ORDER BY entityName";
+
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
     public function deleteOpportunity($id) {
         $sql = "DELETE FROM Opportunity WHERE opportunityID = :id";

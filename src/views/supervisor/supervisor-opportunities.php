@@ -33,39 +33,48 @@ require_once VIEW_PATH . '/layout/header.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if(!empty($data['opportunities'])): ?>
-                            <?php foreach($data['opportunities'] as $opp): ?>
-                                <tr>
-                                    <td class="fw-bold"><?= htmlspecialchars($opp['title']) ?></td>
-                                    <td><?= htmlspecialchars($opp['organization']) ?></td>
-                                    <td>
-                                        <?php 
-                                            $statusClass = ($opp['status'] == 'active') ? 'bg-success' : 'bg-secondary';
-                                            $statusText = ($opp['status'] == 'active') ? 'نشطة' : 'مغلقة';
-                                        ?>
-                                        <span class="badge <?= $statusClass ?> rounded-pill px-3">
-                                            <?= $statusText ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a href="/supervisor-edit-opportunity?id=<?= $opp['id'] ?>" class="btn btn-outline-warning btn-sm border-0">
-                                            <i class="bi bi-pencil-square"></i> تعديل
-                                        </a>
-                                        <button onclick="confirmDelete(<?= $opp['id'] ?>)" class="btn btn-outline-danger btn-sm border-0">
-                                            <i class="bi bi-trash"></i> حذف
-                                        </button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4" class="p-5 text-muted text-center">
-                                    <i class="bi bi-folder2-open fs-1 d-block mb-2 opacity-50"></i>
-                                    لا توجد فرص تدريبية مضافة حالياً.
-                                </td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
+    <?php if(!empty($data['opportunities'])): ?>
+        <?php foreach($data['opportunities'] as $opp): ?>
+            <?php 
+                // نحدد المعرف (ID) بشكل مرن (يحاول البحث عن opportunityID أو id)
+                $oppId = $opp['opportunityID'] ?? ($opp['id'] ?? null);
+            ?>
+            <tr>
+                <td class="fw-bold"><?= htmlspecialchars($opp['title'] ?? 'بدون عنوان') ?></td>
+                <td><?= htmlspecialchars($opp['entityName'] ?? 'غير محددة') ?></td>
+                <td>
+                    <?php 
+                        $isActive = ($opp['status'] === 'نشط');
+                        $statusClass = $isActive ? 'bg-success' : 'bg-secondary';
+                        $statusText = $isActive ? 'نشطة' : 'مغلقة';
+                    ?>
+                    <span class="badge <?= $statusClass ?> rounded-pill px-3">
+                        <?= $statusText ?>
+                    </span>
+                </td>
+                <td>
+                    <?php if ($oppId): ?>
+                        <a href="/supervisor-edit-opportunity?id=<?= $oppId ?>" class="btn btn-outline-warning btn-sm border-0">
+                            <i class="bi bi-pencil-square"></i> تعديل
+                        </a>
+                        <button onclick="confirmDelete(<?= $oppId ?>)" class="btn btn-outline-danger btn-sm border-0">
+                            <i class="bi bi-trash"></i> حذف
+                        </button>
+                    <?php else: ?>
+                        <span class="text-danger small">خطأ في المعرف</span>
+                    <?php endif; ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <tr>
+            <td colspan="4" class="p-5 text-muted text-center">
+                <i class="bi bi-folder2-open fs-1 d-block mb-2 opacity-50"></i>
+                لا توجد فرص تدريبية مضافة حالياً.
+            </td>
+        </tr>
+    <?php endif; ?>
+</tbody>
                 </table>
             </div>
         </div>
@@ -74,7 +83,7 @@ require_once VIEW_PATH . '/layout/header.php';
     <script>
         function confirmDelete(id) {
             if (confirm('هل أنت متأكد من حذف هذه الفرصة؟ لا يمكن التراجع عن هذا الإجراء.')) {
-                window.location.href = '/supervisor/delete-opportunity/' + id;
+                window.location.href ='/supervisor/delete-opportunity?id=' + id;
             }
         }
     </script>

@@ -56,6 +56,8 @@ require_once VIEW_PATH . '/layout/header.php';
                     $desc = htmlspecialchars($descRaw);
                     $oppID = $op['opportunityID'] ?? 0;
                     $seats = htmlspecialchars($op['seats'] ?? 0);
+                    // جلب اسم المؤسسة من الكويري (OrganizationName)
+                    $orgName = htmlspecialchars($op['OrganizationName'] ?? 'جهة غير محددة');
                 ?>
                     <div class="col-12 col-md-6 opportunity-item" data-type="<?php echo $opType; ?>">
                         <div class="card h-100 shadow-sm opportunity-card">
@@ -70,8 +72,12 @@ require_once VIEW_PATH . '/layout/header.php';
                                 <h6 class="text-primary mb-3">عدد المقاعد المتاحة: <?php echo $seats; ?></h6>
 
                                 <div class="small text-muted mb-3">
-                                    <span class="op-location me-3"><i class="bi bi-geo-alt me-1"></i>موقع المؤسسة</span>
-                                    <span class="op-status"><i class="bi bi-info-circle me-1"></i>الحالة: <?php echo htmlspecialchars($op['status'] ?? 'نشط'); ?></span>
+                                    <span class="op-location me-3 d-block mb-1">
+                                        <i class="bi bi-building me-1"></i><?php echo $orgName; ?>
+                                    </span>
+                                    <span class="op-status">
+                                        <i class="bi bi-info-circle me-1"></i>الحالة: <?php echo htmlspecialchars($op['status'] ?? 'نشط'); ?>
+                                    </span>
                                 </div>
 
                                 <p class="op-desc text-secondary mb-4">

@@ -140,7 +140,6 @@
                             <th class="py-3">اسم الطالب</th>
                             <th class="py-3">التخصص</th>
                             <th class="py-3">ساعات الإنجاز</th>
-                            <th class="py-3 text-center">الإجراء</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -160,11 +159,6 @@
                                             <div class="progress-bar bg-primary" style="width: <?= (($student['total_hours'] ?? 0) / 120) * 100 ?>%"></div>
                                         </div>
                                     </div>
-                                </td>
-                                <td class="py-3 text-center">
-                                    <a href="/trainer/student-details/<?= $student['id'] ?>" class="btn btn-sm btn-primary px-3 rounded-2">
-                                        <i class="bi bi-folder2-open ms-1"></i> عرض الملف
-                                    </a>
                                 </td>
                             </tr>
                             <?php endforeach; ?>

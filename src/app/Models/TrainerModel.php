@@ -7,38 +7,48 @@ class TrainerModel {
         $this->db = $db;
     }
 
-    public function getDashboardStats($trainer_id) {
-        $stats = [];
-        $sql = "SELECT COUNT(*) FROM OpportunityRequest WHERE entityID = ? AND entityStatus = 'مقبول'";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$trainer_id]);
-        $stats['total_students'] = $stmt->fetchColumn();
+ public function getDashboardStats($entity_id) {
+    $stats = [];
+    $sql = "SELECT COUNT(*) FROM OpportunityRequest WHERE entityID = ? AND entityStatus = 'مقبول'";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([$entity_id]);
+    $stats['total_students'] = $stmt->fetchColumn();
+    $sql = "SELECT COUNT(*) FROM Attendance WHERE entityID = ? AND status IN ('غائب', 'متأخر')";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([$entity_id]);
+    $stats['pending_attendance'] = $stmt->fetchColumn();
+    $sql = "SELECT COUNT(DISTINCT r.reportID) 
+            FROM StudentReport r 
+            JOIN OpportunityRequest ar ON r.studentID = ar.studentID 
+            WHERE ar.entityID = ? AND r.reportType = 'نهائي'";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([$entity_id]);
+    $stats['completed_reports'] = $stmt->fetchColumn();
 
-        $sql = "SELECT COUNT(*) FROM Attendance WHERE entityID = ? AND status = 'متأخر'";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$trainer_id]);
-        $stats['pending_attendance'] = $stmt->fetchColumn();
+    return $stats;
+}
 
-        $sql = "SELECT COUNT(*) FROM StudentReport r 
-                JOIN OpportunityRequest ar ON r.studentID = ar.studentID 
-                WHERE ar.entityID = ? AND r.reportType = 'نهائي'";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$trainer_id]);
-        $stats['completed_reports'] = $stmt->fetchColumn();
-
-        return $stats;
-    }
-
-    public function getTrainerStudents($trainer_id) {
-        $sql = "SELECT u.userID as id, u.fullName as name, s.majorName as major, s.academicYear as total_hours
-                FROM Users u
-                JOIN Student s ON u.userID = s.studentID
-                JOIN OpportunityRequest ar ON s.studentID = ar.studentID
-                WHERE ar.entityID = ? AND ar.entityStatus = 'مقبول'";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$trainer_id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    public function getTrainerStudents($entity_id) {
+    $sql = "SELECT 
+                u.userID as id, 
+                u.fullName as name, 
+                s.majorName as major,
+                (SELECT SUM(a.hours) 
+                 FROM Attendance a 
+                 WHERE a.studentID = u.userID 
+                   AND a.entityID = :entity_id 
+                   AND a.status = 'حاضر') as total_hours
+            FROM Users u
+            JOIN Student s ON u.userID = s.studentID
+            JOIN OpportunityRequest ar ON s.studentID = ar.studentID
+            WHERE ar.entityID = :entity_id 
+              AND ar.entityStatus = 'مقبول'
+            GROUP BY u.userID";
+            
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':entity_id' => $entity_id]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
  public function getTrainerProfile($trainer_id)
 {
@@ -74,33 +84,115 @@ class TrainerModel {
 }
 
 
-    public function getTodayAttendance($trainer_id) {
-        $today = date('Y-m-d');
-        $sql = "SELECT u.userID as student_id, u.fullName as student_name, s.majorName as major, 
-                       a.checkIn as arrival_time, a.checkOut as departure_time, a.status, a.hours as total_hours
-                FROM Users u
-                JOIN Student s ON u.userID = s.studentID
-                JOIN OpportunityRequest ar ON s.studentID = ar.studentID
-                LEFT JOIN Attendance a ON s.studentID = a.studentID AND a.date = ?
-                WHERE ar.entityID = ? AND ar.entityStatus = 'مقبول'";
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$today, $trainer_id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+public function getTodayAttendance($entity_id) {
+    $date = date('Y-m-d');
+
+    $sql = "
+        SELECT
+            u.userID AS student_id,
+            u.fullName AS student_name,
+            s.majorName AS major,
+            a.checkIn AS arrival_time,
+            a.checkOut AS departure_time,
+            a.status,
+            a.hours AS total_hours,
+            a.notes
+        FROM Users u
+        JOIN Student s
+            ON u.userID = s.studentID
+        JOIN OpportunityRequest ar
+            ON u.userID = ar.studentID
+        LEFT JOIN Attendance a
+            ON u.userID = a.studentID
+            AND a.date = ?
+            AND a.entityID = ar.entityID
+            AND a.opportunityID = ar.opportunityID
+        WHERE ar.entityID = ?
+          AND ar.entityStatus = 'مقبول'
+        ORDER BY u.fullName
+    ";
+
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([$date, $entity_id]);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function saveAttendance($data) {
+
+    $sqlLookup = "
+        SELECT entityID, opportunityID
+        FROM OpportunityRequest
+        WHERE studentID = :studentID
+          AND entityID = :entityID
+          AND entityStatus = 'مقبول'
+        ORDER BY requestDate DESC
+        LIMIT 1
+    ";
+
+    $stmt = $this->db->prepare($sqlLookup);
+
+    $stmt->execute([
+        'studentID' => $data['studentID'],
+        'entityID'  => $data['entityID']
+    ]);
+
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $entityID      = $row['entityID'] ?? null;
+    $opportunityID = $row['opportunityID'] ?? null;
+
+    if (!$entityID || !$opportunityID) {
+        return false;
     }
 
-    public function saveAttendance($data) {
-        $sql = "INSERT INTO Attendance (attendanceID, date, hours, studentID, opportunityID, entityID, status, checkIn, checkOut)
-                VALUES (:attendanceID, :date, :hours, :studentID, :opportunityID, :entityID, :status, :checkIn, :checkOut)
-                ON DUPLICATE KEY UPDATE 
-                checkIn = VALUES(checkIn),
-                checkOut = VALUES(checkOut),
-                hours = VALUES(hours),
-                status = VALUES(status)";
-                
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute($data);
-    }
+    $sql = "
+        INSERT INTO Attendance
+        (
+            date,
+            hours,
+            studentID,
+            opportunityID,
+            entityID,
+            status,
+            checkIn,
+            checkOut,
+            notes
+        )
+        VALUES
+        (
+            :date,
+            :hours,
+            :studentID,
+            :opportunityID,
+            :entityID,
+            :status,
+            :checkIn,
+            :checkOut,
+            :notes
+        )
+        ON DUPLICATE KEY UPDATE
+            checkIn  = VALUES(checkIn),
+            checkOut = VALUES(checkOut),
+            hours    = VALUES(hours),
+            status   = VALUES(status),
+            notes    = VALUES(notes)
+    ";
+
+    $stmt = $this->db->prepare($sql);
+
+    return $stmt->execute([
+        'date'          => $data['date'],
+        'hours'         => $data['hours'],
+        'studentID'     => $data['studentID'],
+        'opportunityID' => $opportunityID,
+        'entityID'      => $entityID,
+        'status'        => $data['status'],
+        'checkIn'       => $data['checkIn'],
+        'checkOut'      => $data['checkOut'],
+        'notes'         => $data['notes']
+    ]);
+}
 
     public function getMyStudents($trainer_id) {
         $sql = "SELECT u.userID as id, u.fullName as name FROM Users u 

@@ -23,6 +23,8 @@ class AttendanceController {
                 'studentID' => $_POST['student_id'],
                 'date'      => date('Y-m-d'),
                 'status'    => $_POST['status'],
+                'checkIn'   => $_POST['check_in'],  
+                'checkOut'  => $_POST['check_out'], 
                 'hours'     => $_POST['hours'],
                 'notes'     => $_POST['notes']
             ];

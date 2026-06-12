@@ -24,14 +24,16 @@ class StudentDashboardController {
         }
 
         $studentId = $_SESSION['user_id'];
-
         $model = new StudentModel($this->db);
+        
         $studentData = $model->getStudentProfile($studentId);
         $latestRequest = $model->getLatestApplication($studentId);
         $certInfo = $model->getCertificateQuickSummary($studentId);
         $certsCount = $model->getCertificatesCount($studentId);
         $trainingCount = $model->getAcceptedTrainingCount($studentId);
         $volunteerCount = $model->getVolunteerCount($studentId);
+        $latestTraining = $model->getLatestOpportunityByType($studentId, 'تدريب');
+        $latestVolunteer = $model->getLatestOpportunityByType($studentId, 'تطوع');
 
         require_once VIEW_PATH . '/student/student_dashboard.php';
     }

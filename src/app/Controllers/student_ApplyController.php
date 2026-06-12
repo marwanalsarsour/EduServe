@@ -3,7 +3,7 @@ require_once __DIR__ . '/../Models/StudentModel.php';
 
 class student_ApplyController {
     
-    public function index() {
+  public function index() {
         if (session_status() === PHP_SESSION_NONE) session_start();
         
         $opportunityId = $_GET['id'] ?? null;
@@ -16,8 +16,12 @@ class student_ApplyController {
         $activeConnection = $db_connection ?? $db ?? $conn;
 
         $studentModel = new StudentModel($activeConnection);
-
-        $sql = "SELECT * FROM Opportunity WHERE opportunityID = :id AND isApproved = 1 AND status = 'نشط'";
+        
+        $sql = "SELECT o.*, ee.entityName AS OrganizationName 
+                FROM Opportunity o
+                LEFT JOIN ExternalEntity ee ON o.entityID = ee.entityID
+                WHERE o.opportunityID = :id AND o.isApproved = 1 AND o.status = 'نشط'";
+                
         $stmt = $activeConnection->prepare($sql);
         $stmt->execute([':id' => $opportunityId]);
         $opportunity = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -38,12 +42,9 @@ class student_ApplyController {
         }
         
         $opportunityId = $_POST['opportunity_id'] ?? null;
-
-        // --- التعديل الجوهري هنا: جلب البيانات الصحيحة من جدول الفرصة مباشرة ---
         global $db, $db_connection, $conn;
         $activeConnection = $db_connection ?? $db ?? $conn;
         
-        // جلب الـ entityID والـ supervisorID معاً لضمان سلامة العلاقات (Foreign Keys)
         $stmt = $activeConnection->prepare("SELECT entityID, supervisorID FROM Opportunity WHERE opportunityID = :oid");
         $stmt->execute([':oid' => $opportunityId]);
         $oppData = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -55,11 +56,10 @@ class student_ApplyController {
         $entityId = $oppData['entityID']; 
         $supervisorId = $oppData['supervisorID'] ?? 0; 
         
-        // التحقق من أن الـ entityID ليس فارغاً لتجنب خطأ المفتاح الأجنبي
         if (empty($entityId)) {
             die("خطأ: لا يمكن إرسال الطلب لأن الفرصة لا ترتبط بجهة خارجية صالحة.");
         }
-        // -------------------------------------------------------------
+    
 
         $cvPath = null;
         if (isset($_FILES['cv_file']) && $_FILES['cv_file']['error'] === UPLOAD_ERR_OK) {
@@ -74,7 +74,6 @@ class student_ApplyController {
 
         $studentModel = new StudentModel($activeConnection);
         
-        // الآن نمرر الـ 5 معاملات التي تتوقعها دالة الموديل:
         $success = $studentModel->submitOpportunityRequest($studentId, $opportunityId, $entityId, $supervisorId, $cvPath);
 
         if ($success) {

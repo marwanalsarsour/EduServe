@@ -16,28 +16,30 @@ class StudentManagementController {
         $raw_students = $this->model->getSupervisedStudents($_SESSION['user_id'], $search);
         
         $students = [];
-        foreach ($raw_students as $s) {
-            $completed = $s['completed_hours'] ?? 0;
-            $required = $s['required_hours'] ?: 1; 
-            $percent = ($completed / $required) * 100;
+      // داخل دالة index في الـ Controller
+foreach ($raw_students as $s) {
+    $completed = $s['completed_hours'] ?? 0;
+    $required = $s['required_hours'] ?: 120; // افترضنا 120 ساعة إذا كانت فارغة
+    $percent = min(100, ($completed / $required) * 100);
 
-            $status_class = 'primary';
-            if ($percent >= 100) $status_class = 'success';
-            elseif ($percent < 20) $status_class = 'danger';
-            elseif ($percent < 50) $status_class = 'warning';
+    $color = 'primary';
+    if ($percent >= 100) $color = 'success';
+    elseif ($percent < 20) $color = 'danger';
+    elseif ($percent < 50) $color = 'warning';
 
-            $students[] = [
-                'id' => $s['id'],
-                'name' => $s['name'],
-                'major' => $s['major'],
-                'company' => $s['company'] ?? 'غير محدد',
-                'completed_hours' => (int)$completed,
-                'required_hours' => (int)$required,
-                'status' => ($percent >= 100 ? 'منتهي' : 'قيد التدريب'),
-                'status_class' => $status_class,
-                'has_alert' => ($s['pending_reports_count'] > 0) 
-            ];
-        }
+    $students[] = [
+        'id' => $s['id'],
+        'name' => $s['name'],
+        'major' => $s['major'],
+        'company' => $s['company'] ?? 'غير محدد',
+        'completed_hours' => (int)$completed,
+        'required_hours' => (int)$required,
+        'percent' => round($percent),
+        'color' => $color, // أضفنا هذا المفتاح المهم للواجهة
+        'status' => ($percent >= 100 ? 'منتهي' : 'قيد التدريب'),
+        'has_alert' => ($s['pending_reports_count'] > 0) 
+    ];
+}
 
         $data = ['students' => $students];
         require_once VIEW_PATH . '/supervisor/supervisor-students.php';

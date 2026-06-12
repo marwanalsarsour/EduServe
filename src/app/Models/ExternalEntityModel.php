@@ -147,26 +147,31 @@ public function updateOpportunity($id, $data) {
     }
 
 public function createOpportunity($org_id, $data) {
-        $sql = "INSERT INTO Opportunity (
-                    opportunityID, title, type, seats, conditions, entityID, supervisorID
-                ) VALUES (:opportunityID, :title, :type, :seats, :conditions, :entityID, :supervisorID)";
-                
-        $stmt = $this->db->prepare($sql);
-        $generatedID = rand(100000, 999999);
+    $sql = "INSERT INTO Opportunity (
+                opportunityID, title, type, seats, conditions, description, entityID, supervisorID
+            ) VALUES (
+                :opportunityID, :title, :type, :seats, :conditions, :description, :entityID, :supervisorID
+            )";
+            
+    $stmt = $this->db->prepare($sql);
+    $generatedID = rand(100000, 999999);
 
-        $requirements = $data['requirements'] ?? $data['conditions'] ?? '';
-        $conditions = !empty(trim($requirements)) ? $requirements : null;
+    $requirements = $data['conditions'] ?? '';
+    $conditions = !empty(trim($requirements)) ? $requirements : null;
+    
+    $description = $data['description'] ?? null;
 
-        return $stmt->execute([
-            ':opportunityID' => $generatedID,
-            ':title'         => $data['title'],
-            ':type'          => $data['type'], 
-            ':seats'         => $data['seats'],
-            ':conditions'    => $conditions, 
-            ':entityID'      => $org_id,
-            ':supervisorID'  => !empty($data['supervisorID']) ? $data['supervisorID'] : null 
-        ]);
-    }
+    return $stmt->execute([
+        ':opportunityID' => $generatedID,
+        ':title'         => $data['title'],
+        ':type'          => $data['type'], 
+        ':seats'         => $data['seats'],
+        ':conditions'    => $conditions, 
+        ':description'   => $description, // إرسال الوصف
+        ':entityID'      => $org_id,
+        ':supervisorID'  => !empty($data['supervisorID']) ? $data['supervisorID'] : null 
+    ]);
+}
 public function getAcceptedStudents($org_id) {
         $stmt = $this->db->prepare("
             SELECT DISTINCT u.userID, u.fullName 

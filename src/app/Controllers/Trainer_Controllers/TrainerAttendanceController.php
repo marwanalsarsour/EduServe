@@ -1,46 +1,56 @@
 <?php
-class TrainerAttendanceController {
+
+class TrainerAttendanceController
+{
     private $model;
     private $db;
 
-    public function __construct($db = null) {
-        if (session_status() === PHP_SESSION_NONE) session_start();
-        
+    public function __construct($db = null)
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         global $db;
         $this->db = $db;
         
-        require_once APP_PATH . '/models/TrainerModel.php'; 
-        
+        require_once APP_PATH . '/models/TrainerModel.php';
         $this->model = new TrainerModel($this->db);
     }
 
-    public function index() {
-        $trainer_id = $_SESSION['user_id'];
-        $attendance_list = $this->model->getTodayAttendance($trainer_id);
+    public function index()
+    {
+        $entity_id = $_SESSION['user_id'] ?? null;
+        $attendance_list = $this->model->getTodayAttendance($entity_id);
         
         require_once VIEW_PATH . '/trainer/trainer_attendance.php';
     }
 
-    public function save() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && date('H') < 17) {
-            foreach ($_POST['attendance'] as $student_id => $data) {
-                $start = new DateTime($data['arrival']);
-                $end = new DateTime($data['departure']);
-                $diff = $start->diff($end);
-                $hours = $diff->h + ($diff->i / 60);
+    public function save()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                $entity_id = $_SESSION['user_id'];
+                $student_id = $_POST['studentID'];
 
                 $saveData = [
-                    'student_id' => $student_id,
-                    'date' => date('Y-m-d'),
-                    'arrival_time' => $data['arrival'],
-                    'departure_time' => $data['departure'],
-                    'total_hours' => round($hours, 2),
-                    'status' => $data['status']
+                    'studentID' => $student_id,
+                    'entityID'  => $entity_id,
+                    'date'      => date('Y-m-d'),
+                    'checkIn'   => $_POST['checkIn'],
+                    'checkOut'  => $_POST['checkOut'],
+                    'hours'     => $_POST['hours'],
+                    'status'    => $_POST['status'],
+                    'notes'     => $_POST['notes'] ?? ''
                 ];
-                $this->model->saveAttendance($saveData);
+
+                $success = $this->model->saveAttendance($saveData);
+                echo json_encode(['success' => $success]);
+                
+            } catch (Exception $e) {
+                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
             }
-            header('Location: /trainer/attendance?success=1');
-            exit();
+            exit;
         }
     }
 }

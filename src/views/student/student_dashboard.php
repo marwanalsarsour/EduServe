@@ -73,7 +73,7 @@ require_once VIEW_PATH . '/layout/header.php';
                                 <div>
                                     <h5 class="fw-bold mb-1">التدريب الميداني</h5>
                                     <div class="text-muted small">
-                                        الحالة: <span id="trainingStatusText" class="fw-semibold text-primary"><?php echo $studentData['TrainingStatus'] ?? 'غير محدد'; ?></span>
+                                        الحالة: <span id="trainingStatusText" class="fw-semibold text-primary"><?php echo $latestTraining['status'] ?? 'غير محدد'; ?></span>
                                     </div>
                                 </div>
                                 <span id="trainingStatusBadge" class="badge bg-primary">نشط</span>
@@ -82,8 +82,8 @@ require_once VIEW_PATH . '/layout/header.php';
                             <hr class="my-3">
 
                             <?php 
-                                $doneHours = $studentData['HoursCompleted'] ?? 0;
-                                $totalHours = $studentData['RequiredHours'] ?? 150;
+                                $doneHours = $latestTraining['hours_done'] ?? 0;
+                                $totalHours = $latestTraining['required_hours'] ?? 150;
                                 $progress = ($totalHours > 0) ? ($doneHours / $totalHours) * 100 : 0;
                             ?>
 
@@ -102,7 +102,7 @@ require_once VIEW_PATH . '/layout/header.php';
 
                             <div class="mt-3">
                                 <div class="text-muted small">الشركة / المؤسسة</div>
-                                <div id="trainingOrg" class="fw-semibold"><?php echo htmlspecialchars($latestRequest['OrganizationName'] ?? 'لم يتم التحديد'); ?></div>
+                                <div id="trainingOrg" class="fw-semibold"><?php echo htmlspecialchars($latestTraining['OrganizationName'] ?? 'لم يتم التحديد'); ?></div>
                             </div>
 
                             <div class="mt-3 d-flex gap-2">
@@ -124,25 +124,30 @@ require_once VIEW_PATH . '/layout/header.php';
                                 <div>
                                     <h5 class="fw-bold mb-1">العمل التطوعي</h5>
                                     <div class="text-muted small">
-                                        الحالة: <span id="volStatusText" class="fw-semibold text-success">متاح</span>
+                                        الحالة: <span id="volStatusText" class="fw-semibold text-success"><?php echo $latestVolunteer['status'] ?? 'متاح'; ?></span>
                                     </div>
                                 </div>
                                 <span id="volStatusBadge" class="badge bg-success">متطوع</span>
                             </div>
                             <hr class="my-3">
+                            <?php 
+                                $volDone = $latestVolunteer['hours_done'] ?? 0;
+                                $volTotal = $latestVolunteer['required_hours'] ?? 50;
+                                $volProgress = ($volTotal > 0) ? ($volDone / $volTotal) * 100 : 0;
+                            ?>
                             <div class="d-flex justify-content-between small text-muted">
                                 <span><i class="bi bi-clock ms-1"></i> الساعات</span>
                                 <span>
-                                    <span id="volHoursDone" class="fw-semibold">0</span> /
-                                    <span id="volHoursTotal">50</span>
+                                    <span id="volHoursDone" class="fw-semibold"><?php echo $volDone; ?></span> /
+                                    <span id="volHoursTotal"><?php echo $volTotal; ?></span>
                                 </span>
                             </div>
                             <div class="progress mt-2" style="height: 10px;">
-                                <div id="volProgressBar" class="bg-success progress-bar" role="progressbar" style="width: 0%"></div>
+                                <div id="volProgressBar" class="bg-success progress-bar" role="progressbar" style="width: <?php echo $volProgress; ?>%"></div>
                             </div>
                             <div class="mt-3">
                                 <div class="text-muted small">المؤسسة</div>
-                                <div id="volOrg" class="fw-semibold">—</div>
+                                <div id="volOrg" class="fw-semibold"><?php echo htmlspecialchars($latestVolunteer['OrganizationName'] ?? '—'); ?></div>
                             </div>
                             <div class="mt-3 d-flex gap-2">
                                 <a href="/student_attendance" class="btn btn-sm btn-outline-success">
@@ -158,57 +163,57 @@ require_once VIEW_PATH . '/layout/header.php';
             </div>
 
             <div class="card shadow-sm border-0">
-    <div class="card-body p-4">
+                <div class="card-body p-4">
 
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0">
-                <i class="bi bi-person-badge ms-1"></i>
-                الملف الرقمي (Portfolio)
-            </h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-person-badge ms-1"></i>
+                            الملف الرقمي (Portfolio)
+                        </h5>
 
-            <a href="/student_Portfolio" class="btn btn-sm btn-primary">
-                <i class="bi bi-box-arrow-up-right ms-1"></i>
-                عرض الملف الرقمي
-            </a>
-        </div>
-
-        <div class="row g-3">
-
-            <div class="col-12 col-md-4">
-                <div class="border rounded p-3 h-100 bg-light">
-                    <div class="text-muted small">إجمالي الشهادات</div>
-                    <div class="fs-4 fw-bold text-primary">
-                        <?= $certsCount ?? 0 ?>
+                        <a href="/student_Portfolio" class="btn btn-sm btn-primary">
+                            <i class="bi bi-box-arrow-up-right ms-1"></i>
+                            عرض الملف الرقمي
+                        </a>
                     </div>
-                </div>
-            </div>
 
-            <div class="col-12 col-md-4">
-                <div class="border rounded p-3 h-100 bg-light">
-                    <div class="text-muted small">التدريبات المنجزة</div>
-                    <div class="fs-4 fw-bold text-success">
-                        <?= $trainingCount ?? 0 ?>
+                    <div class="row g-3">
+
+                        <div class="col-12 col-md-4">
+                            <div class="border rounded p-3 h-100 bg-light">
+                                <div class="text-muted small">إجمالي الشهادات</div>
+                                <div class="fs-4 fw-bold text-primary">
+                                    <?= $certsCount ?? 0 ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <div class="border rounded p-3 h-100 bg-light">
+                                <div class="text-muted small">التدريبات المنجزة</div>
+                                <div class="fs-4 fw-bold text-success">
+                                    <?= $trainingCount ?? 0 ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <div class="border rounded p-3 h-100 bg-light">
+                                <div class="text-muted small">الأعمال التطوعية</div>
+                                <div class="fs-4 fw-bold text-danger">
+                                    <?= $volunteerCount ?? 0 ?>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
-                </div>
-            </div>
 
-            <div class="col-12 col-md-4">
-                <div class="border rounded p-3 h-100 bg-light">
-                    <div class="text-muted small">الأعمال التطوعية</div>
-                    <div class="fs-4 fw-bold text-danger">
-                        <?= $volunteerCount ?? 0 ?>
+                    <div class="alert alert-light border mt-4 mb-0">
+                        <i class="bi bi-info-circle ms-1"></i>
+                        يحتوي الملف الرقمي على الشهادات، التدريبات المنجزة، الأعمال التطوعية والإنجازات التي حصل عليها الطالب خلال مسيرته الأكاديمية.
                     </div>
+
                 </div>
-            </div>
-
-        </div>
-
-        <div class="alert alert-light border mt-4 mb-0">
-            <i class="bi bi-info-circle ms-1"></i>
-            يحتوي الملف الرقمي على الشهادات، التدريبات المنجزة، الأعمال التطوعية والإنجازات التي حصل عليها الطالب خلال مسيرته الأكاديمية.
-             </div>
-
-             </div>
             </div>
 
         </div>

@@ -16,7 +16,7 @@ require_once VIEW_PATH . '/layout/header.php';
         .btn-success { background-color: green !important; border-color: green !important; }
         .btn-outline-danger { color: red !important; border-color: red !important; }
         .btn-outline-danger:hover { background-color: red !important; color: white !important; }
-        h4, h5, h6 { color: blue; }
+        h4, h5 { color: blue; }
         input, select, textarea { border-color: gray !important; }
         
         .fade-field {
@@ -41,8 +41,7 @@ require_once VIEW_PATH . '/layout/header.php';
         <div class="container my-4">
             <form id="opportunityForm" action="/external/opportunities/store" method="POST">
                 <div class="row g-4 my-4">
-
-                    <div class="col-12 col-lg-8">
+                    <div class="col-12">
                         <div class="card shadow-sm border-0">
                             <div class="card-body p-4">
                                 <h4 class="fw-bold mb-4"><i class="bi bi-plus-circle ms-2"></i>إضافة فرصة جديدة</h4>
@@ -55,11 +54,11 @@ require_once VIEW_PATH . '/layout/header.php';
                                     <div class="col-md-6">
                                         <label class="form-label">نوع الفرصة</label>
                                         <select class="form-select" id="opportunityType" name="type" required>
-                                            <option value="">اختر النوع</option>
-                                            <option value="تدريب">التدريب الميداني</option>
-                                            <option value="تطوع">العمل التطوعي</option>
+                                            <option value="تدريب">تدريب</option>
+                                            <option value="تطوع">تطوع</option>
                                         </select>
                                     </div>
+
                                     <div class="col-md-6">
                                         <label class="form-label">الحالة</label>
                                         <select class="form-select" name="status" required>
@@ -67,19 +66,8 @@ require_once VIEW_PATH . '/layout/header.php';
                                             <option value="مغلق">مغلق</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">المدة</label>
-                                        <input type="text" class="form-control" name="duration" placeholder="مثال: شهرين" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">تاريخ البدء</label>
-                                        <input type="date" class="form-control" name="start_date" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">آخر موعد للتقديم</label>
-                                        <input type="date" class="form-control" name="deadline" required>
-                                    </div>
-                                    <div class="col-md-6">
+
+                                    <div class="col-12">
                                         <label class="form-label">عدد المقاعد</label>
                                         <input type="number" class="form-control" name="seats" min="1" required>
                                     </div>
@@ -88,40 +76,21 @@ require_once VIEW_PATH . '/layout/header.php';
                                 <h5 class="mt-4 fw-bold">الوصف</h5>
                                 <textarea class="form-control" name="description" rows="4" placeholder="اكتب تفاصيل الفرصة هنا..." required></textarea>
                                 
-                                <div class="volunteer-hidden fade-field mt-4">
+                                <div class="volunteer-hidden fade-field mt-4" id="conditionsWrapper">
                                     <h5 class="fw-bold">المتطلبات الأساسية</h5>
-                                    <textarea class="form-control" id="requirementsInput" name="requirements" rows="4" placeholder="مثال: معرفة بـ PHP و MySQL" required></textarea>
+                                    <textarea class="form-control" id="requirementsInput" name="conditions" rows="4" placeholder="مثال: معرفة بـ PHP و MySQL"></textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-12 col-lg-4">
-                        <div class="card shadow-sm mb-4 border-0">
-                            <div class="card-body p-4">
-                                <h6 class="fw-bold mb-3">معلومات التواصل</h6>
-                                <div class="mb-3">
-                                    <label class="form-label">البريد الإلكتروني</label>
-                                    <input type="email" class="form-control" name="contact_email" placeholder="example@email.com" required>
-                                </div>
-                                <div>
-                                    <label class="form-label">رقم الهاتف</label>
-                                    <input type="text" class="form-control" name="contact_phone" placeholder="+970" required>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="card shadow-sm border-0">
-                            <div class="card-body p-4">
-                                <h5 class="fw-bold mb-3">الإجراءات</h5>
-                                <button type="submit" class="btn btn-success w-100 mb-2">
-                                    <i class="bi bi-check-circle ms-1"></i> نشر الفرصة
-                                </button>
-                                <a href="/external/opportunities" class="btn btn-outline-danger w-100">
-                                    <i class="bi bi-x-circle ms-1"></i> إلغاء
-                                </a>
-                            </div>
-                        </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-success w-100 mb-2">
+                            <i class="bi bi-check-circle ms-1"></i> نشر الفرصة
+                        </button>
+                        <a href="/external/opportunities" class="btn btn-outline-danger w-100">
+                            <i class="bi bi-x-circle ms-1"></i> إلغاء
+                        </a>
                     </div>
                 </div>
             </form>
@@ -133,16 +102,16 @@ require_once VIEW_PATH . '/layout/header.php';
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const typeSelect = document.getElementById('opportunityType');
-            const volunteerHiddenSection = document.querySelector('.volunteer-hidden');
+            const conditionsWrapper = document.getElementById('conditionsWrapper');
             const requirementsInput = document.getElementById('requirementsInput');
 
             function handleTypeChange() {
                 if (typeSelect.value === 'تطوع') {
-                    volunteerHiddenSection.classList.add('d-none-fade');
+                    conditionsWrapper.classList.add('d-none-fade');
                     requirementsInput.removeAttribute('required');
                     requirementsInput.value = ''; 
                 } else {
-                    volunteerHiddenSection.classList.remove('d-none-fade');
+                    conditionsWrapper.classList.remove('d-none-fade');
                     requirementsInput.setAttribute('required', 'required');
                 }
             }

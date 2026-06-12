@@ -104,7 +104,10 @@ $router->add('GET', '/student_notifications', function() use ($db) {
     require_once APP_PATH . '/Controllers/student_NotificationsController.php';
     (new student_NotificationsController($db))->index();
 });
-
+$router->add('GET', '/student_Portfolio', function() use ($db) {
+    require_once APP_PATH . '/Controllers/student_PortfolioController.php';
+    (new student_PortfolioController($db))->index();
+});
 $router->add('GET', '/external/student-portfolio/{id}', function($id) use ($db) {
     require_once APP_PATH . '/Controllers/External_Controlles/ExternalStudentPortfolioController.php';
     (new ExternalStudentPortfolioController($db))->show($id);
@@ -200,9 +203,9 @@ $router->add('GET', '/supervisor/opportunities', function() use ($db) {
     (new OpportunityController($db))->index();
 });
 
-$router->add('GET', '/supervisor/delete-opportunity/:id', function($id) use ($db) {
+$router->add('GET', '/supervisor/delete-opportunity', function() {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/OpportunityController.php';
-    (new OpportunityController($db))->delete($id);
+    (new OpportunityController())->delete($_GET['id']);
 });
 
 $router->add('GET', '/supervisor/supervisor-reports', function() use ($db) {

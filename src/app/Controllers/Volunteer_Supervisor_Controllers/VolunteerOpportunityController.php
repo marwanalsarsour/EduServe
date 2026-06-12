@@ -11,46 +11,50 @@ class VolunteerOpportunityController {
 
     public function index() {
         $opportunities = $this->model->getAllOpportunities();
+        $entities = $this->model->getOrganizations(); // لجلب المؤسسات للفورم
         require_once VIEW_PATH . '/volunteer/volunteer_opportunities.php';
     }
 
-    public function store() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $status = $_POST['status'] ?? 'نشط';
+  public function store() {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-            if ($status === 'active') $status = 'نشط';
-            elseif ($status === 'closed') $status = 'مغلق';
-            elseif ($status === 'inactive') $status = 'مغلق';
-
-            $data = [
-                'title'        => $_POST['title'],
-                'type'         => $_POST['type'],
-                'seats'        => $_POST['seats'],
-                'conditions'   => $_POST['conditions'] ?? null,
-                'entityID'     => $_POST['entityID'],
-                'supervisorID' => $_POST['supervisorID'],
-                'description'  => $_POST['description'] ?? null,
-                'status'       => $status,
-                'isApproved'   => 0
-            ];
-
-            if ($this->model->addOpportunity($data)) {
-                header('Location: /volunteer_opportunities?status=created');
-            } else {
-                header('Location: /volunteer_opportunities?status=error');
-            }
-            exit;
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
+
+        $status = $_POST['status'] ?? 'نشط';
+
+        if ($status === 'active') $status = 'نشط';
+        elseif ($status === 'closed') $status = 'مغلق';
+        elseif ($status === 'inactive') $status = 'مغلق';
+
+        $data = [
+            'title'        => $_POST['title'] ?? '',
+            'type'         => $_POST['type'] ?? 'تطوع',
+            'seats'        => $_POST['seats'] ?? 1,
+            'conditions'   => $_POST['conditions'] ?? null,
+            'entityID'     => $_POST['entityID'] ?? 0,
+            'supervisorID' => $_SESSION['user_id'],
+            'description'  => $_POST['description'] ?? null,
+            'status'       => $status,
+            'isApproved'   => 0
+        ];
+
+        if ($this->model->addOpportunity($data)) {
+            header('Location: /volunteer_opportunities?status=created');
+        } else {
+            header('Location: /volunteer_opportunities?status=error');
+        }
+        exit;
     }
+}
 
     public function edit($id) {
         $opportunity = $this->model->getOpportunityById($id);
-
         if (!$opportunity) {
             header('Location: /volunteer_opportunities?error=not_found');
             exit;
         }
-
         require_once VIEW_PATH . '/volunteer/volunteer_edit_opportunity.php';
     }
 
@@ -60,15 +64,14 @@ class VolunteerOpportunityController {
             $id = $_POST['opportunity_id'];
 
             $status = $_POST['status'] ?? 'نشط';
-
             if ($status === 'active') $status = 'نشط';
             elseif ($status === 'closed') $status = 'مغلق';
             elseif ($status === 'inactive') $status = 'مغلق';
 
             $data = [
-                'title'        => $_POST['title'],
-                'type'         => $_POST['type'],
-                'seats'        => $_POST['seats'],
+                'title'        => $_POST['title'] ?? '',
+                'type'         => $_POST['type'] ?? 'تطوع',
+                'seats'        => $_POST['seats'] ?? 1,
                 'conditions'   => $_POST['conditions'] ?? null,
                 'description'  => $_POST['description'] ?? null,
                 'status'       => $status

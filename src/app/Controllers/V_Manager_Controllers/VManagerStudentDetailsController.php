@@ -31,7 +31,6 @@ class VManagerStudentDetailsController {
             die("الطالب غير موجود");
         }
 
-        // 🔥 توحيد اسم الساعات المطلوبة بدون أخطاء
         $required = $student['requiredVolunteerHours']
             ?? $student['required_hours']
             ?? 50;
@@ -44,8 +43,6 @@ class VManagerStudentDetailsController {
         $progress = ($required > 0)
             ? min(100, round(($completed / $required) * 100))
             : 0;
-
-        // رسائل السيشن
         $successMessage = $_SESSION['success'] ?? '';
         $errorMessage   = $_SESSION['error'] ?? '';
 

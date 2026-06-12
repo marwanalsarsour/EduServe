@@ -33,21 +33,20 @@ class ApplicationController {
         require_once VIEW_PATH . '/supervisor/supervisor-applications.php';
     }
 
-    public function handleAction() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id'];
-            $action = $_POST['action']; 
-            
-            $status = ($action === 'accept') ? 'accepted' : 'rejected';
+   public function handleAction() {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id = $_POST['id'];
+        $action = $_POST['action']; 
+        $status = ($action === 'accept') ? 'معتمد' : 'مرفوض';
 
-            if ($this->model->updateApplicationStatus($id, $status)) {
-                $_SESSION['success_msg'] = "تم تحديث حالة الطلب بنجاح.";
-            } else {
-                $_SESSION['error_msg'] = "حدث خطأ أثناء التحديث.";
-            }
-            
-            header('Location: /supervisor-applications');
-            exit;
+        if ($this->model->updateApplicationStatus($id, $status)) {
+            $_SESSION['success_msg'] = "تم تحديث حالة الطلب بنجاح.";
+        } else {
+            $_SESSION['error_msg'] = "حدث خطأ أثناء التحديث.";
         }
+        
+        header('Location: /supervisor-applications');
+        exit;
     }
+}
 }

@@ -11,36 +11,13 @@ require_once VIEW_PATH . '/layout/header.php';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        .alert-dot { 
-            width: 10px; 
-            height: 10px; 
-            background-color: red; 
-            border-radius: 50%; 
-            display: inline-block; 
-            margin-right: 5px; 
-            animation: pulse 1.5s infinite; 
-        }
-        
-        @keyframes pulse { 
-            0% { transform: scale(0.95); opacity: 0.7; } 
-            70% { transform: scale(1); opacity: 1; } 
-            100% { transform: scale(0.95); opacity: 0.7; } 
-        }
-        
-        .avatar-placeholder { 
-            width: 40px; 
-            height: 40px; 
-            background: lightgray;
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: dimgray; 
-        }
+        .alert-dot { width: 10px; height: 10px; background-color: red; border-radius: 50%; display: inline-block; margin-right: 5px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.7; } 70% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.95); opacity: 0.7; } }
+        .avatar-placeholder { width: 40px; height: 40px; background: #e9ecef; display: flex; align-items: center; justify-content: center; color: #6c757d; }
     </style>
 </head>
 
 <body class="bg-light d-flex flex-column min-vh-100">
-
 
 <div class="container my-5 flex-grow-1">
     <div class="row mb-4 align-items-center">
@@ -58,7 +35,7 @@ require_once VIEW_PATH . '/layout/header.php';
                         <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
                         <input type="text" name="search" class="form-control border-start-0" 
                                value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" 
-                               placeholder="ابحث بالاسم، الرقم الجامعي، أو التخصص...">
+                               placeholder="ابحث بالاسم أو التخصص...">
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -77,7 +54,6 @@ require_once VIEW_PATH . '/layout/header.php';
                         <th>جهة التدريب</th>
                         <th>الإنجاز</th>
                         <th>الحالة</th>
-                        <th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -91,44 +67,42 @@ require_once VIEW_PATH . '/layout/header.php';
                                 </div>
                                 <div>
                                     <div class="fw-bold d-flex align-items-center">
-                                        <?= htmlspecialchars($student['name']) ?>
-                                        <?php if($student['has_alert']): ?>
-                                            <span class="alert-dot" title="بانتظار مراجعة تقارير متأخرة"></span>
+                                        <?= htmlspecialchars($student['name'] ?? 'غير معروف') ?>
+                                        <?php if(!empty($student['has_alert'])): ?>
+                                            <span class="alert-dot" title="بانتظار مراجعة تقارير"></span>
                                         <?php endif; ?>
                                     </div>
-                                    <div class="text-muted" style="font-size: 11px;"><?= htmlspecialchars($student['major']) ?></div>
+                                    <div class="text-muted" style="font-size: 11px;"><?= htmlspecialchars($student['major'] ?? '-') ?></div>
                                 </div>
                             </div>
                         </td>
                         <td class="small">
-                            <i class="bi bi-building ms-1 text-muted"></i><?= htmlspecialchars($student['company']) ?>
+                            <i class="bi bi-building ms-1 text-muted"></i><?= htmlspecialchars($student['company'] ?? 'غير محدد') ?>
                         </td>
-                        <td style="width: 220px;">
+                        <td style="width: 250px;">
                             <div class="d-flex align-items-center">
                                 <div class="progress flex-grow-1" style="height: 7px; border-radius: 10px;">
-                                    <div class="progress-bar bg-<?= $student['color'] ?>" style="width: <?= $student['percent'] ?>%"></div>
+                                    <div class="progress-bar bg-<?= $student['color'] ?? 'secondary' ?>" 
+                                         style="width: <?= $student['percent'] ?? 0 ?>%"></div>
                                 </div>
-                                <span class="ms-2 small fw-bold text-<?= $student['color'] ?>"><?= $student['percent'] ?>%</span>
+                                <span class="ms-2 small fw-bold text-<?= $student['color'] ?? 'secondary' ?>">
+                                    <?= $student['percent'] ?? 0 ?>%
+                                </span>
                             </div>
                             <div class="text-muted mt-1" style="font-size: 10px;">
-                                <?= $student['completed_hours'] ?> / <?= $student['required_hours'] ?> ساعة
+                                <?= $student['completed_hours'] ?? 0 ?> / <?= $student['required_hours'] ?? 0 ?> ساعة
                             </div>
                         </td>
                         <td>
-                            <span class="badge rounded-pill bg-<?= $student['color'] ?> bg-opacity-10 text-<?= $student['color'] ?> border border-<?= $student['color'] ?> px-3">
-                                <?= $student['status'] ?>
+                            <span class="badge rounded-pill bg-<?= $student['color'] ?? 'secondary' ?> bg-opacity-10 text-<?= $student['color'] ?? 'secondary' ?> border border-<?= $student['color'] ?? 'secondary' ?> px-3">
+                                <?= $student['status'] ?? 'غير محدد' ?>
                             </span>
-                        </td>
-                        <td>
-                            <a href="/supervisor/student-profile/<?= $student['id'] ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-sm">
-                                <i class="bi bi-folder2-open ms-1"></i> الملف الكامل
-                            </a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="5" class="py-5 text-muted">
+                        <td colspan="4" class="py-5 text-muted">
                             <i class="bi bi-people fs-1 d-block mb-3 opacity-25"></i>
                             لا يوجد طلاب مسجلين تحت إشرافك حالياً.
                         </td>

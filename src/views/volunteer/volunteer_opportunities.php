@@ -12,7 +12,6 @@ require_once VIEW_PATH . '/layout/header.php';
 </head>
 <body class="bg-light">
 
-
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold">التحكم بفرص التطوع</h3>
@@ -27,7 +26,7 @@ require_once VIEW_PATH . '/layout/header.php';
                 <tr>
                     <th class="py-3 px-4">عنوان الفرصة</th>
                     <th>جهة التطوع</th>
-                    <th>عدد الساعات</th>
+                    <th>عدد المقاعد</th>
                     <th>الحالة</th>
                     <th class="text-center">التحكم</th>
                 </tr>
@@ -37,17 +36,13 @@ require_once VIEW_PATH . '/layout/header.php';
         <?php foreach($opportunities as $opp): ?>
         <tr>
             <td class="px-4 fw-bold"><?= htmlspecialchars($opp['title'] ?? 'بدون عنوان') ?></td>
-            
-           <td><?= htmlspecialchars($opp['entity_name'] ?? 'جهة غير معروفة') ?></td>
-            
+            <td><?= htmlspecialchars($opp['entity_name'] ?? 'جهة غير معروفة') ?></td>
             <td><?= ($opp['seats'] ?? 0) ?> مقاعد</td>
-            
             <td>
                 <span class="badge <?= ($opp['status'] ?? '') == 'نشط' ? 'bg-success' : 'bg-secondary' ?>">
                     <?= htmlspecialchars($opp['status'] ?? 'غير محدد') ?>
                 </span>
             </td>
-            
             <td class="text-center">
                 <a href="/volunteer_edit_opportunity?id=<?= $opp['opportunityID'] ?>" class="btn btn-sm btn-outline-secondary">
                     <i class="bi bi-pencil"></i>
@@ -61,11 +56,12 @@ require_once VIEW_PATH . '/layout/header.php';
     <?php else: ?>
         <tr><td colspan="5" class="text-center py-4">لا توجد فرص تطوع مضافة حالياً.</td></tr>
     <?php endif; ?>
-</tbody>
+            </tbody>
         </table>
     </div>
 </div>
 
+<!-- Modal إضافة فرصة -->
 <div class="modal fade" id="addOppModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content border-0 shadow">
@@ -79,20 +75,33 @@ require_once VIEW_PATH . '/layout/header.php';
                         <label class="form-label small fw-bold">اسم الفرصة التطوعية</label>
                         <input type="text" name="title" class="form-control" placeholder="مثال: تنظيم فعاليات تقنية" required>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold">المؤسسة المستضيفة</label>
-                            <input type="text" name="org" class="form-control" required>
+                            <select name="entityID" class="form-select" required>
+                                <option value="">اختر المؤسسة</option>
+                                <?php foreach($entities as $entity): ?>
+                                    <option value="<?= $entity['entityID'] ?>">
+                                        <?= htmlspecialchars($entity['entityName']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label small fw-bold">عدد الساعات المطلوبة</label>
-                            <input type="number" name="hours" class="form-control" required>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">عدد المقاعد</label>
+                            <input type="number" name="seats" class="form-control" min="1" value="1" required>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold">وصف المهام</label>
                         <textarea name="description" class="form-control" rows="3" required></textarea>
                     </div>
+
+                    <!-- حقول مخفية -->
+                    <input type="hidden" name="type" value="تطوع">
+                    <input type="hidden" name="supervisorID" value="<?= $_SESSION['user_id'] ?? 0 ?>">
+                    <input type="hidden" name="status" value="active">
+
                     <div class="text-end">
                         <button type="submit" class="btn btn-primary px-5">نشر الفرصة</button>
                     </div>

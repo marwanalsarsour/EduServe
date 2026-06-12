@@ -73,13 +73,30 @@ public function getStudentTrainings($studentId) {
     $stmt->execute([':studentId' => $studentId]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+public function getLatestOpportunityByType($studentId, $typeArabic) {
+    $sql = "SELECT r.*, o.title as OpportunityTitle, ee.entityName as OrganizationName 
+            FROM OpportunityRequest r
+            JOIN Opportunity o ON r.opportunityID = o.opportunityID
+            JOIN ExternalEntity ee ON r.entityID = ee.entityID
+            WHERE r.studentID = :studentId 
+            AND o.type = :type 
+            ORDER BY r.requestDate DESC LIMIT 1";
+            
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':studentId' => $studentId, ':type' => $typeArabic]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
 
-    public function getFullAttendance($studentId) {
-        $sql = "SELECT * FROM Attendance WHERE studentID = :studentId ORDER BY date DESC";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':studentId' => $studentId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+public function getFullAttendance($studentId) {
+    $sql = "SELECT attendanceID, date, hours, checkIn, checkOut, 
+                   academicStatus, academicSupervisorID, academicApprovedAt
+            FROM Attendance 
+            WHERE studentID = :studentId 
+            ORDER BY date DESC";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([':studentId' => $studentId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
     public function getApprovedOpportunity($studentId) {
         $sql = "SELECT o.title, ee.entityName as OrganizationName, o.type 
@@ -93,19 +110,25 @@ public function getStudentTrainings($studentId) {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function updateAttendanceRecord($attendanceId, $studentId, $checkIn, $checkOut, $hours) {
-        $sql = "UPDATE Attendance 
-                SET checkIn = :checkIn, checkOut = :checkOut, hours = :hours 
-                WHERE attendanceID = :attendanceId AND studentID = :studentId";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':checkIn' => $checkIn,
-            ':checkOut' => $checkOut,
-            ':hours' => $hours,
-            ':attendanceId' => $attendanceId,
-            ':studentId' => $studentId
-        ]);
-    }
+   public function updateAttendanceRecord($attendanceId, $studentId, $checkIn, $checkOut, $hours) {
+    $sql = "UPDATE Attendance 
+            SET checkIn = :checkIn, 
+                checkOut = :checkOut, 
+                hours = :hours,
+                academicStatus = 'بانتظار الاعتماد' 
+            WHERE attendanceID = :attendanceId 
+            AND studentID = :studentId 
+            AND academicStatus != 'معتمد'";
+            
+    $stmt = $this->db->prepare($sql);
+    return $stmt->execute([
+        ':checkIn'      => !empty($checkIn) ? $checkIn : null,
+        ':checkOut'     => !empty($checkOut) ? $checkOut : null,
+        ':hours'        => $hours,
+        ':attendanceId' => $attendanceId,
+        ':studentId'    => $studentId
+    ]);
+}
 
     public function getCalendarEvents($studentId) {
         $sql = "
@@ -126,7 +149,7 @@ public function getStudentTrainings($studentId) {
 public function getOpenOpportunities() {
     $sql = "SELECT o.*, ee.entityName AS OrganizationName 
             FROM Opportunity o 
-            JOIN ExternalEntity ee ON o.entityID = ee.entityID 
+            LEFT JOIN ExternalEntity ee ON o.entityID = ee.entityID 
             WHERE o.status = 'نشط' AND o.isApproved = 1
             ORDER BY o.opportunityID DESC";
             
