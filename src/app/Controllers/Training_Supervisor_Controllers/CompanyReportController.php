@@ -14,10 +14,17 @@ class CompanyReportController {
         }
     }
 
-    public function index() {
-        $reports = $this->model->getCompanyReports($_SESSION['user_id']);
-        $data = ['reports' => $reports];
-        
-        require_once VIEW_PATH . '/supervisor/supervisor-employer-reports.php';
-    }
+   public function index()
+{
+    $reports = $this->model->getCompanyReports($_SESSION['user_id']);
+
+    $finalEvaluations = $this->model->getFinalEvaluations($_SESSION['user_id']);
+
+    $data = [
+        'reports' => $reports,
+        'finalEvaluations' => $finalEvaluations
+    ];
+
+    require_once VIEW_PATH . '/supervisor/supervisor-employer-reports.php';
+}
 }

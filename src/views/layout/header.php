@@ -39,7 +39,8 @@ switch (trim($user_role)) {
             ['text' => 'طلبات التقديم', 'url' => '/supervisor-applications'],
             ['text' => 'سجلات الحضور', 'url' => '/supervisor-attendance'],
             ['text' => 'إدارة الطلاب', 'url' => '/supervisor/students'],
-            ['text' => 'التقارير المستلمة', 'url' => '/supervisor/supervisor-reports']
+            ['text' => 'التقارير المستلمة', 'url' => '/supervisor/supervisor-reports'],
+            ['text' => 'تقارير جهات التدريب', 'url' => '/supervisor-employer-reports'],
         ];
         $profileUrl = '/supervisor_profile';
         $notificationsUrl = '/supervisor/notifications';

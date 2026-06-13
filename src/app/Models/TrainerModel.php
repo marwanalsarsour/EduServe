@@ -203,22 +203,98 @@ public function saveAttendance($data) {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function saveMonthlyReport($data) {
-        $sql = "INSERT INTO EvaluationReport (reportID, content, data, entityID, studentID, period, rating) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)";
-        return $this->db->prepare($sql)->execute([
-            $data['reportID'], $data['summary'], $data['date'], $data['supervisor_id'], $data['student_id'], $data['period'], $data['rating']
-        ]);
-    }
+   public function saveMonthlyReport($data)
+{
+    $sql = "INSERT INTO EvaluationReport
+            (
+                content,
+                data,
+                entityID,
+                studentID,
+                period,
+                rating
+            )
+            VALUES
+            (
+                ?, CURDATE(), ?, ?, ?, ?
+            )";
 
-    public function saveFinalEvaluation($data) {
-        $sql = "INSERT INTO FinalEvaluations (evaluationID, studentID, entityID, totalHours, crit1, crit2, crit3, feedback, createdAt) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
-        return $this->db->prepare($sql)->execute([
-            $data['evaluationID'], $data['student_id'], $data['supervisor_id'], $data['total_hours'], 
-            $data['crit_1'], $data['crit_2'], $data['crit_3'], $data['feedback']
-        ]);
-    }
+    $stmt = $this->db->prepare($sql);
+
+    return $stmt->execute([
+        $data['summary'],
+        $data['entity_id'],
+        $data['student_id'],
+        $data['period'],
+        $data['rating']
+    ]);
+}
+public function getEvaluationCriteria() {
+
+    $stmt = $this->db->prepare("
+        SELECT *
+        FROM EvaluationCriteria
+        ORDER BY criterionID ASC
+    ");
+
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function saveFinalEvaluation($data) {
+
+    $sql = "
+        INSERT INTO FinalEvaluations
+        (
+            studentID,
+            entityID,
+            totalHours,
+            feedback,
+            createdAt
+        )
+        VALUES
+        (
+            ?, ?, ?, ?, NOW()
+        )
+    ";
+
+    $stmt = $this->db->prepare($sql);
+
+    $stmt->execute([
+        $data['student_id'],
+        $data['entity_id'],
+        $data['total_hours'],
+        $data['feedback']
+    ]);
+
+    return $this->db->lastInsertId();
+}
+public function saveFinalEvaluationScore(
+    $evaluationID,
+    $criterionID,
+    $score
+) {
+
+    $stmt = $this->db->prepare("
+        INSERT INTO FinalEvaluationScores
+        (
+            evaluationID,
+            criterionID,
+            score
+        )
+        VALUES
+        (
+            ?, ?, ?
+        )
+    ");
+
+    return $stmt->execute([
+        $evaluationID,
+        $criterionID,
+        $score
+    ]);
+}
 
     public function getStudentDetails($student_id) {
         $sql = "SELECT u.userID as id, u.fullName as name, u.email, s.majorName as major, s.academicYear as student_id_number,

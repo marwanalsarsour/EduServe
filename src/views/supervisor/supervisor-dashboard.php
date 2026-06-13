@@ -14,8 +14,7 @@ require_once VIEW_PATH . '/layout/header.php';
         body { background-color: whitesmoke; }
         .card { transition: transform 0.2s; }
         .card:hover { transform: translateY(-5px); }
-        /* تنسيق مخصص لجعل 5 بطاقات في صف واحد */
-        .col-custom { flex: 0 0 20%; max-width: 20%; padding: 0 0.5rem; }
+        .col-custom { flex: 0 0 16.66%; max-width: 16.66%; padding: 0 0.5rem;}
         @media (max-width: 992px) { .col-custom { flex: 0 0 50%; max-width: 50%; margin-bottom: 1rem; } }
     </style>
 </head>
@@ -98,6 +97,25 @@ require_once VIEW_PATH . '/layout/header.php';
                 </div>
             </div>
         </div>
+        <div class="col-custom">
+    <div class="card shadow-sm text-center h-100 border-0 position-relative">
+        <div class="card-body">
+            <div class="p-3 bg-secondary bg-opacity-10 rounded-circle d-inline-block mb-2">
+                <i class="bi bi-clipboard-data fs-3 text-secondary"></i>
+            </div>
+
+            <div class="text-muted small">
+                معايير التقييم
+            </div>
+
+            <div class="fs-6 fw-bold text-secondary">
+                إدارة البنود والدرجات
+            </div>
+
+            <a href="/supervisor_evaluation_criteria" class="stretched-link"></a>
+        </div>
+    </div>
+</div>
     </div>
 
     <div class="row g-4 mb-4">

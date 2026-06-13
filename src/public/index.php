@@ -227,6 +227,36 @@ $router->add('GET', '/supervisor/students', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/StudentManagementController.php';
     (new StudentManagementController($db))->index();
 });
+$router->add('GET', '/supervisor_evaluation_criteria', function() use ($db) {
+
+    require_once APP_PATH .
+    '/Controllers/Training_Supervisor_Controllers/SupervisorEvaluationCriteriaController.php';
+
+    (new SupervisorEvaluationCriteriaController($db))->index();
+});
+$router->add('POST', '/supervisor_evaluation_criteria/add', function() use ($db) {
+
+    require_once APP_PATH .
+    '/Controllers/Training_Supervisor_Controllers/SupervisorEvaluationCriteriaController.php';
+
+    (new SupervisorEvaluationCriteriaController($db))->add();
+});
+$router->add('POST', '/supervisor_evaluation_criteria/update', function() use ($db) {
+
+    require_once APP_PATH .
+    '/Controllers/Training_Supervisor_Controllers/SupervisorEvaluationCriteriaController.php';
+
+    (new SupervisorEvaluationCriteriaController($db))->update();
+});
+$router->add('GET', '/supervisor_evaluation_criteria/delete', function() use ($db) {
+
+    require_once APP_PATH .
+    '/Controllers/Training_Supervisor_Controllers/SupervisorEvaluationCriteriaController.php';
+
+    $id = $_GET['id'] ?? 0;
+
+    (new SupervisorEvaluationCriteriaController($db))->delete($id);
+});
 
 $router->add('GET', '/volunteer_dashboard', function() use ($db) {
     require_once APP_PATH . '/Controllers/Volunteer_Supervisor_Controllers/VolunteerDashboardController.php';

@@ -230,24 +230,116 @@ public function getAllEntities() {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-    public function getCompanyReports($supervisor_id) {
-        $query = "SELECT 
-                    u.fullName as student_name, 
-                    ee.entityName as company_name, 
-                    er.content as notes, 
-                    er.data as report_date,
-                    er.reportID as report_id
-                  FROM EvaluationReport er
-                  JOIN ExternalEntity ee ON er.entityID = ee.entityID
-                  JOIN OpportunityRequest ar ON ee.entityID = ar.entityID
-                  JOIN Users u ON ar.studentID = u.userID
-                  WHERE ar.supervisorID = :sid
-                  ORDER BY er.data DESC";
-        
-        $stmt = $this->db->prepare($query);
-        $stmt->execute([':sid' => $supervisor_id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+   public function getCompanyReports($supervisor_id)
+{
+    $query = "
+        SELECT
+            er.reportID,
+            er.content,
+            er.data AS report_date,
+            er.period,
+            er.rating,
+
+            u.fullName AS student_name,
+            ee.entityName AS company_name
+
+        FROM EvaluationReport er
+
+        INNER JOIN Users u
+            ON er.studentID = u.userID
+
+        INNER JOIN ExternalEntity ee
+            ON er.entityID = ee.entityID
+
+        INNER JOIN OpportunityRequest op
+            ON op.studentID = er.studentID
+            AND op.entityID = er.entityID
+
+        WHERE op.supervisorID = :sid
+
+        ORDER BY er.data DESC
+    ";
+
+    $stmt = $this->db->prepare($query);
+    $stmt->execute([
+        ':sid' => $supervisor_id
+    ]);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+public function getFinalEvaluations($supervisor_id)
+{
+    $query = "
+        SELECT
+            fe.evaluationID,
+            fe.totalHours,
+            fe.feedback,
+            fe.createdAt,
+
+            u.fullName AS student_name,
+            ee.entityName AS company_name
+
+        FROM FinalEvaluations fe
+
+        INNER JOIN Users u
+            ON fe.studentID = u.userID
+
+        INNER JOIN ExternalEntity ee
+            ON fe.entityID = ee.entityID
+
+        INNER JOIN OpportunityRequest op
+            ON op.studentID = fe.studentID
+            AND op.entityID = fe.entityID
+
+        WHERE op.supervisorID = :sid
+
+        ORDER BY fe.createdAt DESC
+    ";
+
+    $stmt = $this->db->prepare($query);
+    $stmt->execute([
+        ':sid' => $supervisor_id
+    ]);
+
+    $evaluations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($evaluations as &$evaluation) {
+
+        $scoreQuery = "
+            SELECT
+                ec.criterionName,
+                ec.maxScore,
+                fes.score
+
+            FROM FinalEvaluationScores fes
+
+            INNER JOIN EvaluationCriteria ec
+                ON fes.criterionID = ec.criterionID
+
+            WHERE fes.evaluationID = :evaluationID
+        ";
+
+        $scoreStmt = $this->db->prepare($scoreQuery);
+        $scoreStmt->execute([
+            ':evaluationID' => $evaluation['evaluationID']
+        ]);
+
+        $evaluation['scores'] = $scoreStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $total = 0;
+        $count = 0;
+
+        foreach ($evaluation['scores'] as $score) {
+            $total += $score['score'];
+            $count++;
+        }
+
+        $evaluation['average_score'] =
+            $count > 0 ? round($total / $count, 2) : 0;
     }
+
+    return $evaluations;
+}
 
     public function saveFinalEvaluation($data) {
         return true;
@@ -478,5 +570,53 @@ public function getLiveNotifications() {
     });
 
     return array_slice($notifications, 0, 15);
+}
+
+public function getAllEvaluationCriteria() {
+    $stmt = $this->db->prepare("
+        SELECT *
+        FROM EvaluationCriteria
+        ORDER BY criterionID ASC
+    ");
+
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function addEvaluationCriterion($criterionName, $maxScore) {
+    $stmt = $this->db->prepare("
+        INSERT INTO EvaluationCriteria
+        (criterionName, maxScore)
+        VALUES (?, ?)
+    ");
+
+    return $stmt->execute([
+        $criterionName,
+        $maxScore
+    ]);
+}
+
+public function updateEvaluationCriterion($criterionID, $criterionName, $maxScore) {
+    $stmt = $this->db->prepare("
+        UPDATE EvaluationCriteria
+        SET criterionName = ?,
+            maxScore = ?
+        WHERE criterionID = ?
+    ");
+
+    return $stmt->execute([
+        $criterionName,
+        $maxScore,
+        $criterionID
+    ]);
+}
+
+public function deleteEvaluationCriterion($criterionID) {
+    $stmt = $this->db->prepare("
+        DELETE FROM EvaluationCriteria
+        WHERE criterionID = ?
+    ");
+
+    return $stmt->execute([$criterionID]);
 }
 }
