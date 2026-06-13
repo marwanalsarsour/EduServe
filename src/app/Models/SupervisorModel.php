@@ -341,18 +341,67 @@ public function getFinalEvaluations($supervisor_id)
     return $evaluations;
 }
 
-    public function saveFinalEvaluation($data) {
-        return true;
+public function saveFinalEvaluation($data) {
+    $checkSql = "SELECT evaluationID 
+                 FROM SupervisorEvaluations 
+                 WHERE studentID = :student_id 
+                 AND supervisorID = :supervisor_id
+                 LIMIT 1";
+
+    $checkStmt = $this->db->prepare($checkSql);
+    $checkStmt->execute([
+        ':student_id'    => $data['student_id'],
+        ':supervisor_id' => $data['supervisor_id']
+    ]);
+
+    $existing = $checkStmt->fetch(PDO::FETCH_ASSOC);
+    if ($existing) {
+
+        $sql = "UPDATE SupervisorEvaluations 
+                SET finalGrade = :final_grade,
+                    notes = :notes
+                WHERE studentID = :student_id 
+                AND supervisorID = :supervisor_id";
+
+    } 
+    else {
+
+        $sql = "INSERT INTO SupervisorEvaluations 
+                (studentID, supervisorID, finalGrade, notes, createdAt)
+                VALUES (:student_id, :supervisor_id, :final_grade, :notes, NOW())";
     }
 
-    public function getStudentById($student_id, $supervisor_id) {
-        $query = "SELECT s.* FROM Student s 
-                  JOIN OpportunityRequest ar ON s.studentID = ar.studentID 
-                  WHERE s.studentID = :student_id AND ar.supervisorID = :sid LIMIT 1";
-        $stmt = $this->db->prepare($query);
-        $stmt->execute([':student_id' => $student_id, ':sid' => $supervisor_id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
+    $stmt = $this->db->prepare($sql);
+
+    return $stmt->execute([
+        ':student_id'     => $data['student_id'],
+        ':supervisor_id'  => $data['supervisor_id'],
+        ':final_grade'    => $data['final_grade'],
+        ':notes'          => $data['notes']
+    ]);
+}
+
+   public function getStudentById($student_id, $supervisor_id) {
+    $query = "SELECT 
+                s.studentID,
+                u.fullName AS name
+              FROM Student s
+              JOIN Users u 
+                ON u.userID = s.studentID
+              JOIN OpportunityRequest ar 
+                ON s.studentID = ar.studentID
+              WHERE s.studentID = :student_id 
+                AND ar.supervisorID = :sid
+              LIMIT 1";
+
+    $stmt = $this->db->prepare($query);
+    $stmt->execute([
+        ':student_id' => $student_id,
+        ':sid' => $supervisor_id
+    ]);
+
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
 
 public function getOpportunitiesBySupervisor($supervisor_id) {
     $query = "SELECT o.opportunityID as id, o.title, o.status, ee.entityName
@@ -420,40 +469,55 @@ public function updateReportStatus($report_id, $status, $feedback = null) {
 
 public function getSupervisedStudents($supervisor_id, $searchTerm = '') {
     $sql = "SELECT 
-                u.userID as id, 
-                u.fullName as name, 
-                s.majorName as major, 
-                s.requiredTrainingHours as required_hours,
-                (SELECT SUM(a.hours) 
-                 FROM Attendance a 
-                 JOIN ExternalEntity ee ON a.entityID = ee.entityID
-                 WHERE a.studentID = u.userID 
-                   AND a.status = 'حاضر'
-                   AND ee.entityName LIKE 'شركة%') as completed_hours,
-                
-                (SELECT COUNT(*) FROM StudentReport WHERE studentID = u.userID) as pending_reports_count,
+            u.userID as id, 
+            u.fullName as name, 
+            s.majorName as major, 
+            s.requiredTrainingHours as required_hours,
+
+            (SELECT SUM(a.hours) 
+             FROM Attendance a 
+             JOIN ExternalEntity ee ON a.entityID = ee.entityID
+             WHERE a.studentID = u.userID 
+               AND a.status = 'حاضر'
+               AND ee.entityName LIKE 'شركة%') as completed_hours,
             
-                (SELECT ee.entityName 
-                 FROM ExternalEntity ee 
-                 JOIN OpportunityRequest ar_sub ON ee.entityID = ar_sub.entityID 
-                 WHERE ar_sub.studentID = u.userID 
-                   AND ar_sub.entityStatus = 'مقبول' 
-                   AND ee.entityName LIKE 'شركة%'
-                 ORDER BY ar_sub.requestID DESC 
-                 LIMIT 1) as company
-            FROM Student s
-            JOIN Users u ON s.studentID = u.userID
-            JOIN OpportunityRequest ar ON s.studentID = ar.studentID
-            WHERE ar.supervisorID = :sid 
-            AND ar.entityStatus = 'مقبول'";
+            (SELECT COUNT(*) 
+             FROM StudentReport 
+             WHERE studentID = u.userID) as pending_reports_count,
+        
+            (SELECT ee.entityName 
+             FROM ExternalEntity ee 
+             JOIN OpportunityRequest ar_sub 
+                 ON ee.entityID = ar_sub.entityID 
+             WHERE ar_sub.studentID = u.userID 
+               AND ar_sub.entityStatus = 'مقبول' 
+               AND ee.entityName LIKE 'شركة%'
+             ORDER BY ar_sub.requestID DESC 
+             LIMIT 1) as company,
+
+            -- 🔥 أهم تعديل هنا (بدل GROUP BY issue)
+            (
+                SELECT se.finalGrade
+                FROM SupervisorEvaluations se
+                WHERE se.studentID = s.studentID
+                  AND se.supervisorID = :sid
+                ORDER BY se.createdAt DESC
+                LIMIT 1
+            ) as final_grade
+
+        FROM Student s
+        JOIN Users u ON s.studentID = u.userID
+        JOIN OpportunityRequest ar ON s.studentID = ar.studentID
+
+        WHERE ar.supervisorID = :sid 
+        AND ar.entityStatus = 'مقبول'";
 
     if (!empty($searchTerm)) {
         $sql .= " AND (u.fullName LIKE :search OR s.majorName LIKE :search)";
     }
 
-    $sql .= " GROUP BY u.userID";
-
     $stmt = $this->db->prepare($sql);
+
     $params = [':sid' => $supervisor_id];
 
     if (!empty($searchTerm)) {
@@ -461,6 +525,7 @@ public function getSupervisedStudents($supervisor_id, $searchTerm = '') {
     }
 
     $stmt->execute($params);
+
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 public function approveOpportunity($opportunityId, $supervisorId) {

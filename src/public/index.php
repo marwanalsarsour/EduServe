@@ -182,6 +182,14 @@ $router->add('GET', '/supervisor/supervisor-evaluation', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/EvaluationController.php';
     (new EvaluationController($db))->create();
 });
+$router->add('GET', '/supervisor/evaluation/create', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/EvaluationController.php';
+    (new EvaluationController($db))->create();
+});
+$router->add('POST', '/submit_save_evaluation_process', function() use ($db) {
+    require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/EvaluationController.php';
+    (new EvaluationController($db))->store();
+});
 
 $router->add('POST', '/submit_save_evaluation_process', function() use ($db) {
     require_once APP_PATH . '/Controllers/Training_Supervisor_Controllers/EvaluationController.php';

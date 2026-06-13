@@ -18,15 +18,17 @@ class EvaluationController {
         }
     }
 
-
     public function create() {
         if (!isset($_GET['student_id'])) {
-            header('Location: /supervisor/supervisor-students');
+            header('Location: /supervisor/students');
             exit;
         }
 
-        $student = $this->model->getStudentById($_GET['student_id'], $_SESSION['user_id']);
-        
+        $student = $this->model->getStudentById(
+            $_GET['student_id'],
+            $_SESSION['user_id']
+        );
+
         if (!$student) {
             die("الطالب غير موجود أو غير تابع لك.");
         }
@@ -37,22 +39,26 @@ class EvaluationController {
 
 
     public function store() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $data = [
-                'student_id'    => $_POST['student_id'],
-                'supervisor_id' => $_SESSION['user_id'],
-                'final_grade'   => $_POST['final_grade'],
-                'notes'         => $_POST['notes']
-            ];
-
-            if ($this->model->saveFinalEvaluation($data)) {
-                $_SESSION['success_msg'] = "تم حفظ التقييم النهائي بنجاح.";
-                header('Location: /supervisor/supervisor-students');
-            } else {
-                $_SESSION['error_msg'] = "حدث خطأ أثناء حفظ التقييم.";
-                header('Location: ' . $_SERVER['HTTP_REFERER']);
-            }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /supervisor/students');
             exit;
         }
+
+        $data = [
+            'student_id'    => $_POST['student_id'],
+            'supervisor_id' => $_SESSION['user_id'],
+            'final_grade'   => $_POST['final_grade'],
+            'notes'         => $_POST['notes']
+        ];
+
+        if ($this->model->saveFinalEvaluation($data)) {
+            $_SESSION['success_msg'] = "تم حفظ التقييم النهائي بنجاح.";
+            header('Location: /supervisor/students');
+            exit;
+        }
+
+        $_SESSION['error_msg'] = "حدث خطأ أثناء حفظ التقييم.";
+        header('Location: /supervisor/evaluation/create?student_id=' . $data['student_id']);
+        exit;
     }
 }

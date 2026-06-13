@@ -20,9 +20,13 @@ require_once VIEW_PATH . '/layout/header.php';
 <body class="bg-light d-flex flex-column min-vh-100">
 
 <div class="container my-5 flex-grow-1">
+
     <div class="row mb-4 align-items-center">
         <div class="col-md-6">
-            <h4 class="fw-bold"><i class="bi bi-person-video3 ms-2 text-primary"></i>قائمة الطلاب المتابعين</h4>
+            <h4 class="fw-bold">
+                <i class="bi bi-person-video3 ms-2 text-primary"></i>
+                قائمة الطلاب المتابعين
+            </h4>
             <p class="text-muted small">متابعة الأداء الأكاديمي والتدريب الميداني لطلاب EduServe</p>
         </div>
     </div>
@@ -32,7 +36,9 @@ require_once VIEW_PATH . '/layout/header.php';
             <form action="/supervisor/students" method="GET" class="row g-3">
                 <div class="col-md-10">
                     <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
                         <input type="text" name="search" class="form-control border-start-0" 
                                value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" 
                                placeholder="ابحث بالاسم أو التخصص...">
@@ -48,58 +54,99 @@ require_once VIEW_PATH . '/layout/header.php';
     <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0 text-center">
+
                 <thead class="table-dark">
                     <tr>
                         <th class="text-start ps-4 p-3">الطالب</th>
                         <th>جهة التدريب</th>
                         <th>الإنجاز</th>
-                        <th>الحالة</th>
+                        <th>التقييم</th>
                     </tr>
                 </thead>
+
                 <tbody>
+
                 <?php if(!empty($data['students'])): ?>
                     <?php foreach($data['students'] as $student): ?>
                     <tr>
+
+                        <!-- الطالب -->
                         <td class="text-start ps-4">
                             <div class="d-flex align-items-center">
                                 <div class="avatar-placeholder rounded-circle ms-3">
                                     <i class="bi bi-person-fill"></i>
                                 </div>
+
                                 <div>
                                     <div class="fw-bold d-flex align-items-center">
                                         <?= htmlspecialchars($student['name'] ?? 'غير معروف') ?>
+
                                         <?php if(!empty($student['has_alert'])): ?>
                                             <span class="alert-dot" title="بانتظار مراجعة تقارير"></span>
                                         <?php endif; ?>
                                     </div>
-                                    <div class="text-muted" style="font-size: 11px;"><?= htmlspecialchars($student['major'] ?? '-') ?></div>
+
+                                    <div class="text-muted" style="font-size: 11px;">
+                                        <?= htmlspecialchars($student['major'] ?? '-') ?>
+                                    </div>
                                 </div>
                             </div>
                         </td>
+
+                        <!-- الشركة -->
                         <td class="small">
-                            <i class="bi bi-building ms-1 text-muted"></i><?= htmlspecialchars($student['company'] ?? 'غير محدد') ?>
+                            <i class="bi bi-building ms-1 text-muted"></i>
+                            <?= htmlspecialchars($student['company'] ?? 'غير محدد') ?>
                         </td>
+
+                        <!-- الإنجاز -->
                         <td style="width: 250px;">
                             <div class="d-flex align-items-center">
                                 <div class="progress flex-grow-1" style="height: 7px; border-radius: 10px;">
                                     <div class="progress-bar bg-<?= $student['color'] ?? 'secondary' ?>" 
                                          style="width: <?= $student['percent'] ?? 0 ?>%"></div>
                                 </div>
+
                                 <span class="ms-2 small fw-bold text-<?= $student['color'] ?? 'secondary' ?>">
                                     <?= $student['percent'] ?? 0 ?>%
                                 </span>
                             </div>
+
                             <div class="text-muted mt-1" style="font-size: 10px;">
                                 <?= $student['completed_hours'] ?? 0 ?> / <?= $student['required_hours'] ?? 0 ?> ساعة
                             </div>
                         </td>
+
+                        <!-- 🔥 التقييم الذكي -->
                         <td>
-                            <span class="badge rounded-pill bg-<?= $student['color'] ?? 'secondary' ?> bg-opacity-10 text-<?= $student['color'] ?? 'secondary' ?> border border-<?= $student['color'] ?? 'secondary' ?> px-3">
-                                <?= $student['status'] ?? 'غير محدد' ?>
-                            </span>
+
+                            <?php if(!empty($student['final_grade'])): ?>
+
+                                <div class="mb-1">
+                                    <span class="badge bg-success px-3 py-2">
+                                        <?= $student['final_grade'] ?>/100
+                                    </span>
+                                </div>
+
+                                <a href="/supervisor/evaluation/create?student_id=<?= $student['id'] ?>"
+                                   class="btn btn-warning btn-sm rounded-pill px-3">
+                                    تعديل التقييم
+                                </a>
+
+                            <?php else: ?>
+
+                                <a href="/supervisor/evaluation/create?student_id=<?= $student['id'] ?>"
+                                   class="btn btn-success btn-sm rounded-pill px-3">
+                                    إدخال التقييم
+                                </a>
+
+                            <?php endif; ?>
+
                         </td>
+
                     </tr>
                     <?php endforeach; ?>
+
                 <?php else: ?>
                     <tr>
                         <td colspan="4" class="py-5 text-muted">
@@ -108,10 +155,12 @@ require_once VIEW_PATH . '/layout/header.php';
                         </td>
                     </tr>
                 <?php endif; ?>
+
                 </tbody>
             </table>
         </div>
     </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
